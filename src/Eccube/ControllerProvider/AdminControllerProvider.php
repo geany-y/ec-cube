@@ -48,6 +48,9 @@ class AdminControllerProvider implements ControllerProviderInterface
 
         // product
         $c->match('/product', '\Eccube\Controller\Admin\Product\ProductController::index')->bind('admin_product');
+        //yoshinaga add 2015/10/15
+        $c->match('/product_sec', '\Eccube\Controller\Admin\Product\ProductSecController::index_sec')->bind('admin_product_sec');
+        //yoshinaga add 2015/10/15
         $c->match('/product/export', '\Eccube\Controller\Admin\Product\ProductController::export')->bind('admin_product_export');
         $c->match('/product/page/{page_no}', '\Eccube\Controller\Admin\Product\ProductController::index')->assert('page_no', '\d+')->bind('admin_product_page');
         $c->match('/product/product/new', '\Eccube\Controller\Admin\Product\ProductController::edit')->bind('admin_product_product_new');

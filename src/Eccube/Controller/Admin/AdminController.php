@@ -69,6 +69,7 @@ class AdminController extends AbstractController
         $searchProductForm = $app['form.factory']
             ->createBuilder('admin_search_product')
             ->getForm();
+
         // 会員マスター検索用フォーム
         $searchCustomerForm = $app['form.factory']
             ->createBuilder('admin_search_customer')
