@@ -87,32 +87,15 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.sex'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\Sex');
         });
-
         $app['eccube.repository.master.disp'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\Disp');
         });
-
-        //@2015'10'16 yoshinaga add@
-        $app['eccube.repository.master.disp_sec'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Eccube\Entity\Master\DispSec');
-        });
-        //@2015'10'16 yoshinaga add@
-
         $app['eccube.repository.master.product_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\ProductType');
         });
-
-
         $app['eccube.repository.master.page_max'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\PageMax');
         });
-
-        //@2015'10'06 yoshinaga add@
-        $app['eccube.repository.master.page_max_sec'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Eccube\Entity\Master\PageMaxSec');
-        });
-        //@2015'10'06 yoshinaga add@
-
         $app['eccube.repository.master.order_status'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\OrderStatus');
         });
@@ -161,24 +144,12 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.order'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Order');
         });
-        
         $app['eccube.repository.product'] = $app->share(function () use ($app) {
             $productRepository = $app['orm.em']->getRepository('Eccube\Entity\Product');
             $productRepository->setConfig($app['config']);
 
             return $productRepository;
         });
-
-        //@2015'10'6 yoshinaga add@
-        $app['eccube.repository.product_sec'] = $app->share(function () use ($app) {
-            $productRepository = $app['orm.em']->getRepository('Eccube\Entity\ProductSec');
-            $productRepository->setConfig($app['config']);
-
-            return $productRepository;
-        });
-        //@2015'10'6 yoshinaga add@
-
-
         $app['eccube.repository.product_image'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\ProductImage');
         });
@@ -322,11 +293,6 @@ class EccubeServiceProvider implements ServiceProviderInterface
                 $types[] = new \Eccube\Form\Type\AddCartType($app['config'], $app['security'], $app['eccube.repository.customer_favorite_product']);
             }
             $types[] = new \Eccube\Form\Type\SearchProductType();
-
-            //@2015'10'06 yoshinaga add@
-            $types[] = new \Eccube\Form\Type\SearchSecProductType();
-            //@2015'10'06 yoshinaga add@
-
             $types[] = new \Eccube\Form\Type\OrderSearchType($app);
             $types[] = new \Eccube\Form\Type\ShippingItemType($app);
             $types[] = new \Eccube\Form\Type\ShippingMultipleType($app);
@@ -346,13 +312,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);
             $types[] = new \Eccube\Form\Type\Admin\ProductType($app);
             $types[] = new \Eccube\Form\Type\Admin\ProductClassType($app);
-
             $types[] = new \Eccube\Form\Type\Admin\SearchProductType($app);
-
-            //@2015'10'06 yoshinaga add@
-            $types[] = new \Eccube\Form\Type\Admin\SearchSecProductType($app);
-            //@2015'10'06 yoshinaga add@
-
             $types[] = new \Eccube\Form\Type\Admin\SearchCustomerType($app['config']);
             $types[] = new \Eccube\Form\Type\Admin\SearchOrderType($app['config']);
             $types[] = new \Eccube\Form\Type\Admin\CustomerType($app['config']);

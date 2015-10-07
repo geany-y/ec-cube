@@ -21,9 +21,6 @@
       - id: category_csv_import
         name: カテゴリCSV登録
         url: admin_product_category_csv_import
-      - id: product_master_sec
-        name: 商品マスター2
-        url: admin_product_sec
 - id: order
   name: 受注管理
   has_child: true
