@@ -128,8 +128,6 @@ $(function(){
 		}
 		return false;
 	});
-	
-		
 });
 
 
