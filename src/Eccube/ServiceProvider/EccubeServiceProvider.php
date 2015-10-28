@@ -218,7 +218,8 @@ class EccubeServiceProvider implements ServiceProviderInterface
         });
 
         $app['paginator'] = $app->protect(function () {
-            return new \Knp\Component\Pager\Paginator();
+            //return new \Knp\Component\Pager\Paginator();
+            return new \Eccube\Paginator\Paginator();
         });
 
         $app['eccube.repository.help'] = $app->share(function () use ($app) {

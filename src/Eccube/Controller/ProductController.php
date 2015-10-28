@@ -27,6 +27,7 @@ namespace Eccube\Controller;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Exception\CartException;
+use Eccube\Paginator\ProductFrontPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -66,14 +67,19 @@ class ProductController
         $searchForm = $builder->getForm();
         $searchForm->handleRequest($request);
 
-        // paginator
+        // クエリ作成
         $searchData = $searchForm->getData();
         $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
-        $pagination = $app['paginator']()->paginate(
-            $qb,
-            !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
-            $searchData['disp_number']->getId(),
-            array('wrap-queries' => true)
+
+        //専用ページネータセット
+        //$pagination = $app['paginator']()->setCustomPagination(new \Eccube\Paginator\ProductFrontPaginator());
+
+
+        $app['paginator']()->paginate(
+                    $qb,
+                    !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
+                    $searchData['disp_number']->getId(),
+                    array('wrap-queries' => true)
         );
 
         // addCart form
