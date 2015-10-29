@@ -21,16 +21,13 @@ class DefaultPaginator extends Paginator implements PaginatorInterface
     protected $eventDispatcher;
 
     /**
-     * Initialize paginator with event dispatcher
-     * Can be a service in concept. By default it
-     * hooks standard pagination subscriber
+     * this method works can be parent class.
      *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
      */
 
     public function __construct()
     {
-        //parent::__construct();
     }
 
     /**
@@ -73,11 +70,11 @@ class DefaultPaginator extends Paginator implements PaginatorInterface
         if (isset($options['defaultSortFieldName']) && is_array($options['defaultSortFieldName'])) {
             $options['defaultSortFieldName'] = implode('+', $options['defaultSortFieldName']);
         }
-        
+
         // default sort field and direction are set based on options (if available)
         if (!isset($_GET[$options['sortFieldParameterName']]) && isset($options['defaultSortFieldName'])) {
             $_GET[$options['sortFieldParameterName']] = $options['defaultSortFieldName'];
-            
+
             if (!isset($_GET[$options['sortDirectionParameterName']])) {
                 $_GET[$options['sortDirectionParameterName']] = isset($options['defaultSortDirection']) ? $options['defaultSortDirection'] : 'asc';
             }

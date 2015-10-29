@@ -22,7 +22,7 @@ class Paginator implements PaginatorInterface
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
-    protected $eventDispatcher;
+    //protected $eventDispatcher;
 
     /**
      * @var Knp\Component\Pager\PaginatorInterface
@@ -55,26 +55,12 @@ class Paginator implements PaginatorInterface
         if(empty($this->paginator)){
             $this->paginator = new \Eccube\Paginator\DefaultPaginator();
         }
-        $this->_attributeDispatcher($eventDispatcher);
-        return false;
-    }
-
-    /**
-     * Initialize paginator with event dispatcher
-     * Can be a service in concept. By default it
-     * hooks standard pagination subscriber
-     *
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-     */
-    protected function _attributeDispatcher(Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher = null)
-    {
         if (is_null($this->paginator->eventDispatcher)) {
             $this->paginator->eventDispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
             $this->paginator->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber());
             $this->paginator->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber());
-            return true;
         }
-        $this->paginate->eventDispatcher = $eventDispatcher;
+        //$this->paginate->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -87,10 +73,8 @@ class Paginator implements PaginatorInterface
     {
         if(!empty($pagination)){
             $this->pagination = $pagination;
-            $this->_attributeDispatcher();
             return $pagination;
         }
-        //return false;
     }
 
     /**
@@ -122,8 +106,6 @@ class Paginator implements PaginatorInterface
      */
     public function paginate($target, $page = 1, $limit = 10, array $options = array())
     {
-        var_dump('HERE');
-        exit();
         return $this->paginator->paginate($target, $page, $limit, $options);
     }
 

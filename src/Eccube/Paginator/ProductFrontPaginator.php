@@ -6,6 +6,9 @@ use Knp\Component\Pager\Event\PaginationEvent;
 use Knp\Component\Pager\Event;
 use Eccube\Paginator\Paginator;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber;
+use Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber;
 
 /**
  * Paginator uses event dispatcher to trigger pagination
@@ -24,13 +27,17 @@ class ProductFrontPaginator extends Paginator implements PaginatorInterface
      * Initialize paginator with event dispatcher
      * Can be a service in concept. By default it
      * hooks standard pagination subscriber
+     * @marks : if you will make original paginator,you must be need set eventDispatcher here.
      *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
      */
-
     public function __construct()
     {
-        //parent::__construct();
+        if(is_null($this->eventDispatcher)){
+            $this->eventDispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+            $this->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber());
+            $this->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber());
+        }
     }
 
     /**
@@ -62,22 +69,57 @@ class ProductFrontPaginator extends Paginator implements PaginatorInterface
      */
     public function paginate($target, $page = 1, $limit = 10, array $options = array())
     {
+        //オーダー判定用SQL抽出
+        $check_order_sql = $target->getDQL();
+
+        //オーダー種別判定
+        $price_order_flg = false;
+        if(preg_match('/price02/', $check_order_sql)){
+            $price_order_flg = true;
+        }
+
         $limit = intval(abs($limit));
+        //リミット作成
         if (!$limit) {
             throw new \LogicException("Invalid item per page number, must be a positive number");
         }
+
+        //オフセット作成
         $offset = abs($page - 1) * $limit;
+
+        //価格昇順ページネート用設定
+        if($price_order_flg){
+            $counter = clone $target;
+            $counter->resetDQLpart('orderBy');
+            $counter->select('count(p)');
+            $total = count($target->getQuery()->getScalarResult());
+            //クエリビルダーにリミット・オフセット付与
+            $target->setFirstResult($offset)
+                ->setMaxResults($limit);
+
+            //検索結果取得
+            $query_res = $target->getQuery()->getResult();
+            $items = array();
+
+            //不要なセレクト句を排除
+            for($i = 0; $i < count($query_res); $i++){
+                //var_dump($query_res[$i]);
+                $items[] = $query_res[$i][0];
+            }
+        }
+
+        //オプション設定共通処理
         $options = array_merge($this->defaultOptions, $options);
 
         // normalize default sort field
         if (isset($options['defaultSortFieldName']) && is_array($options['defaultSortFieldName'])) {
             $options['defaultSortFieldName'] = implode('+', $options['defaultSortFieldName']);
         }
-        
+
         // default sort field and direction are set based on options (if available)
         if (!isset($_GET[$options['sortFieldParameterName']]) && isset($options['defaultSortFieldName'])) {
             $_GET[$options['sortFieldParameterName']] = $options['defaultSortFieldName'];
-            
+
             if (!isset($_GET[$options['sortDirectionParameterName']])) {
                 $_GET[$options['sortDirectionParameterName']] = isset($options['defaultSortDirection']) ? $options['defaultSortDirection'] : 'asc';
             }
@@ -90,14 +132,27 @@ class ProductFrontPaginator extends Paginator implements PaginatorInterface
         // items
         $itemsEvent = new \Knp\Component\Pager\Event\ItemsEvent($offset, $limit);
         $itemsEvent->options = &$options;
-        $itemsEvent->target = &$target;
+        if($price_order_flg){
+            //価格
+            $itemsEvent->target = &$items;
+        }else{
+            //新着
+            $itemsEvent->target = &$target;
+        }
+
         $this->eventDispatcher->dispatch('knp_pager.items', $itemsEvent);
         if (!$itemsEvent->isPropagationStopped()) {
             throw new \RuntimeException('One of listeners must count and slice given target');
         }
-        // pagination initialization event
         $paginationEvent = new \Knp\Component\Pager\Event\PaginationEvent();
-        $paginationEvent->target = &$target;
+        if($price_order_flg){
+            //価格
+            $paginationEvent->target = &$items;
+        }else{
+            //新着
+            $paginationEvent->target = &$target;
+        }
+
         $paginationEvent->options = &$options;
         $this->eventDispatcher->dispatch('knp_pager.pagination', $paginationEvent);
         if (!$paginationEvent->isPropagationStopped()) {
@@ -108,9 +163,21 @@ class ProductFrontPaginator extends Paginator implements PaginatorInterface
         $paginationView->setCustomParameters($itemsEvent->getCustomPaginationParameters());
         $paginationView->setCurrentPageNumber($page);
         $paginationView->setItemNumberPerPage($limit);
-        $paginationView->setTotalItemCount($itemsEvent->count);
+        if($price_order_flg){
+            //価格
+            $paginationView->setTotalItemCount($total);
+        }else{
+            //新着
+            $paginationView->setTotalItemCount($itemsEvent->count);
+        }
         $paginationView->setPaginatorOptions($options);
-        $paginationView->setItems($itemsEvent->items);
+        if($price_order_flg){
+            //価格
+            $paginationView->setItems($items);
+        }else{
+            //新着
+            $paginationView->setItems($itemsEvent->items);
+        }
 
         // after
         $afterEvent = new \Knp\Component\Pager\Event\AfterEvent($paginationView);

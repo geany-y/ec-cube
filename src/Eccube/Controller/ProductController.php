@@ -72,10 +72,9 @@ class ProductController
         $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
 
         //専用ページネータセット
-        //$pagination = $app['paginator']()->setCustomPagination(new \Eccube\Paginator\ProductFrontPaginator());
+        $paginator = $app['paginator']()->setCustomPagination(new \Eccube\Paginator\ProductFrontPaginator());
 
-
-        $app['paginator']()->paginate(
+        $pagination = $paginator->paginate(
                     $qb,
                     !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
                     $searchData['disp_number']->getId(),
@@ -84,8 +83,8 @@ class ProductController
 
         // addCart form
         $forms = array();
-        foreach ($pagination as $Product) {
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
+        foreach ($pagination as $Product) {
             $builder = $app['form.factory']->createNamedBuilder('', 'add_cart', null, array(
                 'product' => $Product,
                 'allow_extra_fields' => true,

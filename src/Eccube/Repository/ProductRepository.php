@@ -120,8 +120,12 @@ class ProductRepository extends EntityRepository
         // Order By
         // 価格順
         if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == '1') {
+            $qb->addSelect('p.id as pid');
+            $qb->addSelect('MiN(pc.price02) as pri');
+            $qb->addSelect('pc');
             $qb->innerJoin('p.ProductClasses', 'pc');
-            $qb->orderBy('pc.price02', 'ASC');
+            $qb->groupBy('pid');
+            $qb->orderBy('pri', 'ASC');
             // 新着順
         } else if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == '2') {
             $qb->orderBy('p.create_date', 'DESC');
@@ -132,8 +136,8 @@ class ProductRepository extends EntityRepository
                     ->leftJoin('pct.Category', 'c');
             }
             $qb
-                ->orderBy('c.rank', 'DESC')
-                ->addOrderBy('pct.rank', 'DESC')
+                //->orderBy('c.rank', 'DESC')
+                //->addOrderBy('pct.rank', 'DESC')
                 ->addOrderBy('p.id', 'DESC');
         }
 
