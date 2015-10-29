@@ -9,7 +9,6 @@ use Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber;
 use Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber;
 use Knp\Component\Pager\Event;
 use Knp\Component\Pager\PaginatorInterface;
-use Eccube\Paginator\DefaultPaginator;
 
 /**
  * Paginator uses event dispatcher to trigger pagination
@@ -22,13 +21,21 @@ class Paginator implements PaginatorInterface
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
-    //protected $eventDispatcher;
+    protected $eventDispatcher;
 
-    /**
-     * @var Knp\Component\Pager\PaginatorInterface
-     */
-    protected $paginator;
+    protected $itemsEvent;
 
+    protected $paginationEvent;
+
+    protected $paginationView;
+
+    private $page;
+    private $limit;
+    private $options;
+    private $item_target;
+    private $pagination_target;
+    private $pagination_view_total;
+    private $pagination_view_items;
     /**
      * Default options of paginator
      *
@@ -52,29 +59,46 @@ class Paginator implements PaginatorInterface
      */
     public function __construct(Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher = null)
     {
-        if(empty($this->paginator)){
-            $this->paginator = new \Eccube\Paginator\DefaultPaginator();
-        }
-        if (is_null($this->paginator->eventDispatcher)) {
-            $this->paginator->eventDispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
-            $this->paginator->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber());
-            $this->paginator->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber());
+        if (is_null($this->eventDispatcher)) {
+            $this->eventDispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+            $this->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber());
+            $this->eventDispatcher->addSubscriber(new \Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber());
         }
         //$this->paginate->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * Set Decorator Concreate
-     *
-     * @param \Knp\Component\Pager\Pagination\PaginationInterface $pagination
-     * @return boolean
-     */
-    public function setCustomPagination(Paginator $pagination = null)
-    {
-        if(!empty($pagination)){
-            $this->pagination = $pagination;
-            return $pagination;
+    public function getItemsEvent(){
+        return $this->itemsEvent;
+    }
+
+    public function setItemTarget($target){
+        $this->item_target = $target;
+    }
+
+    public function setPaginationTarget($target){
+        $this->pagination_target = $target;
+    }
+
+    public function setPaginationViewItems($items){
+        $this->pagination_view_items = $items;
+        /*
+        if(is_null($items) && !empty($this->itemsEvent)){
+            $this->pagination_view_items = $this->itemsEvent->items;
+            return true;
         }
+        return false;
+         */
+    }
+
+    public function setPaginationViewTotal($total){
+        $this->pagination_view_items = $total;
+        /*
+        if(is_null($total) && !empty($this->itemsEvent)){
+            $this->pagination_view_items = $this->itemsEvent->count;
+            return true;
+        }
+        return false;
+         */
     }
 
     /**
@@ -85,7 +109,7 @@ class Paginator implements PaginatorInterface
      */
     public function setDefaultPaginatorOptions(array $options)
     {
-        $this->paginator->defaultOptions = array_merge($this->defaultOptions, $options);
+        $this->defaultOptions = array_merge($this->defaultOptions, $options);
     }
 
     /**
@@ -106,7 +130,90 @@ class Paginator implements PaginatorInterface
      */
     public function paginate($target, $page = 1, $limit = 10, array $options = array())
     {
-        return $this->paginator->paginate($target, $page, $limit, $options);
+        $this->pagination_target = $this->items_target = $target;
+        //共通
+        $this->limit = $limit = intval(abs($limit));
+        $this->page = $page;
+        if (!$limit) {
+            throw new \LogicException("Invalid item per page number, must be a positive number");
+        }
+        $offset = abs($page - 1) * $limit;
+        $this->options = array_merge($this->defaultOptions, $options);
+        //共通
+
+        //共通
+        // normalize default sort field
+        if (isset($this->options['defaultSortFieldName']) && is_array($this->options['defaultSortFieldName'])) {
+            $this->options['defaultSortFieldName'] = implode('+', $this->options['defaultSortFieldName']);
+        }
+
+        // default sort field and direction are set based on options (if available)
+        if (!isset($_GET[$this->options['sortFieldParameterName']]) && isset($this->options['defaultSortFieldName'])) {
+            $_GET[$this->options['sortFieldParameterName']] = $options['defaultSortFieldName'];
+
+            if (!isset($_GET[$options['sortDirectionParameterName']])) {
+                $_GET[$this->options['sortDirectionParameterName']] = isset($this->options['defaultSortDirection']) ? $this->options['defaultSortDirection'] : 'asc';
+            }
+        }
+        //共通
+
+        //共通
+        // before pagination start
+        $beforeEvent = new \Knp\Component\Pager\Event\BeforeEvent($this->eventDispatcher);
+        $this->eventDispatcher->dispatch('knp_pager.before', $beforeEvent);
+
+        // items
+        $this->itemsEvent = new \Knp\Component\Pager\Event\ItemsEvent($offset, $limit);
+        $this->itemsEvent->options = &$this->options;
+        //メソッド化
+        $this->itemsEvent->target = &$this->item_target;
+        //共通
+        $this->eventDispatcher->dispatch('knp_pager.items', $this->itemsEvent);
+    }
+
+    public function getPaginateView(){
+        if (!$this->itemsEvent->isPropagationStopped()) {
+            throw new \RuntimeException('One of listeners must count and slice given target');
+        }
+        //共通
+        // pagination initialization event
+        $this->paginationEvent = new \Knp\Component\Pager\Event\PaginationEvent();
+        //共通
+
+        //メソッド化
+        $paginationEvent->target = &$this->pagination_target;
+
+        //共通
+        $this->paginationEvent->options = &$this->options;
+        $this->eventDispatcher->dispatch('knp_pager.pagination', $this->paginationEvent);
+        if (!$this->paginationEvent->isPropagationStopped()) {
+            throw new \RuntimeException('One of listeners must create pagination view');
+        }
+        //共通
+
+        // pagination class can be different, with different rendering methods
+
+        //共通
+        $this->paginationView = $this->paginationEvent->getPagination();
+        $this->paginationView->setCustomParameters($this->itemsEvent->getCustomPaginationParameters());
+        $this->paginationView->setCurrentPageNumber($this->page);
+        $this->paginationView->setItemNumberPerPage($this->limit);
+        //共通
+
+        //メソッド化
+        $this->paginationView->setTotalItemCount($this->pagination_view_total);
+
+        //共通
+        $this->paginationView->setPaginatorOptions($this->options);
+        //共通
+
+        //メソッド化
+        $this->paginationView->setItems($this->pagination_view_items);
+
+        // after
+        $afterEvent = new \Knp\Component\Pager\Event\AfterEvent($this->paginationView);
+        $this->eventDispatcher->dispatch('knp_pager.after', $afterEvent);
+        return $this->paginationView;
     }
 
     /**
@@ -116,7 +223,7 @@ class Paginator implements PaginatorInterface
      */
     public function subscribe(Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
     {
-        $this->paginator->eventDispatcher->addSubscriber($subscriber);
+        $this->eventDispatcher->addSubscriber($subscriber);
     }
 
     /**
@@ -128,6 +235,6 @@ class Paginator implements PaginatorInterface
      */
     public function connect($eventName, $listener, $priority = 0)
     {
-        $this->paginator->eventDispatcher->addListener($eventName, $listener, $priority);
+        $this->eventDispatcher->addListener($eventName, $listener, $priority);
     }
 }

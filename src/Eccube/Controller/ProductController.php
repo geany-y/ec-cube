@@ -27,7 +27,9 @@ namespace Eccube\Controller;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Exception\CartException;
-use Eccube\Paginator\ProductFrontPaginator;
+use Eccube\Paginator\Paginator;
+use Eccube\Paginator\DefaultPaginator;
+use Eccube\Paginator\AssociationPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -72,13 +74,20 @@ class ProductController
         $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
 
         //専用ページネータセット
-        $paginator = $app['paginator']()->setCustomPagination(new \Eccube\Paginator\ProductFrontPaginator());
+        //$app['paginator']()->setCustomPagination(new \Eccube\Paginator\ProductFrontPaginator());
 
-        $pagination = $paginator->paginate(
+        if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == '1') {
+            $custompager = new \Eccube\Paginator\AssociationPaginator($app['paginator']());
+        }else{
+            $custompager = new \Eccube\Paginator\DefaultPaginator($app['paginator']());
+        }
+        //$custompager = new \Eccube\Paginator\DefaultPaginator($app['paginator']());
+
+        $pagination = $custompager->paginate(
                     $qb,
                     !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
-                    $searchData['disp_number']->getId(),
-                    array('wrap-queries' => true)
+                    $searchData['disp_number']->getId()
+                    //array('wrap-queries' => true)
         );
 
         // addCart form
