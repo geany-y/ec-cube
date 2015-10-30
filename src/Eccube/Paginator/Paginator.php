@@ -1,5 +1,4 @@
 <?php
-
 namespace Eccube\Paginator;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -15,18 +14,13 @@ use Knp\Component\Pager\PaginatorInterface;
  * lifecycle events. Subscribers are expected to paginate
  * wanted target and finally it generates pagination view
  * which is only the result of paginator
+ * @note ConcreateComponent
  */
 class Paginator implements PaginatorInterface
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
     protected $eventDispatcher;
-
     protected $itemsEvent;
-
     protected $paginationEvent;
-
     protected $paginationView;
 
     private $page;
@@ -36,6 +30,7 @@ class Paginator implements PaginatorInterface
     private $pagination_target;
     private $pagination_view_total;
     private $pagination_view_items;
+
     /**
      * Default options of paginator
      *
@@ -81,24 +76,10 @@ class Paginator implements PaginatorInterface
 
     public function setPaginationViewItems($items){
         $this->pagination_view_items = $items;
-        /*
-        if(is_null($items) && !empty($this->itemsEvent)){
-            $this->pagination_view_items = $this->itemsEvent->items;
-            return true;
-        }
-        return false;
-         */
     }
 
     public function setPaginationViewTotal($total){
-        $this->pagination_view_items = $total;
-        /*
-        if(is_null($total) && !empty($this->itemsEvent)){
-            $this->pagination_view_items = $this->itemsEvent->count;
-            return true;
-        }
-        return false;
-         */
+        $this->pagination_view_total = $total;
     }
 
     /**
@@ -126,22 +107,18 @@ class Paginator implements PaginatorInterface
      *     string $alias - pagination alias, default none
      *     array $whitelist - sortable whitelist for target fields being paginated
      * @throws \LogicException
-     * @return \Knp\Component\Pager\Pagination\PaginationInterface
      */
     public function paginate($target, $page = 1, $limit = 10, array $options = array())
     {
-        $this->pagination_target = $this->items_target = $target;
-        //共通
-        $this->limit = $limit = intval(abs($limit));
+        //note. unuse this $target, couse defalentset this.
+        $this->limit = intval(abs($limit));
         $this->page = $page;
-        if (!$limit) {
+        if (!$this->limit) {
             throw new \LogicException("Invalid item per page number, must be a positive number");
         }
-        $offset = abs($page - 1) * $limit;
+        $offset = abs($page - 1) * $this->limit;
         $this->options = array_merge($this->defaultOptions, $options);
-        //共通
 
-        //共通
         // normalize default sort field
         if (isset($this->options['defaultSortFieldName']) && is_array($this->options['defaultSortFieldName'])) {
             $this->options['defaultSortFieldName'] = implode('+', $this->options['defaultSortFieldName']);
@@ -155,9 +132,7 @@ class Paginator implements PaginatorInterface
                 $_GET[$this->options['sortDirectionParameterName']] = isset($this->options['defaultSortDirection']) ? $this->options['defaultSortDirection'] : 'asc';
             }
         }
-        //共通
 
-        //共通
         // before pagination start
         $beforeEvent = new \Knp\Component\Pager\Event\BeforeEvent($this->eventDispatcher);
         $this->eventDispatcher->dispatch('knp_pager.before', $beforeEvent);
@@ -165,49 +140,34 @@ class Paginator implements PaginatorInterface
         // items
         $this->itemsEvent = new \Knp\Component\Pager\Event\ItemsEvent($offset, $limit);
         $this->itemsEvent->options = &$this->options;
-        //メソッド化
         $this->itemsEvent->target = &$this->item_target;
-        //共通
         $this->eventDispatcher->dispatch('knp_pager.items', $this->itemsEvent);
     }
 
+    /**
+     * @return \Knp\Component\Pager\Pagination\PaginationInterface
+     */
     public function getPaginateView(){
         if (!$this->itemsEvent->isPropagationStopped()) {
             throw new \RuntimeException('One of listeners must count and slice given target');
         }
-        //共通
+
         // pagination initialization event
         $this->paginationEvent = new \Knp\Component\Pager\Event\PaginationEvent();
-        //共通
-
-        //メソッド化
         $paginationEvent->target = &$this->pagination_target;
-
-        //共通
         $this->paginationEvent->options = &$this->options;
         $this->eventDispatcher->dispatch('knp_pager.pagination', $this->paginationEvent);
         if (!$this->paginationEvent->isPropagationStopped()) {
             throw new \RuntimeException('One of listeners must create pagination view');
         }
-        //共通
 
         // pagination class can be different, with different rendering methods
-
-        //共通
         $this->paginationView = $this->paginationEvent->getPagination();
         $this->paginationView->setCustomParameters($this->itemsEvent->getCustomPaginationParameters());
         $this->paginationView->setCurrentPageNumber($this->page);
         $this->paginationView->setItemNumberPerPage($this->limit);
-        //共通
-
-        //メソッド化
         $this->paginationView->setTotalItemCount($this->pagination_view_total);
-
-        //共通
         $this->paginationView->setPaginatorOptions($this->options);
-        //共通
-
-        //メソッド化
         $this->paginationView->setItems($this->pagination_view_items);
 
         // after

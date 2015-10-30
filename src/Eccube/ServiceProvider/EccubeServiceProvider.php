@@ -217,9 +217,11 @@ class EccubeServiceProvider implements ServiceProviderInterface
             return $app['orm.em']->getRepository('Eccube\Entity\Template');
         });
 
+        $app['association.paginator'] = $app->protect(function () {
+            return new \Eccube\Paginator\AssociationPaginator(new \Eccube\Paginator\Paginator());
+        });
         $app['paginator'] = $app->protect(function () {
-            //return new \Knp\Component\Pager\Paginator();
-            return new \Eccube\Paginator\Paginator();
+            return new \Eccube\Paginator\DefaultPaginator(new \Eccube\Paginator\Paginator());
         });
 
         $app['eccube.repository.help'] = $app->share(function () use ($app) {

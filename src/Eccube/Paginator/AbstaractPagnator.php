@@ -1,58 +1,83 @@
 <?php
-
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 namespace Eccube\Paginator;
 
-use Knp\Component\Pager\Event\PaginationEvent;
 use Knp\Component\Pager\Event;
-use Eccube\Paginator\Paginator;
 use Knp\Component\Pager\PaginatorInterface;
 
 /**
- * Paginator uses event dispatcher to trigger pagination
- * lifecycle events. Subscribers are expected to paginate
- * wanted target and finally it generates pagination view
- * which is only the result of paginator
+ *  @note Decorator
+ *  @param \Knp\Component\Pager\PaginatorInterface
+ *  @return \Knp\Component\Pager\PaginatorInterface
+ *
  */
-class AbstaractPagnator implements PaginatorInterface
+abstract class AbstaractPagnator implements PaginatorInterface
 {
     protected $paginator;
 
     /**
-     * this method works can be parent class.
-     *
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+     * @param \Knp\Component\Pager\PaginatorInterface
      */
-
-    public function __construct($paginator)
+    public function __construct(\Knp\Component\Pager\PaginatorInterface $paginator = null)
     {
+        if(empty($paginator)){
+            throw new \RuntimeException('Not given paginator object,this class constructor must be need object.');
+        }
         $this->paginator = $paginator;
     }
 
-    public function getPaginator(){
+    public function getPaginator()
+    {
         return $this->paginator;
     }
 
-    public function setItemTarget($target){
+    public function setItemTarget($target)
+    {
         $this->paginator->setItemTarget($target);
     }
 
-    public function setPaginationTarget($target){
+    public function setPaginationTarget($target)
+    {
         $this->paginator->setPaginationTarget($target);
     }
 
-    public function setPaginationViewItems($items){
+    public function setPaginationViewItems($items)
+    {
         $this->paginator->setPaginationViewItems($items);
     }
 
-    public function setPaginationViewTotal($total){
-        $this->paginator->setPaginationViewTotal = $total;
+    public function setPaginationViewTotal($total)
+    {
+        $this->paginator->setPaginationViewTotal($total);
     }
 
-    public function paginate($target, $page = 1, $limit = 10, array $options = array()){
+    public function paginate($target, $page = 1, $limit = 10, array $options = array())
+    {
         $this->paginator->paginate($target, $page, $limit, $options);
     }
 
-    public function getPaginateView(){
+    public function getPaginateView()
+    {
         return $this->paginator->getPaginateView();
     }
 }

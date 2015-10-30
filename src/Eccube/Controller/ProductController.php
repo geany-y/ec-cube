@@ -28,7 +28,6 @@ use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Exception\CartException;
 use Eccube\Paginator\Paginator;
-use Eccube\Paginator\DefaultPaginator;
 use Eccube\Paginator\AssociationPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -71,22 +70,28 @@ class ProductController
 
         // クエリ作成
         $searchData = $searchForm->getData();
+        echo '<pre>';
+        var_dump($searchData);
+        echo '</pre>';
+        exit();
         $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
 
-        //専用ページネータセット
-        //$app['paginator']()->setCustomPagination(new \Eccube\Paginator\ProductFrontPaginator());
-
+        //価格順のみカスタムページネーターを使用
         if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == '1') {
-            $custompager = new \Eccube\Paginator\AssociationPaginator($app['paginator']());
-        }else{
-            $custompager = new \Eccube\Paginator\DefaultPaginator($app['paginator']());
+            //アソシエーション用のページネーターを呼び出し
+            $pager = $app['association.paginator']();
+            //カウントを取得するため、基本情報設定
+            $pager->setMainTableAlias('c');
+            $pager->setDeleteDQLParts(array('orderBy'));
+        } else {
+            //通常のページネーターを呼び出し
+            $pager = $app['paginator']();
         }
-        //$custompager = new \Eccube\Paginator\DefaultPaginator($app['paginator']());
 
-        $pagination = $custompager->paginate(
-                    $qb,
-                    !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
-                    $searchData['disp_number']->getId()
+        $pagination = $pager->paginate(
+            $qb,
+            !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
+            $searchData['disp_number']->getId()
                     //array('wrap-queries' => true)
         );
 
