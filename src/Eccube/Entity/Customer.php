@@ -242,6 +242,11 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     private $del_flg;
 
     /**
+     * @var integer
+     */
+    private $point;
+
+    /**
      * @var \Eccube\Entity\Master\Sex
      */
     private $Sex;
@@ -1021,6 +1026,29 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     public function getDelFlg()
     {
         return $this->del_flg;
+    }
+
+    /**
+     * Set point
+     *
+     * @param  integer  $point
+     * @return Customer
+     */
+    public function setPoint($point)
+    {
+        $this->point = $point;
+
+        return $this;
+    }
+
+    /**
+     * Get point
+     *
+     * @return integer
+     */
+    public function getPoint()
+    {
+        return $this->point;
     }
 
     /**

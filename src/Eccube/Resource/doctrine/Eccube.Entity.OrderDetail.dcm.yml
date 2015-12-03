@@ -53,6 +53,20 @@ Eccube\Entity\OrderDetail:
             type: smallint
             nullable: true
             unsigned: false
+        use_point:
+            type: decimal
+            nullable: false
+            precision: 10
+            scale: 0
+            options:
+                default: 0
+        add_point:
+            type: decimal
+            nullable: false
+            precision: 10
+            scale: 0
+            options:
+                default: 0
     manyToOne:
         Order:
             targetEntity: Eccube\Entity\Order

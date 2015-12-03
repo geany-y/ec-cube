@@ -59,6 +59,13 @@ Eccube\Entity\ProductClass:
             unsigned: false
             options:
                 default: '0'
+        product_point_rate:
+            type: decimal
+            nullable: false
+            precision: 10
+            scale: 0
+            options:
+                default: 0
     manyToOne:
         Product:
             targetEntity: Eccube\Entity\Product

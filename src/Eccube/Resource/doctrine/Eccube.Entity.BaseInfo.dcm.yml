@@ -144,6 +144,35 @@ Eccube\Entity\BaseInfo:
         authentication_key:
             type: text
             nullable: true
+        point_flg:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        point_caliculate_type:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        basic_point_rate:
+            type: decimal
+            nullable: false
+            precision: 10
+            scale: 0
+            options:
+                default: 0
+        point_rounding_type:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        point_conversion_rate:
+            type: decimal
+            nullable: true
+            precision: 10
+            scale: 0
+            options:
+                default: null
     manyToOne:
         Country:
             targetEntity: Eccube\Entity\Master\Country
@@ -154,6 +183,11 @@ Eccube\Entity\BaseInfo:
             targetEntity: Eccube\Entity\Master\Pref
             joinColumn:
                 name: pref
+                referencedColumnName: id
+        OrderStatus:
+            targetEntity: Eccube\Entity\Master\OrderStatus
+            joinColumn:
+                name: add_point_status
                 referencedColumnName: id
     lifecycleCallbacks:
         loadClassMetadata: {  }

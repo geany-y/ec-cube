@@ -36,6 +36,7 @@ class CustomerController extends AbstractController
 {
     public function index(Application $app, Request $request, $page_no = null)
     {
+        exit();
         $session = $request->getSession();
         $pagination = array();
         $searchForm = $app['form.factory']

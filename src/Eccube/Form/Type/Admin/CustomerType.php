@@ -32,10 +32,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CustomerType extends AbstractType
 {
     protected $config;
+    protected $welcomPoint;
 
-    public function __construct($config)
+    public function __construct($config, \Eccube\Application $app)
     {
         $this->config = $config;
+        $this->setDefaultWelComePoint($app);
     }
 
     /**
@@ -129,6 +131,14 @@ class CustomerType extends AbstractType
                     new Assert\NotBlank(),
                 ),
             ))
+            ->add('point', 'text', array(
+                'label' => '所持ポイント',
+                'required' => true,
+                'empty_data' => $this->welcomPoint,
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
             ->add('note', 'textarea', array(
                 'label' => 'SHOP用メモ',
                 'required' => false,
@@ -139,6 +149,12 @@ class CustomerType extends AbstractType
                 ),
             ))
             ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+    }
+
+    private function setDefaultWelComePoint(\Eccube\Application $app)
+    {
+        //$welcomPoint = $app['eccube.repository.base_info']->get()->getWelcomePoint();
+        $this->welcomPoint = !empty($welcomPoint) ? $welcomPoint : 0;
     }
 
     /**

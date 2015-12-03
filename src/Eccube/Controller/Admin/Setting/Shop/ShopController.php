@@ -24,8 +24,16 @@
 
 namespace Eccube\Controller\Admin\Setting\Shop;
 
+/*
 use Eccube\Application;
 use Eccube\Controller\AbstractController;
+*/
+
+use Doctrine\Common\Util\Debug;
+use Eccube\Application;
+use Eccube\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ShopController extends AbstractController
 {
@@ -44,7 +52,9 @@ class ShopController extends AbstractController
                 $app['orm.em']->flush();
                 $app->addSuccess('admin.shop.save.complete', 'admin');
 
-                return $app->redirect($app->url('admin_setting_shop'));
+                return $app->render('Setting/Shop/shop_master.twig', array(
+                    'form' => $form->createView(),
+                ));
             }
             $app->addError('admin.shop.save.error', 'admin');
         }

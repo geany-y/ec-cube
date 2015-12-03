@@ -115,6 +115,13 @@ Eccube\Entity\Customer:
         update_date:
             type: datetime
             nullable: false
+        point:
+            type: decimal
+            nullable: false
+            precision: 10
+            scale: 0
+            options:
+                default: 0
         del_flg:
             type: smallint
             nullable: false

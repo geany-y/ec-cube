@@ -142,6 +142,29 @@ class ProductClass extends \Eccube\Entity\AbstractEntity
     }
 
     /**
+     * Get product_point_rate
+     *
+     * @return integer
+     */
+    public function getProductPointRate()
+    {
+        return $this->product_point_rate;
+    }
+
+    /**
+     * Set product_point_rate
+     *
+     * @param  integer $product_point_rate
+     * @return ProductClass
+     */
+    public function setProductPointRate($product_point_rate)
+    {
+        $this->product_point_rate = $product_point_rate;
+
+        return $this;
+    }
+
+    /**
      * Get tax_rate
      *
      * @return string
@@ -207,6 +230,11 @@ class ProductClass extends \Eccube\Entity\AbstractEntity
      * @var integer
      */
     private $del_flg;
+
+    /**
+     * @var integer
+     */
+    private $product_point_rate;
 
     /**
      * @var \Eccube\Entity\Product

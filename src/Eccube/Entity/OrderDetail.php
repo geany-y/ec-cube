@@ -167,6 +167,16 @@ class OrderDetail extends \Eccube\Entity\AbstractEntity
     private $tax_rule;
 
     /**
+     * @var integer
+     */
+    private $use_point;
+
+    /**
+     * @var integer
+     */
+    private $add_point;
+
+    /**
      * @var \Eccube\Entity\Order
      */
     private $Order;
@@ -373,6 +383,52 @@ class OrderDetail extends \Eccube\Entity\AbstractEntity
     public function getTaxRule()
     {
         return $this->tax_rule;
+    }
+
+    /**
+     * Set use_point
+     *
+     * @param  integer     $use_point
+     * @return OrderDetail
+     */
+    public function setUsePoint($use_point)
+    {
+        $this->use_point = $use_point;
+
+        return $this;
+    }
+
+    /**
+     * Get use_point
+     *
+     * @return integer
+     */
+    public function getUsePoint($use_point)
+    {
+        return $this->use_point;
+    }
+
+    /**
+     * Set add_point
+     *
+     * @param  integer     $add_point
+     * @return OrderDetail
+     */
+    public function setAddPoint($add_point)
+    {
+        $this->add_point = $add_point;
+
+        return $this;
+    }
+
+    /**
+     * Get add_point
+     *
+     * @return integer
+     */
+    public function getAddPoint($add_point)
+    {
+        return $this->add_point;
     }
 
     /**

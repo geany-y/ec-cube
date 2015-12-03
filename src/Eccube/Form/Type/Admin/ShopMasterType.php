@@ -24,13 +24,25 @@
 
 namespace Eccube\Form\Type\Admin;
 
+use Eccube\Form\DataTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ShopMasterType extends AbstractType
 {
+    const POINT_OFF = 0;
+    const POINT_ON = 1;
+    const POINT_SUBTRACT_OFF = 0;
+    const POINT_SUBTRACT_ON = 1;
+    const POINT_MATH_FLOOR = 0;
+    const POINT_ROUND_CEIL = 1;
+    const POINT_ROUND_ROUND = 2;
+
     public function __construct($config)
     {
         $this->config = $config;
@@ -267,6 +279,63 @@ class ShopMasterType extends AbstractType
                 'multiple' => false,
             ))
 
+            // ポイント機能
+            ->add('point_flg', 'choice', array(
+                'label' => 'ポイント機能を有効にする',
+                'choices' => array(
+                    '0' => '無効',
+                    '1' => '有効',
+                ),
+                'expanded' => true,
+                'multiple' => false,
+            ))
+            ->add('OrderStatus', 'entity', array(
+                'label' => 'ポイントを付与する受注ステータス',
+                'class' => 'Eccube\Entity\Master\OrderStatus',
+                'property' => 'name',
+                'empty_value' => false,
+                'empty_data' => null,
+            ))
+            ->add('point_caliculate_type', 'choice', array(
+                'label' => 'ポイント計算時に減算を行う',
+                'choices' => array(
+                    '0' => '無効',
+                    '1' => '有効',
+                ),
+                'expanded' => true,
+                'multiple' => false,
+            ))
+            ->add('basic_point_rate', 'integer', array(
+                'label' => '基本ポイント付与率',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Regex(array(
+                        'pattern' => "/^\d+$/u",
+                        'message' => 'form.type.numeric.invalid'
+                    )),
+                ),
+            ))
+            ->add('point_rounding_type', 'choice', array(
+                'label' => 'ポイント端数処理方法',
+                'choices' => array(
+                    '0' => '切り捨て',
+                    '1' => '切り上げ',
+                    '2' => '四捨五入',
+                ),
+                'expanded' => true,
+                'multiple' => false,
+            ))
+            ->add('point_conversion_rate', 'integer', array(
+                'label' => 'ポイント換算率',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Regex(array(
+                        'pattern' => "/^\d+$/u",
+                        'message' => 'form.type.numeric.invalid'
+                    )),
+                ),
+            ))
+
             // 地図設定
             ->add('latitude', 'number', array(
                 'label' => '緯度',
@@ -300,6 +369,7 @@ class ShopMasterType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Eccube\Entity\BaseInfo',
+            'compound' => true,
         ));
     }
 
