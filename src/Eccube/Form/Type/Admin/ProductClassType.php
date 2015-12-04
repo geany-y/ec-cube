@@ -148,6 +148,16 @@ class ProductClassType extends AbstractType
                 'required' => false,
                 'value' => 1,
             ))
+            ->add('product_point_rate', 'text', array(
+                'label' => 'ポイント付与率',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Regex(array(
+                        'pattern' => "/^\d+(\.\d+)?$/u",
+                        'message' => 'form.type.float.invalid'
+                    )),
+                ),
+            ))
             ->addEventListener(FormEvents::POST_SUBMIT, function ($event) {
                 $form = $event->getForm();
                 $data = $form->getData();

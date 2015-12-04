@@ -29,6 +29,14 @@ namespace Eccube\Entity;
  */
 class BaseInfo extends \Eccube\Entity\AbstractEntity
 {
+    const POINT_OFF = 0;
+    const POINT_ON = 1;
+    const POINT_SUBTRACT_OFF = 0;
+    const POINT_SUBTRACT_ON = 1;
+    const POINT_MATH_FLOOR = 0;
+    const POINT_ROUND_CEIL = 1;
+    const POINT_ROUND_ROUND = 2;
+
     /**
      * @var integer
      */

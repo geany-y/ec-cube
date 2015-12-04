@@ -171,6 +171,7 @@ class ProductController extends AbstractController
 
         $has_class = false;
         if (is_null($id)) {
+            //新規作成
             $Product = new \Eccube\Entity\Product();
             $ProductClass = new \Eccube\Entity\ProductClass();
             $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_HIDE);
@@ -186,6 +187,7 @@ class ProductController extends AbstractController
             $ProductClass->setProductStock($ProductStock);
             $ProductStock->setProductClass($ProductClass);
         } else {
+            //編集
             $Product = $app['eccube.repository.product']->find($id);
             if (!$Product) {
                 throw new NotFoundHttpException();
@@ -261,6 +263,7 @@ class ProductController extends AbstractController
                             }
                         }
                     }
+
                     $app['orm.em']->persist($ProductClass);
 
                     // 在庫情報を作成

@@ -27,6 +27,7 @@ namespace Eccube\ServiceProvider;
 use Eccube\Application;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
+use Symfony\serializer;
 
 class EccubeServiceProvider implements ServiceProviderInterface
 {
@@ -217,6 +218,10 @@ class EccubeServiceProvider implements ServiceProviderInterface
 
         $app['paginator'] = $app->protect(function () {
             return new \Knp\Component\Pager\Paginator();
+        });
+
+        $app['serializer'] = $app->share(function () {
+            return new \Eccube\Serializer\Serializer();
         });
 
         $app['eccube.repository.help'] = $app->share(function () use ($app) {

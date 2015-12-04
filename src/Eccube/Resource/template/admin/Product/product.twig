@@ -295,6 +295,21 @@ function fnClass(action) {
 
                                 </div>
                             </div>
+
+                           {% if BaseInfo.point_flg == constant('POINT_ON', BaseInfo) %}
+                            <div class="form-group">
+                                {{ form_label(form.class.product_point_rate) }}
+                                <div class="col-sm-9 col-lg-10">
+                                    <div class="row">
+                                        <div class="col-xs-12 form-inline">
+                                            {{ form_widget(form.class.product_point_rate) }}
+                                            {{ form_errors(form.class.product_point_rate) }}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            {% endif %}
                             {% endif %}
 
                             <div class="form-group">

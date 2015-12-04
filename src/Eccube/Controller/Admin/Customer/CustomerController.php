@@ -36,7 +36,6 @@ class CustomerController extends AbstractController
 {
     public function index(Application $app, Request $request, $page_no = null)
     {
-        exit();
         $session = $request->getSession();
         $pagination = array();
         $searchForm = $app['form.factory']
@@ -65,8 +64,10 @@ class CustomerController extends AbstractController
                     $page_count
                 );
 
+                //検索条件をシリアライズ
+                $serializeSearchData = $app['serializer']->serialize($searchData);
                 // sessionのデータ保持
-                $session->set('eccube.admin.customer.search', $searchData);
+                $session->set('eccube.admin.customer.search', $serializeSearchData);
             }
         } else {
             if (is_null($page_no)) {
@@ -74,7 +75,8 @@ class CustomerController extends AbstractController
                 $session->remove('eccube.admin.customer.search');
             } else {
                 // pagingなどの処理
-                $searchData = $session->get('eccube.admin.customer.search');
+                $searchData = $app['serializer']->deialize($session->get('eccube.admin.customer.search'));
+
                 if (!is_null($searchData)) {
                     // 表示件数
                     $pcount = $request->get('page_count');

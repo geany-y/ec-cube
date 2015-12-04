@@ -183,6 +183,7 @@
                             </div>
                         </div>
                         {# 保有ポイント #}
+                        {% if BaseInfo.point_flg == constant('POINT_ON', BaseInfo) %}
                         <div class="form-group">
                             {{ form_label(form.point) }}
                             <div class="col-sm-9 col-lg-10">
@@ -192,6 +193,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
 
                 </div><!-- /.box-body -->

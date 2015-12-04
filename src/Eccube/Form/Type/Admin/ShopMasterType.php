@@ -35,14 +35,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ShopMasterType extends AbstractType
 {
-    const POINT_OFF = 0;
-    const POINT_ON = 1;
-    const POINT_SUBTRACT_OFF = 0;
-    const POINT_SUBTRACT_ON = 1;
-    const POINT_MATH_FLOOR = 0;
-    const POINT_ROUND_CEIL = 1;
-    const POINT_ROUND_ROUND = 2;
-
     public function __construct($config)
     {
         $this->config = $config;
@@ -305,13 +297,13 @@ class ShopMasterType extends AbstractType
                 'expanded' => true,
                 'multiple' => false,
             ))
-            ->add('basic_point_rate', 'integer', array(
+            ->add('basic_point_rate', 'text', array(
                 'label' => '基本ポイント付与率',
                 'required' => false,
                 'constraints' => array(
                     new Assert\Regex(array(
-                        'pattern' => "/^\d+$/u",
-                        'message' => 'form.type.numeric.invalid'
+                        'pattern' => "/^\d+(\.\d+)?$/u",
+                        'message' => 'form.type.float.invalid'
                     )),
                 ),
             ))

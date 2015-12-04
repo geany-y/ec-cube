@@ -137,6 +137,10 @@ class CustomerType extends AbstractType
                 'empty_data' => $this->welcomPoint,
                 'constraints' => array(
                     new Assert\NotBlank(),
+                    new Assert\Regex(array(
+                        'pattern' => "/^\d+$/u",
+                        'message' => 'form.type.numeric.invalid'
+                    )),
                 ),
             ))
             ->add('note', 'textarea', array(
