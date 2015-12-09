@@ -1,0 +1,221 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+
+http://www.lockon.co.jp/
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#}
+{% extends 'default_frame.twig' %}
+
+{% block javascript %}
+<script>
+/*
+$(function(){
+
+    $('.delivery').on('change', function() {
+        $('#shopping-form').attr('action', '{{ url("shopping_delivery") }}').submit();
+    });
+
+    $('.payment').on('change', function() {
+        $('#shopping-form').attr('action', '{{ url("shopping_payment") }}').submit();
+    });
+
+    $('.btn-shipping').click(function() {
+        $('#shopping-form').attr('action', $(this).attr('href')).submit();
+        return false;
+    });
+
+    $('.btn-shipping-edit').click(function() {
+        $('#shopping-form').attr('action', $(this).attr('href')).submit();
+        return false;
+    });
+
+    $('.btn-shipping-multiple').click(function() {
+        $('#shopping-form').attr('action', $(this).attr('href')).submit();
+        return false;
+    });
+
+    {% if is_granted('ROLE_USER') == false %}
+    var ref = new Array();
+    var name = new Array();
+    var input = new Array();
+    var customerin = new Array();
+    $('#customer').click(function() {
+        // ref = $('.customer-name01');
+        var edit = $('.customer-edit');
+        var hidden = $('.customer-in');
+
+        $(edit).each(function(index) {
+            ref[index] = $(this);
+        });
+        $(hidden).each(function(index) {
+            customerin[index] = $(this);
+        });
+        $(ref).each(function(index) {
+            name[index] = $(this).text();
+        });
+        $(name).each(function(index) {
+            input[index] = $('<input id="edit' + index + '" type="text" />').val(name[index]);
+        });
+        $(input).each(function(index) {
+            ref[index].empty().append(input[index]);
+        });
+
+        $('#customer').prop("disabled", true);
+        $('.mod-button').show();
+    });
+
+    $('#customer-ok').click(function() {
+
+        var data;
+        $(ref).each(function(index) {
+            var nameAfter = input[index].val();
+            ref[index].empty().text(nameAfter);
+            customerin[index].val(nameAfter);
+            input[index].remove();
+        });
+
+        var postData = {};
+        $('.customer-in').each(function() {
+          postData[$(this).attr('name')] = $(this).val();
+        });
+
+        $.ajax({
+            url: "{{ url('shopping_customer') }}",
+            type: 'POST',
+            data: postData,
+            dataType: 'json',
+        }).done(function(data){
+        }).fail(function(data){
+            alert('更新に失敗しました。入力内容を確認してください。');
+            $(ref).each(function(index) {
+                ref[index].empty().text(name[index]);
+                input[index].remove();
+            });
+        });
+
+        $('#customer').prop("disabled", false);
+        $('.mod-button').hide();
+    });
+
+    $('#customer-cancel').click(function() {
+
+        $(ref).each(function(index) {
+            ref[index].empty().text(name[index]);
+            input[index].remove();
+        });
+
+        $('#customer').prop("disabled", false);
+        $('.mod-button').hide();
+    });
+    {% endif %}
+
+});
+*/
+</script>
+{% endblock javascript %}
+
+{% block main %}
+    <h1 class="page-heading">使用ポイントの設定</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {% if is_granted('ROLE_USER') %}
+                <div class="flowline step3">
+                {% else %}
+                <div class="flowline step4">
+                {% endif %}
+                    <ul class="clearfix">
+                    <li><span class="flow_number">1</span><br>カートの商品</li>
+                    {% if is_granted('ROLE_USER') %}
+                        <li class="active"><span class="flow_number">2</span><br>ご注文内容確認</li>
+                        <li><span class="flow_number">3</span><br>完了</li>
+                    {% else %}
+                        <li><span class="flow_number">2</span><br>お客様情報</li>
+                        <li class="active"><span class="flow_number">3</span><br>ご注文内容確認</li>
+                        <li><span class="flow_number">4</span><br>完了</li>
+                    {% endif %}
+                    </ul>
+                </div>
+                {% for error in app.session.flashbag.get('eccube.front.request.error')  %}
+                    <div class="message">
+                        <p class="errormsg bg-danger">
+                            <svg class="cb cb-warning"><use xlink:href="#cb-warning" /></svg>{{ error|trans|nl2br }}
+                        </p>
+                    </div>
+                {% endfor %}
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+        <form id="shopping-form" method="post" action="{{ url('shopping_confirm') }}">
+            {{ form_widget(form._token) }}
+            <div id="shopping_point" class="row">
+                <div id="point_main" class="col-sm-8">
+                    <div class="cart_item table">
+                        <div class="tbody">
+                            {% for orderDetail in Order.orderDetails %}
+                            <div class="item_box tr">
+                                <div class="td table">
+                                    <div class="item_photo"><img src="{{ app.config.image_save_urlpath }}/{{ orderDetail.product.MainListImage|no_image_product }}" alt="{{ orderDetail.productName }}" /></div>
+                                    <dl class="item_detail">
+                                        <dt class="item_name text-default">{{ orderDetail.productName }}</dt>
+                                        <dd class="item_pattern small">
+                                            {% if orderDetail.productClass.classCategory1 %}
+                                                {{ orderDetail.productClass.classCategory1.className }}：{{ orderDetail.productClass.classCategory1 }}
+                                            {% endif %}
+                                            {% if orderDetail.productClass.classCategory2 %}
+                                                <br>{{ orderDetail.productClass.classCategory2.className }}：{{ orderDetail.productClass.classCategory2 }}
+                                            {% endif %}
+                                        </dd>
+                                        <dd class="item_price">{{ orderDetail.priceIncTax|price }} × {{ orderDetail.quantity|number_format }}</dd>
+                                        <!-- <dd class="item_subtotal">小計：{{ orderDetail.totalPrice|price }}</dd> -->
+                                    </dl>
+                                </div>
+                            </div><!--/item_box-->
+                            {% endfor %}
+                        </div>
+                    </div><!--/cart_item-->
+                    <div class="row">
+                        <ul class="clearfix">
+                            <li>{{ form_row(form.use_point) }}</li>
+                            <li>{{ form_row(form.save) }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="confirm_side" class="col-sm-4">
+                    <div class="total_box">
+                        <dl>
+                            <dt>小計</dt>
+                            <dd class="text-primary">{{ Order.subtotal|price }}</dd>
+                        </dl>
+                        <dl>
+                            <dt>手数料</dt>
+                            <dd>{{ Order.charge|price }}</dd>
+                        </dl>
+                        <dl>
+                            <dt>送料</dt>
+                            <dd>{{ Order.deliveryFeeTotal|price }}</dd>
+                        </dl>
+                        <div class="total_amount">
+                            <p class="total_price">合計 <strong class="text-primary">{{ Order.total|price }}<span class="small">税込</span></strong></p>
+                            <p><button id="order-button" type="submit" class="btn btn-primary btn-block prevention-btn prevention-mask">注文する</button></p>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.row -->
+        </form>
+    </div>
+{% endblock %}

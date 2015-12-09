@@ -162,6 +162,7 @@ $(function(){
             {{ form_widget(form._token) }}
             <div id="shopping_confirm" class="row">
                 <div id="confirm_main" class="col-sm-8">
+                    <p>あなたの保有ポイントは<span style="color:red;font-weight:bold;">{{ app.user.point }}</span>ptです</p>
                     <div class="cart_item table">
                         <div class="tbody">
                             {% for orderDetail in Order.orderDetails %}
@@ -186,7 +187,10 @@ $(function(){
                             {% endfor %}
                         </div>
                     </div><!--/cart_item-->
-                    <p><a href="{{ url('cart') }}" class="btn btn-default btn-sm">数量を変更または削除する</a></p>
+                    <div class="row">
+                        <p class="col-sm-4"><a href="{{ url('cart') }}" class="btn btn-default btn-sm">数量を変更または削除する</a></p>
+                        <p class="col-sm-4"><a href="{{ url('shopping_point') }}" class="btn btn-default btn-sm">ポイントを使用する</a></p>
+                    </div>
                     <h2 class="heading02">お客様情報</h2>
                     <div class="column is-edit">
                         <p class="address"><span class="customer-edit customer-name01">{{ Order.name01 }}</span> <span class="customer-edit customer-name02">{{ Order.name02 }}</span> 様<br>

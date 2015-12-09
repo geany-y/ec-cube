@@ -1119,6 +1119,76 @@ class ShoppingController extends AbstractController
     }
 
     /**
+     * ポイント利用処理
+     *
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function point(Application $app, Request $request)
+    {
+        $cartService = $app['eccube.service.cart'];
+
+        // カートチェック
+        if (!$cartService->isLocked()) {
+            // カートが存在しない、カートがロックされていない時はエラー
+            return $app->redirect($app->url('cart'));
+        }
+
+        // カートチェック
+        if (count($cartService->getCart()->getCartItems()) <= 0) {
+            // カートが存在しない時はエラー
+            return $app->redirect($app->url('cart'));
+        }
+
+        // 登録済みの受注情報を取得
+        $Order = $app['eccube.service.shopping']->getOrder($app['config']['order_processing']);
+
+        // 初回アクセス(受注情報がない)の場合は, 受注情報を作成
+        /*
+        if (is_null($Order)) {
+
+            // 未ログインの場合, ログイン画面へリダイレクト.
+            if (!$app->isGranted('IS_AUTHENTICATED_FULLY')) {
+
+                // 非会員でも一度会員登録されていればショッピング画面へ遷移
+                $Customer = $app['eccube.service.shopping']->getNonMember($this->sessionKey);
+
+                if (is_null($Customer)) {
+                    return $app->redirect($app->url('shopping_login'));
+                }
+
+            } else {
+                $Customer = $app->user();
+            }
+
+            // 受注情報を作成
+            $Order = $app['eccube.service.shopping']->createOrder($Customer);
+
+            // セッション情報を削除
+            $app['session']->remove($this->sessionOrderKey);
+            $app['session']->remove($this->sessionMultipleKey);
+
+        } else {
+        */
+            // 計算処理
+            $Order = $app['eccube.service.shopping']->getAmount($Order);
+        //}
+
+        // 受注関連情報を最新状態に更新
+        $app['orm.em']->refresh($Order);
+
+        // form作成
+        //$form = $app['eccube.service.shopping']->getShippingForm($Order);
+        $form = $app['form.factory']->createBuilder('shopping_point')->getForm();
+
+        return $app->render('Shopping/point.twig', array(
+            'form' => $form->createView(),
+            'Order' => $Order,
+        ));
+    }
+
+    /**
      * 非会員用複数配送設定時の新規お届け先の設定
      */
     public function shippingMultipleEdit(Application $app, Request $request)
