@@ -162,7 +162,8 @@ $(function(){
         </div><!-- /.row -->
         <form id="shopping-form" method="post" action="{{ url('shopping_confirm') }}">
             {{ form_widget(form._token) }}
-            <div id="shopping_point" class="row">
+            <!-- 後にCSS必要 -->
+            <div id="shopping_confirm" class="row">
                 <div id="point_main" class="col-sm-8">
                     <div class="cart_item table">
                         <div class="tbody">
@@ -189,12 +190,11 @@ $(function(){
                         </div>
                     </div><!--/cart_item-->
                     <div class="row">
-                        <ul class="clearfix">
-                            <li>{{ form_row(form.use_point) }}</li>
-                            <li>{{ form_row(form.save) }}</li>
-                        </ul>
+                        <p>{{ form_row(form.use_point) }}</p>
+                        <p>{{ form_row(form.save) }}</p>
                     </div>
                 </div>
+
                 <div id="confirm_side" class="col-sm-4">
                     <div class="total_box">
                         <dl>
@@ -211,10 +211,13 @@ $(function(){
                         </dl>
                         <div class="total_amount">
                             <p class="total_price">合計 <strong class="text-primary">{{ Order.total|price }}<span class="small">税込</span></strong></p>
+                            <!--
                             <p><button id="order-button" type="submit" class="btn btn-primary btn-block prevention-btn prevention-mask">注文する</button></p>
+                            -->
                         </div>
                     </div>
                 </div>
+
             </div><!-- /.row -->
         </form>
     </div>

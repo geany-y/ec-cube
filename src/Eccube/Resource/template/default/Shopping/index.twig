@@ -162,7 +162,9 @@ $(function(){
             {{ form_widget(form._token) }}
             <div id="shopping_confirm" class="row">
                 <div id="confirm_main" class="col-sm-8">
-                    <p>あなたの保有ポイントは<span style="color:red;font-weight:bold;">{{ app.user.point }}</span>ptです</p>
+                    {% if is_granted('ROLE_USER') and BaseInfo.point_flg == constant('POINT_ON', BaseInfo) %}
+                        <p>あなたの保有ポイントは<span style="color:red;font-weight:bold;">{{ app.user.point }}</span>ptです</p>
+                    {% endif %}
                     <div class="cart_item table">
                         <div class="tbody">
                             {% for orderDetail in Order.orderDetails %}
@@ -189,7 +191,9 @@ $(function(){
                     </div><!--/cart_item-->
                     <div class="row">
                         <p class="col-sm-4"><a href="{{ url('cart') }}" class="btn btn-default btn-sm">数量を変更または削除する</a></p>
+                    {% if is_granted('ROLE_USER') and BaseInfo.point_flg == constant('POINT_ON', BaseInfo) %}
                         <p class="col-sm-4"><a href="{{ url('shopping_point') }}" class="btn btn-default btn-sm">ポイントを使用する</a></p>
+                    {% endif %}
                     </div>
                     <h2 class="heading02">お客様情報</h2>
                     <div class="column is-edit">

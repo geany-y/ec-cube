@@ -1127,6 +1127,10 @@ class ShoppingController extends AbstractController
      */
     public function point(Application $app, Request $request)
     {
+        if (!$app['security']->isGranted('ROLE_USER')) {
+            throw Exception('権限がありません。');
+        }
+
         $cartService = $app['eccube.service.cart'];
 
         // カートチェック
@@ -1143,6 +1147,7 @@ class ShoppingController extends AbstractController
 
         // 登録済みの受注情報を取得
         $Order = $app['eccube.service.shopping']->getOrder($app['config']['order_processing']);
+
 
         // 初回アクセス(受注情報がない)の場合は, 受注情報を作成
         /*

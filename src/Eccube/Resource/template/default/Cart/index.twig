@@ -74,9 +74,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
                 {% if Cart.CartItems|length > 0 %}
                 <form name="form" id="form_cart" method="post" action="{{ url('cart') }}">
-                    <p class="message">
-                        あなたの保有ポイントは<span style="color:red;font-weight:bold;">{{ app.user.point }}</span>ptです
-                    </p>
+                    {% if is_granted('ROLE_USER') and BaseInfo.point_flg == constant('POINT_ON', BaseInfo) %}
+                        <p class="message">
+                            あなたの保有ポイントは<span style="color:red;font-weight:bold;">{{ app.user.point }}</span>ptです
+                        </p>
+                    {% endif %}
                     <p class="message">
                         商品の合計金額は「<strong>{{ Cart.total_price|price }}</strong>」です。
                         {% if BaseInfo.delivery_free_amount and BaseInfo.delivery_free_quantity %}
