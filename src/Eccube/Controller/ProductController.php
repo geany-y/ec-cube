@@ -145,33 +145,41 @@ class ProductController
 
     public function detail(Application $app, Request $request, $id)
     {
+        // 基本情報取得
         $BaseInfo = $app['eccube.repository.base_info']->get();
+        //在庫情報確認
         if ($BaseInfo->getNostockHidden() === Constant::ENABLED) {
             $app['orm.em']->getFilters()->enable('nostock_hidden');
         }
 
         /* @var $Product \Eccube\Entity\Product */
+        // 商品情報を取得
         $Product = $app['eccube.repository.product']->get($id);
         if (!$request->getSession()->has('_security_admin') && $Product->getStatus()->getId() !== 1) {
             throw new NotFoundHttpException();
         }
+        // 商品規格取得
         if (count($Product->getProductClasses()) < 1) {
             throw new NotFoundHttpException();
         }
 
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
+        // 商品詳細フォーム作成
         $builder = $app['form.factory']->createNamedBuilder('', 'add_cart', null, array(
             'product' => $Product,
             'id_add_product_id' => false,
         ));
+
         /* @var $form \Symfony\Component\Form\FormInterface */
         $form = $builder->getForm();
 
+        //　商品詳細ユーザー処理判定
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
 
             if ($form->isValid()) {
                 $addCartData = $form->getData();
+                //　お気に入り登録処理
                 if ($addCartData['mode'] === 'add_favorite') {
                     if ($app->isGranted('ROLE_USER')) {
                         $Customer = $app->user();
@@ -186,6 +194,7 @@ class ProductController
                         return $app->redirect($app->url('mypage_login'));
                     }
                 } else {
+                    // カート追加処理
                     try {
                         $app['eccube.service.cart']->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
                     } catch (CartException $e) {
@@ -196,6 +205,7 @@ class ProductController
                 }
             }
         } else {
+            // 表示処理 ( お気に入り情報取得 )
             $addFavorite = $app['session']->getFlashBag()->get('eccube.add.favorite');
             if (!empty($addFavorite)) {
                 // お気に入り登録時にログインされていない場合、ログイン後にお気に入り追加処理を行う
@@ -213,6 +223,7 @@ class ProductController
             $is_favorite = $app['eccube.repository.customer_favorite_product']->isFavorite($Customer, $Product);
         }
 
+        // 画面描画
         return $app->render('Product/detail.twig', array(
             'title' => $this->title,
             'subtitle' => $Product->getName(),

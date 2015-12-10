@@ -78,6 +78,11 @@ class EccubeServiceProvider implements ServiceProviderInterface
             return new \Eccube\Service\ShoppingService($app, $app['eccube.service.cart'], $app['eccube.service.order']);
         });
 
+        // Point
+        $app['eccube.service.discount'] = $app->share(function () use ($app) {
+            return new \Eccube\Service\PointService($app);
+        });
+
         // Repository
         $app['eccube.repository.master.authority'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\Authority');

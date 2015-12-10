@@ -32,6 +32,7 @@ class CartController extends AbstractController
 {
     public function index(Application $app)
     {
+        // カート情報取得(定形処理)
         $Cart = $app['eccube.service.cart']->getCart();
 
         /* @var $BaseInfo \Eccube\Entity\BaseInfo */
@@ -41,6 +42,9 @@ class CartController extends AbstractController
         $isDeliveryFree = false;
         $least = 0;
         $quantity = 0;
+
+        //管理画面のステータスを確認(配送料無料)
+        //管理画面のステータスを確認()
         if ($BaseInfo->getDeliveryFreeAmount()) {
             if ($BaseInfo->getDeliveryFreeAmount() <= $Cart->getTotalPrice()) {
                 // 送料無料（金額）を超えている

@@ -800,14 +800,18 @@ class ShoppingService
     public function setStockUpdate($em, Order $Order)
     {
 
+        //受注明細
         $orderDetails = $Order->getOrderDetails();
 
         // 在庫情報更新
+        // 受注明細情報をもとに在庫情報更新
         foreach ($orderDetails as $orderDetail) {
             // 在庫が無制限かチェックし、制限ありなら在庫数を更新
             if ($orderDetail->getProductClass()->getStockUnlimited() == Constant::DISABLED) {
 
+                //商品単一の在庫情報を取得
                 $productStock = $em->getRepository('Eccube\Entity\ProductStock')->find(
+                    //商品単一情報から在庫情報→IDを取得
                     $orderDetail->getProductClass()->getProductStock()->getId()
                 );
 
@@ -833,17 +837,24 @@ class ShoppingService
     public function setCustomerUpdate(Order $Order, Customer $user)
     {
 
+        //受注明細取得
         $orderDetails = $Order->getOrderDetails();
 
         // 顧客情報を更新
         $now = new \DateTime();
+
+        //初回購入日
         $firstBuyDate = $user->getFirstBuyDate();
         if (empty($firstBuyDate)) {
             $user->setFirstBuyDate($now);
         }
+
+        //最終購入日
         $user->setLastBuyDate($now);
 
+        // 購入日情報
         $user->setBuyTimes($user->getBuyTimes() + 1);
+        // 金額情報
         $user->setBuyTotal($user->getBuyTotal() + $Order->getTotal());
 
     }

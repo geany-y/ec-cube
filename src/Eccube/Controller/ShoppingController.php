@@ -68,6 +68,7 @@ class ShoppingController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
+        // カート情報を取得
         $cartService = $app['eccube.service.cart'];
 
         // カートチェック
@@ -83,11 +84,12 @@ class ShoppingController extends AbstractController
         }
 
         // 登録済みの受注情報を取得
+        // 受注ステータス「購入処理中」の情報
         $Order = $app['eccube.service.shopping']->getOrder($app['config']['order_processing']);
 
         // 初回アクセス(受注情報がない)の場合は, 受注情報を作成
         if (is_null($Order)) {
-
+            //購入ユーザー判定
             // 未ログインの場合, ログイン画面へリダイレクト.
             if (!$app->isGranted('IS_AUTHENTICATED_FULLY')) {
 
@@ -103,6 +105,8 @@ class ShoppingController extends AbstractController
             }
 
             // 受注情報を作成
+            // 購入者情報をもとに受注情報を新規作成
+            // 本処理は受注情報を初作成の時のみ
             $Order = $app['eccube.service.shopping']->createOrder($Customer);
 
             // セッション情報を削除
@@ -111,13 +115,22 @@ class ShoppingController extends AbstractController
 
         } else {
             // 計算処理
+            // 受注情報が存在した場合のみカート内計算処理
+            // 小計・配送料・消費税
             $Order = $app['eccube.service.shopping']->getAmount($Order);
+
+            // @Yoshinaga Added 20151210
+            //値引き機能処理
+            $app['eccube.service.discount']->setTarget($Order);
+            $app['eccube.service.discount']->caliculateDiscountAmount();
         }
 
         // 受注関連情報を最新状態に更新
+        // エンティティ情報を再度最新に更新
         $app['orm.em']->refresh($Order);
 
         // form作成
+        // 計算した受注情報をもとに、お届け先フォームの作成
         $form = $app['eccube.service.shopping']->getShippingForm($Order);
 
         // 複数配送の場合、エラーメッセージを一度だけ表示
@@ -128,7 +141,7 @@ class ShoppingController extends AbstractController
             $app['session']->set($this->sessionMultipleKey, 'multiple');
         }
 
-
+        //画面表示
         return $app->render('Shopping/index.twig', array(
             'form' => $form->createView(),
             'Order' => $Order,
@@ -136,11 +149,11 @@ class ShoppingController extends AbstractController
     }
 
     /**
-     * 購入処理
+     * 購入処理(完了)
      */
     public function confirm(Application $app, Request $request)
     {
-
+        //カート情報を取得
         $cartService = $app['eccube.service.cart'];
 
         // カートチェック
@@ -149,15 +162,21 @@ class ShoppingController extends AbstractController
             return $app->redirect($app->url('cart'));
         }
 
+        //受注ステータスの受注情報を取得
+        //受注ステータス(購入処理中)をもとに油中情報を取得
         $Order = $app['eccube.service.shopping']->getOrder($app['config']['order_processing']);
+
+        //受注情報が存在しない場合は、エラー画面へ遷移
         if (!$Order) {
             $app->addError('front.shopping.order.error');
             return $app->redirect($app->url('shopping_error'));
         }
 
         // form作成
+        //　受注情報をもとに商品購入フォームを取得
         $form = $app['eccube.service.shopping']->getShippingForm($Order);
 
+        //画面からの遷移
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
 
@@ -178,14 +197,23 @@ class ShoppingController extends AbstractController
                         return $app->redirect($app->url('shopping_error'));
                     }
 
+
+                    //@important@
+                    //受注情報更新
                     // 受注情報、配送情報を更新
                     $app['eccube.service.shopping']->setOrderUpdate($Order, $data);
+
                     // 在庫情報を更新
                     $app['eccube.service.shopping']->setStockUpdate($em, $Order);
 
                     if ($app->isGranted('ROLE_USER')) {
                         // 会員の場合、購入金額を更新
                         $app['eccube.service.shopping']->setCustomerUpdate($Order, $app->user());
+
+                        // @Yoshinaga Added 20151210
+                        //値引き機能処理
+                        $app['eccube.service.discount']->setTarget($Order);
+                        $app['eccube.service.discount']->caliculateDiscountAmount();
                     }
 
                     $em->getConnection()->commit();
