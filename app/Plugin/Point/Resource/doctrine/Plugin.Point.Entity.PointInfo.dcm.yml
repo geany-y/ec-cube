@@ -11,11 +11,6 @@ Plugin\Point\Entity\PointInfo:
             generator:
                 strategy: AUTO
     fields:
-        point_flg:
-            type: smallint
-            nullable: false
-            options:
-                default: 0
         point_caliculate_type:
             type: smallint
             nullable: false

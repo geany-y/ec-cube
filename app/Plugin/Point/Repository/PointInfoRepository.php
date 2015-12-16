@@ -35,14 +35,25 @@ use Doctrine\ORM\EntityRepository;
 class PointInfoRepository extends EntityRepository
 {
     /**
-     * get
-     *
-     * @param mixed $id The identifier.
-     *
-     * @return object|null The entity instance or NULL if the entity can not be found.
+     * @param  \Plugin\Point\Entity\PointInfo $point
+     * @return bool
      */
-    public function get()
+    public function save(\Plugin\Point\Entity\PointInfo $Point)
     {
+        $em = $this->getEntityManager();
+        $em->getConnection()->beginTransaction();
+        try {
+
+            $em->persist($Point);
+            $em->flush();
+
+            $em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+
+            return false;
+        }
+
         return true;
     }
 }

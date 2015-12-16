@@ -17,28 +17,33 @@ use Symfony\Component\HttpKernel\Exception as HttpException;
 
 class PointController
 {
-    public function __construct()
-    {
-    }
-
     public function index(Application $app, Request $request)
     {
-        $repo = $app['eccube.plugin.point.repository.pointinfo'];
-
+        //ポイントのエンティティ取得
         $Point = new \Plugin\Point\Entity\PointInfo();
-
+        // エラーハンドリング
         if (!$Point) {
             throw new NotFoundHttpException();
         }
 
+        $repo = $app['eccube.plugin.point.repository.pointinfo'];
+        $pointData = $repo->findAll();
+
+        if (!is_null($pointData)) {
+            $Point = $pointData[0];
+        }
+
+        //フォーム生成
         $form = $app['form.factory']
             ->createBuilder('admin_point', $Point)
             ->getForm();
+
+        // 保存処理
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $SavePoint = $form->getData();
-                $status = $repos->save($Point);
+                $status = $repo->save($SavePoint);
                 if ($status) {
                     $app->addSuccess('admin.point.save.complete', 'admin');
                     return $app->redirect($app->url('point'));
@@ -48,10 +53,8 @@ class PointController
             }
         }
 
-        //$Makers = $app['eccube.plugin.maker.repository.maker']->findAll();
-        return $app->render('Point/View/admin/index.twig', array(
+        return $app->render('Point/Resource/template/admin/pointinfo.twig', array(
             'form'          => $form->createView(),
-            //'Makers'        => $Makers,
             'Point'   => $Point,
         ));
     }

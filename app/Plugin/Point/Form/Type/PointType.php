@@ -32,15 +32,18 @@ class PointType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+             ->add('id', 'hidden', array(
+                'required' => false,
+            ))
              ->add('OrderStatus', 'entity', array(
-                'label' => 'ポイントを付与する受注ステータス',
+                'label' => 'ポイント受注ステータス',
                 'class' => 'Eccube\Entity\Master\OrderStatus',
                 'property' => 'name',
                 'empty_value' => false,
                 'empty_data' => null,
             ))
             ->add('point_caliculate_type', 'choice', array(
-                'label' => 'ポイント計算時に減算を行う',
+                'label' => 'ポイント減算処理',
                 'choices' => array(
                     '0' => '無効',
                     '1' => '有効',

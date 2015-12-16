@@ -37,12 +37,6 @@ class PointServiceProvider implements ServiceProviderInterface
             return $app['orm.em']->getRepository('Plugin\Point\Entity\PointInfo');
         });
 
-        /*
-        var_dump($app['eccube.plugin.point.repository.pointinfo']);
-        var_dump('OK');
-        exit();
-        */
-
         // 型登録
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
             $types[] = new PointType($app);
@@ -50,7 +44,17 @@ class PointServiceProvider implements ServiceProviderInterface
         }));
 
         // 一覧
-        $app->match('/point/setting', 'Plugin\Point\Controller\PointController::index')->bind('point');
+        $app->match('/admin/point/setting', 'Plugin\Point\Controller\PointController::index')->bind('point');
+
+        // メッセージ登録
+        $app['translator'] = $app->share($app->extend('translator', function ($translator, \Silex\Application $app) {
+            $translator->addLoader('yaml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
+            $file = __DIR__ . '/../Resource/locale/message.' . $app['locale'] . '.yml';
+            if (file_exists($file)) {
+                $translator->addResource('yaml', $file, $app['locale']);
+            }
+            return $translator;
+        }));
 
         // メニュー登録
         $app['config'] = $app->share($app->extend('config', function ($config) {

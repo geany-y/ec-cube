@@ -60,9 +60,25 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
      */
     private $point_conversion_rate;
     /**
-     * @var integer
+     * Set id
+     *
+     * @param integer $id
+     * @return BaseInfo
      */
-    private $point_flg;
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
     /**
      * Set basic_point_rate
      *
@@ -122,26 +138,6 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
     public function getPointCaliculateType()
     {
         return $this->point_caliculate_type;
-    }
-    /**
-     * Set point_flg
-     *
-     * @param integer $point_flg
-     * @return BaseInfo
-     */
-    public function setPointFlg($point_flg)
-    {
-        $this->point_flg = $point_flg;
-        return $this;
-    }
-    /**
-     * Get point_flg
-     *
-     * @return integer
-     */
-    public function getPointFlg()
-    {
-        return $this->point_flg;
     }
     /**
      * Set point_conversion_rate

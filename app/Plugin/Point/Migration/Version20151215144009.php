@@ -29,8 +29,6 @@ class Version20151215144009 extends AbstractMigration
         $t->addColumn('id', 'smallint', array('NotNull' => true));
         $t->addColumn('basic_point_rate', 'decimal', array('NotNull' => true, 'Default' => 0));
         $t->addColumn('add_point_status', 'smallint', array('NotNull' => false, 'Default' => 1));
-        $t->addColumn('point_caliculate_type', 'smallint', array('NotNull' => true, 'Default' => 0));
-        $t->addColumn('point_flg', 'smallint', array('NotNull' => true, 'Default' => 0));
         $t->addColumn('point_conversion_rate', 'decimal', array('NotNull' => true, 'Default' => null));
         $t->setPrimaryKey(array('id'));
 
