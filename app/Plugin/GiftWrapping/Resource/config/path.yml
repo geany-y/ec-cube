@@ -1,0 +1,7 @@
+# realdir:plugin
+gift_wrapping_html_realdir: /html/plugin/giftwrapping
+gift_wrapping_img_realdir: /html/plugin/giftwrapping/assets/img
+
+# urlpath
+gift_wrapping_urlpath: /plugin/giftwrapping
+gift_wrapping_img_urlpath: /plugin/giftwrapping/assets/img

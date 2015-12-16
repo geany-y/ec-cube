@@ -1,0 +1,6 @@
+name: LikeNiko
+event: LikeNiko
+code: LikeNiko
+version: 0.0.1
+service:
+  - LikeNikoServiceProvider

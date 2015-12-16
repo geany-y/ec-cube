@@ -1,0 +1,8 @@
+name: Pointプラグイン
+code: Point
+version: 1.0.0
+service:
+  - PointServiceProvider
+orm.path:
+  - /Resource/doctrine
+event: Point

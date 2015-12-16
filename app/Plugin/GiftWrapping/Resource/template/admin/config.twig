@@ -1,0 +1,42 @@
+{% extends 'default_frame.twig' %}
+
+{% block title %}ラッピング設定画面{% endblock %}
+{% block sub_title %}{% endblock %}
+
+{% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form class="form-horizontal" method="post" action="{{ url('plugin_GiftWrapping_config') }}">
+                {{ form_widget(form._token) }}
+                <div class="form-group {% if form.user_id.vars.errors|length %} has-error {% endif %}">
+                    <label class="col-sm-4 control-label">ユーザーID <span class="text-danger">*</span></label>
+                    <div class="col-sm-8">
+                        {{ form_widget(form.user_id) }}
+                        {{ form_errors(form.user_id) }}
+                    </div>
+                </div>
+                <div class="form-group {% if form.user_password.vars.errors|length %} has-error {% endif %}">
+                    <label class="col-sm-4 control-label">パスワード <span class="text-danger">*</span></label>
+                    <div class="col-sm-8">
+                        {{ form_widget(form.user_password, {'type': 'password'}) }}
+                        {{ form_errors(form.user_password) }}
+                    </div>
+                </div>
+                <div class="form-group {% if form.is_wrapping.vars.errors|length %} has-error {% endif %}">
+                    <label class="col-sm-4">ラッピング項目の使用</label>
+                    <div class="col-sm-8">
+                        {{ form_widget(form.is_wrapping) }}
+                        {{ form_errors(form.is_wrapping) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-6">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">登録</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock main %}

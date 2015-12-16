@@ -1,0 +1,22 @@
+Plugin\GiftWrapping\Entity\Wrapping:
+    type: entity
+    table: plg_gift_wrapping
+    repositoryClass: Plugin\GiftWrapping\Repository\WrappingRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: gift_wrapping_id
+    fields:
+        user_id:
+            type: text
+            nullable: true
+        user_password:
+            type: text
+            nullable: true
+        is_wrapping:
+            type: boolean
+            nullable: true
+    lifecycleCallbacks: {  }
