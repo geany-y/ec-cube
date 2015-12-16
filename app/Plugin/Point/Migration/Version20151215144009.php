@@ -49,7 +49,7 @@ class Version20151215144009 extends AbstractMigration
         }
         $t = $schema->createTable(self::PLG_POINT_PRODUCT);
         $t->addColumn('id', 'smallint', array('NotNull' => true));
-        $t->addColumn('product_id', 'smallint', array('NotNull' => true));
+        $t->addColumn('product_class_id', 'smallint', array('NotNull' => true));
         $t->addColumn('product_point_rate', 'decimal', array('NotNull' => true, 'Default' => 0));
         $t->addColumn('created', 'date', array('NotNull' => true));
         $t->addColumn('modified', 'date', array('NotNull' => true));

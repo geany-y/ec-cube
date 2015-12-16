@@ -22,6 +22,7 @@ use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Plugin\Point\Form\Type\PointType;
+use Plugin\Point\Form\Type\ProductPointRateType;
 use Plugin\Point\Entity\PointInfo;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
@@ -40,6 +41,7 @@ class PointServiceProvider implements ServiceProviderInterface
         // 型登録
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
             $types[] = new PointType($app);
+            $types[] = new ProductPointRateType($app);
             return $types;
         }));
 

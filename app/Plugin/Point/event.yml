@@ -1,2 +1,6 @@
-eccube.event.render.point.before:
-    - [setPointMenu, NORMAL]
+# 商品新規登録
+eccube.event.render.admin_product_product_new.before:
+    - [setProductPointRateColumn, NORMAL]
+# 商品編集
+eccube.event.render.admin_product_product_edit.before:
+    - [setProductPointRateColumn, NORMAL]
