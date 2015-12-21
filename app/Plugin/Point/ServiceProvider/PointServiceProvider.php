@@ -38,6 +38,11 @@ class PointServiceProvider implements ServiceProviderInterface
             return $app['orm.em']->getRepository('Plugin\Point\Entity\PointInfo');
         });
 
+        // ポイント機能関連商品情報テーブル用レポジトリ
+        $app['eccube.plugin.point.repository.pointproduct'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('\Plugin\Point\Entity\ProductPointRate');
+        });
+
         // 型登録
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
             $types[] = new PointType($app);

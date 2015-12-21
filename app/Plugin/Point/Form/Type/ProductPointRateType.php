@@ -9,6 +9,7 @@
 * file that was distributed with this source code.
 */
 namespace Plugin\Point\Form\Type;
+use Eccube\Form\Type\ProductClass;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -34,16 +35,7 @@ class ProductPointRateType extends AbstractType
         $builder
              ->add('id', 'hidden', array(
                 'required' => false,
-            ))
-             ->add('ProductClassId', 'entity', array(
-                'label' => '商品規格ID',
-                'class' => 'Eccube\Entity\ProductClass',
-                'expanded' => false,
-                'multiple' => false,
-                'empty_value' => 0,
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                ),
+                'empty_data' => 0,
             ))
             ->add('product_point_rate', 'text', array(
                 'label' => '商品別ポイント付与率',
@@ -54,16 +46,6 @@ class ProductPointRateType extends AbstractType
                         'message' => 'form.type.float.invalid'
                     )),
                 ),
-            ))
-            ->add('created', 'datetime', array(
-                'required' => false,
-                'format' => 'yyyy/MM/dd H:i:s',
-                'empty_value' => date('yyyy/MM/dd H:i:s'),
-            ))
-            ->add('modified', 'datetime', array(
-                'required' => false,
-                'format' => 'yyyy/MM/dd H:i:s',
-                'empty_value' => date('yyyy/MM/dd H:i:s'),
             ))
             ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
     }

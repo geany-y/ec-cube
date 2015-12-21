@@ -21,13 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 #}
-<h2 class="heading02">商品別ポイント付与率を設定してください</h2>
-<div class="column">
-    <div class="form-inline form-group">
-        <label>商品別ポイント付与率</label>
-        {{ form_widget(form.id) }}
-        {{ form_widget(form.product_class_id) }}
-        {{ form_widget(form.product_point_rate) }}
-        {{ form_errors(form.product_point_rate) }}
-    </div>
+<div class="form-group">
+<label class="col-sm-2 control-label required">{{ form_label(form.product_point_rate) }}</label>
+<div class="col-sm-10">
+{{ form_widget(form.id) }}
+{{ form_widget(form.product_point_rate) }}
+{{ form_errors(form.product_point_rate) }}
+</div>
 </div>
