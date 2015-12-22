@@ -123,6 +123,11 @@ class Point
         */
     }
 
+    public function onPreSetData(){
+      var_dump('Formデータのセット前だよ!!');
+      exit();
+    }
+
     /**
      *
      * @param FormType $form

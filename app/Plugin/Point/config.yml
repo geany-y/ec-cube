@@ -6,3 +6,8 @@ service:
 orm.path:
   - /Resource/doctrine
 event: Point
+#onPreSetData: Point
+form:
+    onPostSetData:
+        Form\Event\PointEvent
+
