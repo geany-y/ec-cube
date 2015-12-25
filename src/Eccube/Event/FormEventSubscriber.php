@@ -24,6 +24,7 @@
 
 namespace Eccube\Event;
 
+use Eccube\Application;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

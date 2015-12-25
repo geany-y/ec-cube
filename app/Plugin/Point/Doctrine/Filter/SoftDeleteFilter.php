@@ -1,4 +1,4 @@
-{#
+<?php
 /*
  * This file is part of EC-CUBE
  *
@@ -20,14 +20,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-#}
-<div class="form-group">
-<label class="col-sm-2 control-label">{{ form_label(form.product_point_rate) }}</label>
-<div class="col-sm-3 col-lg-3">
-<div class="input-group">
-{{ form_widget(form.id) }}
-{{ form_widget(form.product_point_rate) }}
-{{ form_errors(form.product_point_rate) }}
-</div>
-</div>
-</div>
+
+
+namespace Eccube\Doctrine\Filter;
+
+use Doctrine\ORM\Query\Filter\SQLFilter;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+class SoftDeleteFilter extends SQLFilter
+{
+    public $excludes = array();
+
+    public function setExcludes($excludes)
+    {
+        $this->excludes = $excludes;
+
+        return $this;
+    }
+    
+    public function getExcludes()
+    {
+        return $this->excludes;
+    }
+
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    {
+        if ($targetEntity->hasField('del_flg') && !in_array($targetEntity->getName(), $this->getExcludes())) {
+            return $targetTableAlias . '.del_flg = 0';
+        } else {
+            return "";
+        }
+    }
+}

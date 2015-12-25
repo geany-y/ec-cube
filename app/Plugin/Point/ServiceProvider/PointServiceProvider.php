@@ -50,6 +50,14 @@ class PointServiceProvider implements ServiceProviderInterface
             return $types;
         }));
 
+        // Form/Extension
+        /*
+        $app['form.type.extensions'] = $app->share($app->extend('form.type.extensions', function ($extensions) use($app) {
+            $extensions[] = new \Plugin\Point\Form\Extension\ProductTypeExtension($app);
+            return $extensions;
+        }));
+        */
+
         // 一覧
         $app->match('/admin/point/setting', 'Plugin\Point\Controller\PointController::index')->bind('point');
 

@@ -51,10 +51,25 @@ class Point
     }
 
     public function savePostDatas(Request $request, Response $response){
+      $id = $this->app['request']->attributes->get('id');
+      echo '<script>alert('.$id.');</script>';
+      /*
+      $newc = $this->app['controllers_factory']->match('admin_product_product_edit', function(){ echo 'hoge'; exit();});
+
+      echo '<pre>';
+      $newc->getRoute()->run();
+      echo '</pre>';
+      exit();
+      */
+      //admin_product_product_edit
+      //echo '</pre>';
+      //exit();
+      //$this->app->extend('controllers_factory', function($c){
+      //});
         //var_dump($request->attributes->get('id'));
         //exit();
-        $form = $this->app['form.factory']->createBuilder('admin_product_point_rate')->getForm();
-        $curr_entity = $this->app['orm.em']->getUnitOfWork();
+        //$form = $this->app['form.factory']->createBuilder('admin_product_point_rate')->getForm();
+        //$curr_entity = $this->app['orm.em']->getUnitOfWork();
         /*
         echo '<pre>';
         //var_dump(get_class_methods($curr_entity));
@@ -121,11 +136,6 @@ class Point
             'Point'   => $Point,
         ));
         */
-    }
-
-    public function onPreSetData(){
-      var_dump('Formデータのセット前だよ!!');
-      exit();
     }
 
     /**

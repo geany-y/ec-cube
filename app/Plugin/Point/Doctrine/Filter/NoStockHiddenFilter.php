@@ -1,4 +1,4 @@
-{#
+<?php
 /*
  * This file is part of EC-CUBE
  *
@@ -20,14 +20,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-#}
-<div class="form-group">
-<label class="col-sm-2 control-label">{{ form_label(form.product_point_rate) }}</label>
-<div class="col-sm-3 col-lg-3">
-<div class="input-group">
-{{ form_widget(form.id) }}
-{{ form_widget(form.product_point_rate) }}
-{{ form_errors(form.product_point_rate) }}
-</div>
-</div>
-</div>
+
+
+namespace Eccube\Doctrine\Filter;
+
+use Doctrine\ORM\Query\Filter\SQLFilter;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+class NoStockHiddenFilter extends SQLFilter
+{
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    {
+        if ($targetEntity->reflClass->getName() === 'Eccube\Entity\ProductClass') {
+            return $targetTableAlias . '.stock >= 1 OR ' . $targetTableAlias . '.stock_unlimited = 1';
+        } else {
+            return "";
+        }
+    }
+}

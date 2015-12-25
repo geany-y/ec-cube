@@ -14,6 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Plugin\Point\Doctrine\EventSubscriber\SaveEventSubscriberExtends;
 
 class ProductPointRateType extends AbstractType
 {
@@ -47,7 +48,8 @@ class ProductPointRateType extends AbstractType
                     )),
                 ),
             ))
-            ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+            //->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+            ->addEventSubscriber(new SaveEventSubscriberExtends($this->app));
     }
 
     public function configureOptions(OptionsResolver $resolver)

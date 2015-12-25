@@ -664,7 +664,6 @@ class Application extends ApplicationTrait
             if (isset($config['event'])) {
                 $class = '\\Plugin\\'.$config['code'].'\\'.$config['event'];
                 $subscriber = new $class($this);
-
                 if (file_exists($dir->getRealPath().'/event.yml')) {
                     foreach (Yaml::Parse($dir->getRealPath().'/event.yml') as $event => $handlers) {
                         foreach ($handlers as $handler) {

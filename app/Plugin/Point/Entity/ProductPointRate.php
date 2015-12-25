@@ -38,7 +38,7 @@ class ProductPointRate extends \Eccube\Entity\AbstractEntity
     /**
      * @var integer
      */
-    private $product_class_id;
+    private $product_id;
     /**
      * @var integer
      */
@@ -72,24 +72,24 @@ class ProductPointRate extends \Eccube\Entity\AbstractEntity
         return $this->id;
     }
     /**
-     * Set prodcut_class_id
+     * Set prodcut_id
      *
-     * @param integer $product_class_id
+     * @param integer $product_id
      * @return ProductPointRate
      */
-    public function setProductClassId($product_class_id)
+    public function setProductId($product_id)
     {
-        $this->product_class_id = $product_class_id;
+        $this->product_id = $product_id;
         return $this;
     }
     /**
-     * Get prodcut_class_id
+     * Get prodcut_id
      *
-     * @return product_class_id
+     * @return product_id
      */
-    public function getProductClassId()
+    public function getProductId()
     {
-        return $this->product_class_id;
+        return $this->product_id;
     }
     /**
      * Set product_point_rate

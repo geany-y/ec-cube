@@ -202,6 +202,8 @@ class PluginService
                         if (!$this->checkSymbolName($handler[0])) {
                             throw new PluginException('Handler name format error');
                         }
+                        var_dump('Start Event!!');
+                        exit();
                         $peh = new \Eccube\Entity\PluginEventHandler();
                         $peh->setPlugin($p)
                             ->setEvent($event)
