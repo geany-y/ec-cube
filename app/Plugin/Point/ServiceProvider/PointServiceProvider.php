@@ -23,10 +23,12 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Plugin\Point\Form\Type\PointType;
 use Plugin\Point\Form\Type\ProductPointRateType;
+use Plugin\Point\Doctrine\Listener\ORMListener;
 use Plugin\Point\Entity\PointInfo;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Yaml\Yaml;
+use Doctrine\Common\EventManager;
 
 
 class PointServiceProvider implements ServiceProviderInterface
@@ -50,6 +52,27 @@ class PointServiceProvider implements ServiceProviderInterface
             return $types;
         }));
 
+        /*
+        $app['doctrine.event_listener'] = $app->share(function (\Silex\Application $app) use($app){
+                return new \Plugin\Point\Doctrine\Listener\ORMListener($app);
+        });
+        */
+        // EventSubScriber Set
+        $app['doctrine.event_subscriber'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\ProductUpsertSubscriber($app);
+        });
+        // Retunr Doctrine Event Manager
+        $app['doctrine.em'] = $app->share(function ($app) use($app) {
+                return new \Doctrine\Common\EventManager($app);
+        });
+        $app['eccube.service.cart'] = $container->extend('eccube.service.cart',function(Application $app) {
+            return new \Eccube\Service\CartService($app);
+        });
+        /*
+        $app['eccube.service.cart'] = $app->share(function () use ($app) {
+            return new \Eccube\Service\CartService($app);
+        });
+        */
         // Form/Extension
         /*
         $app['form.type.extensions'] = $app->share($app->extend('form.type.extensions', function ($extensions) use($app) {
@@ -57,6 +80,7 @@ class PointServiceProvider implements ServiceProviderInterface
             return $extensions;
         }));
         */
+
 
         // 一覧
         $app->match('/admin/point/setting', 'Plugin\Point\Controller\PointController::index')->bind('point');

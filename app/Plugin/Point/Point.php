@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Doctrine\Common\EventManager;
 //use Symfony\Component\EventDispatcher\EventDispatcher;
 //use Acme\StoreBundle\Event\StoreSubscriber;
 
@@ -31,6 +32,20 @@ class Point
         $this->app = $app;
     }
 
+    // Doctrineのアップデートイベントリスナー登録
+    public function setProductPointDoctrineEvent($event){
+      //eccube.event.controller.admin_product_product_edit.before
+      //Symfony\Component\EventDispatcher\EventDispatcher
+      //$event->getDispatcher()->addListener('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'updateTagged'));
+      //$this->app['doctrine.em']->addEventListener('doctrine.admin.save_object', $this->app['doctrine.event_listener']);
+      //$this->app['doctrine.em']->addEventSubscriber($this->app['doctrine.event_subscriber']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event_subscriber']);
+      //$this->app['kernel.event_subscriber'];
+      //$this->app['doctrine.em']->getEventDispatcher()->connect('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'onFlush'));
+      //$doctrineEventManager->addEventListener('doctrine.event_listener', $this->app['doctrine.event_listener']);
+      //$doctrineEventManager->addEventListener('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'onFlush'));
+    }
+
     /**
      * 商品登録・更新画面にポイント付与率項目を追加
      *
@@ -38,8 +53,14 @@ class Point
      */
     public function setProductPointRateColumn(FilterResponseEvent $event)
     {
+        //$event->getDispatcher()->dispatch('doctrine.event_listener',$event);
+        //$this->app['doctrine.em']->dispatchEvent('updateTagged', 'updateTagged');
+        //$this->app['doctrine.em']->dispatchEvent('onFlush', new \Doctrine\Common\Persistence\Event\ManagerEventArgs(new \Doctrine\Common\Persistence\ObjectManager()));
+        //$this->app['doctrine.em']->dispatchEvent('onFlush', new \Doctrine\Common\Persistence\Event\ManagerEventArgs(new \Doctrine\Common\Persistence\ObjectManager()));
         $request = $event->getRequest();
         $response = $event->getResponse();
+
+        //$this->app['doctrine.em']->dispatchEvent('doctrine.admin.save_object', $this->app['doctrine.event_listener']);
 
         //ユーザーからポストがあった際の保存処理
         $this->savePostDatas($request, $response);

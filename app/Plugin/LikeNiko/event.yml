@@ -1,2 +1,0 @@
-eccube.event.render.homepage.before:
-    - [setNikoMassegeBox, NORMAL]

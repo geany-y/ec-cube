@@ -1,5 +1,0 @@
-eccube.event.render.shopping.before:
-  - [onRenderGiftWrappingShoppingBefore, NORMAL]
-
-eccube.event.render.admin_setting_shop_payment_edit.before:
-  - [onRenderGiftWrappingAdminPaymentBefore, NORMAL]
