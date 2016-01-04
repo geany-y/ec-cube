@@ -14,17 +14,17 @@
 //use Silex\Application as BaseApplication;
 //use Silex\ServiceProviderInterface;
 
-namespace Plugin\Point\ServiceProvider;
+namespace Plugin\Point2\ServiceProvider;
 
 use Eccube\Application;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
-use Plugin\Point\Form\Type\PointType;
-use Plugin\Point\Form\Type\ProductPointRateType;
-use Plugin\Point\Doctrine\Listener\ORMListener;
-use Plugin\Point\Entity\PointInfo;
+use Plugin\Point2\Form\Type\PointType;
+use Plugin\Point2\Form\Type\ProductPointRateType;
+use Plugin\Point2\Doctrine\Listener\ORMListener;
+use Plugin\Point2\Entity\PointInfo;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -36,13 +36,14 @@ class PointServiceProvider implements ServiceProviderInterface
     public function register(BaseApplication $app)
     {
         // ポイント機能基本情報テーブル用リポジトリ
+        /*
         $app['eccube.plugin.point.repository.pointinfo'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Plugin\Point\Entity\PointInfo');
+            return $app['orm.em']->getRepository('Plugin\Point2\Entity\PointInfo');
         });
 
         // ポイント機能関連商品情報テーブル用レポジトリ
         $app['eccube.plugin.point.repository.pointproduct'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('\Plugin\Point\Entity\ProductPointRate');
+            return $app['orm.em']->getRepository('\Plugin\Point2\Entity\ProductPointRate');
         });
 
         // 型登録
@@ -51,41 +52,28 @@ class PointServiceProvider implements ServiceProviderInterface
             $types[] = new ProductPointRateType($app);
             return $types;
         }));
+        */
 
         /*
         $app['doctrine.event_listener'] = $app->share(function (\Silex\Application $app) use($app){
                 return new \Plugin\Point\Doctrine\Listener\ORMListener($app);
         });
         */
-
         // EventSubScriber Set
-        $app['doctrine.event_subscriber'] = $app->share(function ($app) use($app) {
-                return new \Plugin\Point\Doctrine\EventSubscriber\ProductUpsertSubscriber($app);
+        $app['doctrine.event_subscriber2'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point2\Doctrine\EventSubscriber\ProductUpsertSubscriber($app);
         });
         // Retunr Doctrine Event Manager
-        $app['doctrine.em'] = $app->share(function ($app) use($app) {
+        $app['doctrine.em2'] = $app->share(function ($app) use($app) {
                 return new \Doctrine\Common\EventManager($app);
         });
-        /*
-        $app['eccube.service.cart'] = $app->extend('eccube.service.cart',function(Application $app) {
-            return new \Eccube\Service\CartService($app);
-        });
-        */
         $app['eccube.service.cart'] = $app->share(function () use ($app) {
-            return new \Plugin\Point\Service\CartServiceEx($app);
+            return new \Plugin\Point2\Service\CartServiceEx($app);
         });
-
-        // Form/Extension
-        /*
-        $app['form.type.extensions'] = $app->share($app->extend('form.type.extensions', function ($extensions) use($app) {
-            $extensions[] = new \Plugin\Point\Form\Extension\ProductTypeExtension($app);
-            return $extensions;
-        }));
-        */
 
 
         // 一覧
-        $app->match('/'.$app['config']['admin_route'].'/point/setting', 'Plugin\Point\Controller\PointController::index')->bind('point');
+        $app->match('/admin/point2/setting', 'Plugin\Point2\Controller\PointController::index')->bind('point2');
 
         // メッセージ登録
         $app['translator'] = $app->share($app->extend('translator', function ($translator, \Silex\Application $app) {

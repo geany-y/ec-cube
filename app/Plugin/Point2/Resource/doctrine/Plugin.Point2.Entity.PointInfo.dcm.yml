@@ -1,0 +1,40 @@
+Plugin\Point2\Entity\PointInfo:
+    type: entity
+    table: plg_point_info
+    repositoryClass: Plugin\Point2\Repository\PointInfoRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        point_caliculate_type:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        basic_point_rate:
+            type: decimal
+            nullable: false
+            precision: 10
+            scale: 0
+            options:
+                default: 0
+        point_conversion_rate:
+            type: decimal
+            nullable: true
+            precision: 10
+            scale: 0
+            options:
+                default: null
+    manyToOne:
+        OrderStatus:
+            targetEntity: Eccube\Entity\Master\OrderStatus
+            joinColumn:
+                name: add_point_status
+                referencedColumnName: id
+    lifecycleCallbacks:
+        loadClassMetadata: {  }

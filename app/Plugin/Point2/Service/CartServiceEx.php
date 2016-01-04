@@ -22,7 +22,7 @@
  */
 
 
-namespace Plugin\Point\Service;
+namespace Plugin\Point2\Service;
 
 use Eccube\Service\CartService;
 use Doctrine\ORM\EntityManager;
@@ -37,6 +37,6 @@ class CartServiceEx extends CartService
     public function save()
     {
         $buff = parent::save();
-        var_dump('Point -> CartService::save()拡張');
+        var_dump('Point2拡張成功!!!!!!!!!!!!!!!!!!!!!!');
     }
 }

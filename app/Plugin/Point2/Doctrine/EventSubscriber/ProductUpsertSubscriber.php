@@ -1,5 +1,5 @@
 <?php
-namespace Plugin\Point\Doctrine\EventSubscriber;
+namespace Plugin\Point2\Doctrine\EventSubscriber;
 
 use Doctrine\Common\EventSubscriber;
 //use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -38,7 +38,7 @@ class ProductUpsertSubscriber implements EventSubscriber
         //var_dump($uow->getScheduledEntityInsertions());
         // follow the on Insert
         foreach ($uow->getScheduledEntityInsertions() as $updated) {
-            var_dump('Save対象Entity一覧<br />');
+            var_dump('<br />Point2拡張<br />');
             var_dump(get_class($updated).'<br />');
             if ($updated instanceof \Eccube\Entity\Product) {
                 // save PointProductRojicHere //Product Entity HERE()
@@ -47,8 +47,9 @@ class ProductUpsertSubscriber implements EventSubscriber
         }
 
         $point_rate = $this->app['request']->request->get('admin_product_point_rate');
-        var_dump('ポスト値<br />');
+        var_dump('Point2拡張<br />');
         var_dump($point_rate);
+        exit();
         //$ProductPointRate = new \Plugin\Point\Entity\ProductPointRate();
         //$ProductPointRate->setId(1);
         /*

@@ -22,21 +22,19 @@
  */
 
 
-namespace Plugin\Point\Service;
+namespace Eccube\Doctrine\Filter;
 
-use Eccube\Service\CartService;
-use Doctrine\ORM\EntityManager;
-use Eccube\Common\Constant;
-use Eccube\Entity\CartItem;
-use Eccube\Entity\Master\Disp;
-use Eccube\Exception\CartException;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Doctrine\ORM\Query\Filter\SQLFilter;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
-class CartServiceEx extends CartService
+class NoStockHiddenFilter extends SQLFilter
 {
-    public function save()
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
     {
-        $buff = parent::save();
-        var_dump('Point -> CartService::save()拡張');
+        if ($targetEntity->reflClass->getName() === 'Eccube\Entity\ProductClass') {
+            return $targetTableAlias . '.stock >= 1 OR ' . $targetTableAlias . '.stock_unlimited = 1';
+        } else {
+            return "";
+        }
     }
 }

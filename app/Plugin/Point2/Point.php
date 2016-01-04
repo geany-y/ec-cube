@@ -9,9 +9,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Plugin\Point;
+namespace Plugin\Point2;
 
-use Plugin\Point\Entity\ProductPointRate;
+use Plugin\Point2\Entity\ProductPointRate;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +39,7 @@ class Point
       //$event->getDispatcher()->addListener('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'updateTagged'));
       //$this->app['doctrine.em']->addEventListener('doctrine.admin.save_object', $this->app['doctrine.event_listener']);
       //$this->app['doctrine.em']->addEventSubscriber($this->app['doctrine.event_subscriber']);
-      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event_subscriber']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event_subscriber2']);
       //$this->app['kernel.event_subscriber'];
       //$this->app['doctrine.em']->getEventDispatcher()->connect('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'onFlush'));
       //$doctrineEventManager->addEventListener('doctrine.event_listener', $this->app['doctrine.event_listener']);
@@ -73,8 +73,7 @@ class Point
 
     public function savePostDatas(Request $request, Response $response){
       $id = $this->app['request']->attributes->get('id');
-      $message = "'商品毎ポイント付与率入力欄動的挿入'";
-      echo '<script>alert('.$message.');</script>';
+      echo '<script>alert('.$id.');</script>';
       /*
       $newc = $this->app['controllers_factory']->match('admin_product_product_edit', function(){ echo 'hoge'; exit();});
 
@@ -202,7 +201,7 @@ class Point
 
         $form->handleRequest($request);
 
-        $parts = $this->app->renderView('Point/Resource/template/admin/product_point_rate_parts.twig', array(
+        $parts = $this->app->renderView('Point2/Resource/template/admin/product_point_rate_parts.twig', array(
             'form' => $form->createView()
         ));
 

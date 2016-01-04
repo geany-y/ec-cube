@@ -1,4 +1,4 @@
-<?php
+{#
 /*
  * This file is part of EC-CUBE
  *
@@ -20,23 +20,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-
-namespace Plugin\Point\Service;
-
-use Eccube\Service\CartService;
-use Doctrine\ORM\EntityManager;
-use Eccube\Common\Constant;
-use Eccube\Entity\CartItem;
-use Eccube\Entity\Master\Disp;
-use Eccube\Exception\CartException;
-use Symfony\Component\HttpFoundation\Session\Session;
-
-class CartServiceEx extends CartService
-{
-    public function save()
-    {
-        $buff = parent::save();
-        var_dump('Point -> CartService::save()拡張');
-    }
-}
+#}
+<div class="form-group">
+<label class="col-sm-2 control-label">{{ form_label(form.product_point_rate) }}</label>
+<div class="col-sm-3 col-lg-3">
+<div class="input-group">
+{{ form_widget(form.id) }}
+{{ form_widget(form.product_point_rate) }}
+{{ form_errors(form.product_point_rate) }}
+</div>
+</div>
+</div>

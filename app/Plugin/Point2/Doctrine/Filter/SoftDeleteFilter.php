@@ -22,21 +22,33 @@
  */
 
 
-namespace Plugin\Point\Service;
+namespace Eccube\Doctrine\Filter;
 
-use Eccube\Service\CartService;
-use Doctrine\ORM\EntityManager;
-use Eccube\Common\Constant;
-use Eccube\Entity\CartItem;
-use Eccube\Entity\Master\Disp;
-use Eccube\Exception\CartException;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Doctrine\ORM\Query\Filter\SQLFilter;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
-class CartServiceEx extends CartService
+class SoftDeleteFilter extends SQLFilter
 {
-    public function save()
+    public $excludes = array();
+
+    public function setExcludes($excludes)
     {
-        $buff = parent::save();
-        var_dump('Point -> CartService::save()拡張');
+        $this->excludes = $excludes;
+
+        return $this;
+    }
+    
+    public function getExcludes()
+    {
+        return $this->excludes;
+    }
+
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    {
+        if ($targetEntity->hasField('del_flg') && !in_array($targetEntity->getName(), $this->getExcludes())) {
+            return $targetTableAlias . '.del_flg = 0';
+        } else {
+            return "";
+        }
     }
 }

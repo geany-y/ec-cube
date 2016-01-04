@@ -22,21 +22,25 @@
  */
 
 
-namespace Plugin\Point\Service;
+namespace Eccube\Doctrine\Filter;
 
-use Eccube\Service\CartService;
-use Doctrine\ORM\EntityManager;
-use Eccube\Common\Constant;
-use Eccube\Entity\CartItem;
-use Eccube\Entity\Master\Disp;
-use Eccube\Exception\CartException;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Doctrine\ORM\Query\Filter\SQLFilter;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
-class CartServiceEx extends CartService
+class OrderStatusFilter extends SQLFilter
 {
-    public function save()
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
     {
-        $buff = parent::save();
-        var_dump('Point -> CartService::save()拡張');
+        // 決済処理中/購入処理中を除く.
+        if ($targetEntity->reflClass->getName() === 'Eccube\Entity\Order') {
+            return $targetTableAlias . '.status <> 7 AND ' . $targetTableAlias . '.status <> 8';
+        }
+
+        // 決済処理中/購入処理中を除く.
+        if ($targetEntity->reflClass->getName() === 'Eccube\Entity\Master\OrderStatus') {
+            return $targetTableAlias . '.id <> 7 AND ' . $targetTableAlias . '.id <> 8';
+        }
+
+        return '';
     }
 }
