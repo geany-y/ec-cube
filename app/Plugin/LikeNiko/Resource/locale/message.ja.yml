@@ -1,0 +1,4 @@
+admin.nikoinfo.save.complete: LikeNiko基本情報を保存しました。
+admin.nikoinfo.save.error: LikeNiko基本情報をの保存に失敗しました。(Nodeサーバーを確認してください)
+admin.nikoinfo.alphanumeric.error: 半角英数字( 記号含 )のみ入力できます。
+admin.nikoinfo.numeric.error: 半角数字のみ入力できます。

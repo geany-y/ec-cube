@@ -1,0 +1,50 @@
+Plugin\LikeNiko\Entity\NikoInfo:
+    type: entity
+    table: plg_likeniko_info
+    repositoryClass: Plugin\LikeNiko\Repository\NikoInfoRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        is_auth_flg:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        form_insert_key:
+            type: string
+            nullable: false
+            options:
+                default: ''
+        replace_block_key:
+            type: string
+            nullable: false
+            options:
+                default: ''
+        target_img_name:
+            type: string
+            nullable: false
+            options:
+                default: ''
+        target_img_height:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        target_img_width:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        node_server_address:
+            type: string
+            nullable: false
+            options:
+                default: ''
+    lifecycleCallbacks:
+        loadClassMetadata: {  }

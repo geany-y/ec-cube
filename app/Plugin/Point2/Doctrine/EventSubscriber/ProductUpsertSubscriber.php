@@ -38,8 +38,6 @@ class ProductUpsertSubscriber implements EventSubscriber
         //var_dump($uow->getScheduledEntityInsertions());
         // follow the on Insert
         foreach ($uow->getScheduledEntityInsertions() as $updated) {
-            var_dump('<br />Point2拡張<br />');
-            var_dump(get_class($updated).'<br />');
             if ($updated instanceof \Eccube\Entity\Product) {
                 // save PointProductRojicHere //Product Entity HERE()
                 //$em->persist(new IssueLog($updated));
@@ -47,9 +45,6 @@ class ProductUpsertSubscriber implements EventSubscriber
         }
 
         $point_rate = $this->app['request']->request->get('admin_product_point_rate');
-        var_dump('Point2拡張<br />');
-        var_dump($point_rate);
-        exit();
         //$ProductPointRate = new \Plugin\Point\Entity\ProductPointRate();
         //$ProductPointRate->setId(1);
         /*

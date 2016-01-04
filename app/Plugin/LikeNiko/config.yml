@@ -1,0 +1,8 @@
+name: LikeNiko
+code: LikeNiko
+version: 0.5.0
+service:
+  - LikeNikoServiceProvider
+orm.path:
+  - /Resource/doctrine
+event: LikeNiko

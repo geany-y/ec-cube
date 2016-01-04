@@ -48,8 +48,8 @@ class ProductPointRateType extends AbstractType
                     )),
                 ),
             ))
-            //->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
-            ->addEventSubscriber(new SaveEventSubscriberExtends($this->app));
+            ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+            //->addEventSubscriber(new SaveEventSubscriberExtends($this->app));
     }
 
     public function configureOptions(OptionsResolver $resolver)

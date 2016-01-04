@@ -11,12 +11,12 @@ Plugin\Point\Entity\ProductPointRate:
             generator:
                 strategy: AUTO
     fields:
-        product_class_id:
-            type: integer
-            nullable: false
-            unsigned: false
-            options:
-                default: 0
+        #product_class_id:
+        #    type: integer
+        #    nullable: false
+        #    unsigned: false
+        #    options:
+        #        default: 0
         product_point_rate:
             type: decimal
             nullable: false
@@ -30,5 +30,12 @@ Plugin\Point\Entity\ProductPointRate:
         modified:
             type: datetime
             nullable: false
+    oneToOne:
+        Product:
+            targetEntity: Eccube\Entity\Product
+            inversedBy: ProductPointRate
+            joinColumn:
+                name: product_id
+                referencedColumnName: product_id
     lifecycleCallbacks:
         loadClassMetadata: {  }
