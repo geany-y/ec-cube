@@ -21,6 +21,7 @@ class ProductUpsertSubscriber implements EventSubscriber
 
     public function onFlush($args)
     {
+        $date = new \DateTime("now");
         $findProductFlg = false;
         $uow = $args->getEntityManager()->getUnitOfWork();
         foreach ($uow->getScheduledEntityInsertions() as $updated) {
@@ -38,10 +39,10 @@ class ProductUpsertSubscriber implements EventSubscriber
             $ProductPoint->setProductPointRate($point_rate['product_point_rate']);
         }
 
+        var_dump(get_class_methods($ProductPoint));
 
-        $date = new \DateTime("now");
         $ProductPoint->setCreated($date);
-        //$ProductPoint->setModified($date);
+        $ProductPoint->setModified($date);
         $uow->persist($ProductPoint);
         //$uow->flush();
 
