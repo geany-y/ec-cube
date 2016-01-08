@@ -170,7 +170,10 @@ class ProductController extends AbstractController
         ));
 
         $has_class = false;
+
+        // 引数「id」をもとに、「新規」か「編集」を判定
         if (is_null($id)) {
+            // 新規
             $Product = new \Eccube\Entity\Product();
             $ProductClass = new \Eccube\Entity\ProductClass();
             $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_HIDE);
@@ -185,14 +188,21 @@ class ProductController extends AbstractController
             $ProductStock = new \Eccube\Entity\ProductStock();
             $ProductClass->setProductStock($ProductStock);
             $ProductStock->setProductClass($ProductClass);
+            /*
+            $ProductPointRate = new \Plugin\Point\Entity\ProductPointRate();
+            $ProductPointRate->setProductClassId($ProductClass->getId());
+            */
         } else {
+            // 編集 ( IDをもとに取得 )
             $Product = $app['eccube.repository.product']->find($id);
             if (!$Product) {
                 throw new NotFoundHttpException();
             }
+
             // 規格あり商品か
             $has_class = $Product->hasProductClass();
             if (!$has_class) {
+                // 商品規格/税率/削除/在庫を確認
                 $ProductClasses = $Product->getProductClasses();
                 $ProductClass = $ProductClasses[0];
                 $BaseInfo = $app['eccube.repository.base_info']->get();
@@ -201,8 +211,28 @@ class ProductController extends AbstractController
                 }
                 $ProductStock = $ProductClasses[0]->getProductStock();
             }
+
+            // 商品別ポイント付与率
+            //$ProductPointRate = new \Plugin\Point\Entity\ProductPointRate();
+            /*
+            $ProductPointRate = $app['eccube.plugin.point.repository.pointproduct']->findOneBy(array('product_class_id' => $ProductClass->getId()));
+            echo '<pre>';
+            foreach (get_class_methods($ProductPointRate) as $method) {
+                if (preg_match('/get/', $method)) {
+                    if (is_object($ProductPointRate->$method())) {
+                        var_dump(get_class($ProductPointRate->$method()));
+                    } else {
+                        var_dump($ProductPointRate->$method());
+                    }
+                }
+            }
+            echo '</pre>';
+            exit();
+            $app['orm.em']->persist($ProductPointRate);
+            */
         }
 
+        // 商品登録フォーム生成
         $builder = $app['form.factory']
             ->createBuilder('admin_product', $Product);
 
@@ -211,8 +241,10 @@ class ProductController extends AbstractController
             $builder->remove('class');
         }
 
+        // フォームを取得
         $form = $builder->getForm();
         if (!$has_class) {
+            // 規格がある場合は規格データをセット
             $ProductClass->setStockUnlimited((boolean) $ProductClass->getStockUnlimited());
             $form['class']->setData($ProductClass);
         }
@@ -225,16 +257,23 @@ class ProductController extends AbstractController
         }
         $form['images']->setData($images);
 
+        // 商品カテゴリ取得
         $categories = array();
         $ProductCategories = $Product->getProductCategories();
         foreach ($ProductCategories as $ProductCategory) {
             /* @var $ProductCategory \Eccube\Entity\ProductCategory */
             $categories[] = $ProductCategory->getCategory();
         }
+
+        // フォームにカテゴリを取得
         $form['Category']->setData($categories);
 
+        // リクエストにバインド
+        $form->handleRequest($request);
+
+        // 登録・更新処理
         if ('POST' === $request->getMethod()) {
-            $form->handleRequest($request);
+            // バリデーション
             if ($form->isValid()) {
                 $Product = $form->getData();
 
@@ -272,6 +311,21 @@ class ProductController extends AbstractController
                     }
                     $app['orm.em']->persist($ProductStock);
                 }
+
+                // 商品ポイント付与率設定
+                /*
+                $point_rate = $request->request->get('admin_product_point_rate');
+                $ProductPointRate = new \Plugin\Point\Entity\ProductPointRate();
+                //$ProductPointRate->setId(1);
+                $ProductPointRate->setProductPointRate($point_rate['product_point_rate']);
+                $ProductPointRate->setProductClassId($ProductClass->getId());
+
+                $date = new \DateTime("now");
+                $ProductPointRate->setCreated($date);
+                $ProductPointRate->setModified($date);
+                $app['orm.em']->persist($ProductPointRate);
+                $res = $app['eccube.plugin.point.repository.pointproduct']->save($ProductPointRate);
+                */
 
                 // カテゴリの登録
                 // 一度クリア
