@@ -32,18 +32,59 @@ class Point
         $this->app = $app;
     }
 
-    // Doctrineのアップデートイベントリスナー登録
-    public function setProductPointDoctrineEvent($event){
+
+    // Doctrineのインサートイベントリスナー登録
+    public function setProductPointDoctrineNewEvent($event){
       //eccube.event.controller.admin_product_product_edit.before
       //Symfony\Component\EventDispatcher\EventDispatcher
       //$event->getDispatcher()->addListener('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'updateTagged'));
       //$this->app['doctrine.em']->addEventListener('doctrine.admin.save_object', $this->app['doctrine.event_listener']);
       //$this->app['doctrine.em']->addEventSubscriber($this->app['doctrine.event_subscriber']);
-      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event_subscriber']);
+
+
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.loadclassmetadata']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postload']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.prepersist']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postpersist']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.preflush']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.onflush']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postflush']);
+      //$this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event_subscriber']);
+      //$this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event_subscriber']);
       //$this->app['kernel.event_subscriber'];
       //$this->app['doctrine.em']->getEventDispatcher()->connect('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'onFlush'));
       //$doctrineEventManager->addEventListener('doctrine.event_listener', $this->app['doctrine.event_listener']);
       //$doctrineEventManager->addEventListener('doctrine.event_listener', array($this->app['doctrine.event_listener'], 'onFlush'));
+    }
+
+
+    // Doctrineのアップデートイベントリスナー登録
+    public function setProductPointDoctrineEditEvent($event){
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.preupdate']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postupdate']);
+
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.loadclassmetadata']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postload']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.prepersist']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postpersist']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.preflush']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.onflush']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postflush']);
+    }
+
+
+    // Doctrineのデリートイベントリスナー登録
+    public function setProductPointDoctrineDeleteEvent($event){
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.preremove']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postremove']);
+
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.loadclassmetadata']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postload']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.prepersist']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postpersist']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.preflush']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.onflush']);
+      $this->app['orm.em']->getEventManager()->addEventSubscriber($this->app['doctrine.event.postflush']);
     }
 
     /**

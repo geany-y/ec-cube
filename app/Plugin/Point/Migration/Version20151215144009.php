@@ -2,8 +2,11 @@
 
 namespace DoctrineMigrations;
 
+use Eccube\Application;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Plugin\Point\Entity;
+use Eccube\Exception\PluginException;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -20,6 +23,15 @@ class Version20151215144009 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
+        /*
+        $app = \Eccube\Application::getInstance();
+        $PI = new PointInfo();
+        $PI->setBasicPointRate('ABC');
+        $app['orm.em']->persist($PI);
+        $app['orm.em']->flush();
+        throw new \Excetion;
+        $app['orm.em']->clear();
+        */
         // this up() migration is auto-generated, please modify it to your needs
         // ポイント機能基本情報格納テーブルを追加
         if ($schema->hasTable(self::PLG_POINT_INFO)) {
@@ -71,6 +83,16 @@ class Version20151215144009 extends AbstractMigration
         $t->addColumn('created', 'datetime', array('NotNull' => true));
         $t->addColumn('modified', 'datetime', array('NotNull' => true));
         $t->setPrimaryKey(array('id'));
+
+        /*
+        $app = \Eccube\Application::getInstance();
+        $PI = new PointInfo();
+        $PI->setBasicPointRate('ABC');
+        $app['orm.em']->persist($PI);
+        $app['orm.em']->flush();
+        throw new \Excetion;
+        $app['orm.em']->clear();
+        */
     }
 
     /**

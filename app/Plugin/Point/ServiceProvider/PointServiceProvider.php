@@ -59,9 +59,69 @@ class PointServiceProvider implements ServiceProviderInterface
         */
 
         // EventSubScriber Set
-        $app['doctrine.event_subscriber'] = $app->share(function ($app) use($app) {
-                return new \Plugin\Point\Doctrine\EventSubscriber\ProductUpsertSubscriber($app);
+        $app['doctrine.event.preupdate'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PreUpdateSubscriber($app);
         });
+        $app['doctrine.event.postupdate'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PostUpdateSubscriber($app);
+        });
+
+
+
+
+
+        $app['doctrine.event.preremove'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PreRemoveSubscriber($app);
+        });
+        $app['doctrine.event.postremove'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PostRemoveSubscriber($app);
+        });
+
+
+
+
+
+
+        $app['doctrine.event.loadclassmetadata'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\LoadClassMetadataSubscriber($app);
+        });
+
+        $app['doctrine.event.postload'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PostLoadSubscriber($app);
+        });
+
+        $app['doctrine.event.prepersist'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PrePersistSubscriber($app);
+        });
+
+        $app['doctrine.event.postpersist'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PostPersistSubscriber($app);
+        });
+
+        $app['doctrine.event.preflush'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PreFlushSubscriber($app);
+        });
+
+        $app['doctrine.event.onflush'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\OnFlushSubscriber($app);
+        });
+
+        $app['doctrine.event.postflush'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PostFlushSubscriber($app);
+        });
+
+        $app['doctrine.event.onclear'] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\OnClearSubscriber($app);
+        });
+
+
+
+        $app['doctrine.event.preremove '] = $app->share(function ($app) use($app) {
+                return new \Plugin\Point\Doctrine\EventSubscriber\PreRemoveSubscriber($app);
+        });
+
+
+        
         // Retunr Doctrine Event Manager
         $app['doctrine.em'] = $app->share(function ($app) use($app) {
                 return new \Doctrine\Common\EventManager($app);

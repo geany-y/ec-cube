@@ -4,6 +4,16 @@ eccube.event.render.admin_product_product_new.before:
 # 商品編集
 eccube.event.render.admin_product_product_edit.before:
     - [setProductPointRateColumn, NORMAL]
+
+# ドクトリンイベント挿入
 # 商品コントローラーDoctrineイベント登録
+
+# 新規
 eccube.event.controller.admin_product_product_new.before:
-    - [setProductPointDoctrineEvent, NORMAL]
+    - [setProductPointDoctrineNewEvent, NORMAL]
+# 編集
+eccube.event.controller.admin_product_product_edit.before:
+    - [setProductPointDoctrineEditEvent, NORMAL]
+# 削除
+eccube.event.controller.admin_product_product_delete.before:
+    - [setProductPointDoctrineDeleteEvent, NORMAL]

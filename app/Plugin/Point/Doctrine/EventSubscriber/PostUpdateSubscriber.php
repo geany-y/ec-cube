@@ -9,7 +9,7 @@ use Doctrine\ORM\Events;
 use AppBundle\Entity\Product;
 use Plugin\Point\Entity\ProductPointRate;
 
-class ProductUpsertSubscriber implements EventSubscriber
+class PostUpdateSubscriber implements EventSubscriber
 {
     protected $app;
 
@@ -19,8 +19,10 @@ class ProductUpsertSubscriber implements EventSubscriber
         $this->app = $app;
     }
 
-    public function onFlush($args)
+    public function postUpdate($args)
     {
+        ezd('postUpdate');
+        /*
         $date = new \DateTime("now");
         $findProductFlg = false;
         $uow = $args->getEntityManager()->getUnitOfWork();
@@ -47,12 +49,13 @@ class ProductUpsertSubscriber implements EventSubscriber
         //$uow->flush();
 
         $uow->computeChangeSets();
+        */
     }
 
     public function getSubscribedEvents()
     {
         //return array(Events::onFlush, array($this, 'onFlush'));
-        return array('onFlush');
+        return array('postUpdate');
         //return array(Events::onFlush);
     }
 }
