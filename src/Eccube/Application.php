@@ -40,7 +40,6 @@ use Symfony\Component\Yaml\Yaml;
 class Application extends ApplicationTrait
 {
     const USER_AUTH_ROUTE = 'mypage';
-    const ADMIN_ROUTE = 'admin';
 
     public function __construct(array $values = array())
     {
@@ -578,62 +577,34 @@ class Application extends ApplicationTrait
             return new EventDispatcher();
         });
 
-        // Auth Judge
-        $this['eccube.event.auth.check'] = $this->share(function() {
-            // front side
-            $route = $this['request']->attributes->get('_route');
-            if ($route === self::USER_AUTH_ROUTE) {
-                if (!$this->isGranted('ROLE_USER')) {
-                    return false;
-                }
-            }
-            if (!$this->isGranted('ROLE_USER')) {
-                return false;
-            }
-            return true;
-        });
-
-
         // hook point
         $this->before(function(Request $request, \Silex\Application $app) {
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.before');
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.before');
         }, self::LATE_EVENT);
 
         $this->before(function(Request $request, \Silex\Application $app) {
-            if ($this['eccube.event.auth.check']) {
-                $event = 'eccube.event.controller.'.$request->attributes->get('_route').'.before';
-                $app['eccube.event.dispatcher']->dispatch($event);
-            }
+            $event = 'eccube.event.controller.'.$request->attributes->get('_route').'.before';
+            $app['eccube.event.dispatcher']->dispatch($event);
         });
 
         $this->after(function(Request $request, Response $response, \Silex\Application $app) {
-            if ($this['eccube.event.auth.check']) {
-                $event = 'eccube.event.controller.'.$request->attributes->get('_route').'.after';
-                $app['eccube.event.dispatcher']->dispatch($event);
-            }
+            $event = 'eccube.event.controller.'.$request->attributes->get('_route').'.after';
+            $app['eccube.event.dispatcher']->dispatch($event);
         });
 
         $this->after(function(Request $request, Response $response, \Silex\Application $app) {
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.after');
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.after');
         }, self::LATE_EVENT);
 
         $this->finish(function(Request $request, Response $response, \Silex\Application $app) {
-            if ($this['eccube.event.auth.check']) {
-                $event = 'eccube.event.controller.'.$request->attributes->get('_route').'.finish';
-                $app['eccube.event.dispatcher']->dispatch($event);
-            }
+            $event = 'eccube.event.controller.'.$request->attributes->get('_route').'.finish';
+            $app['eccube.event.dispatcher']->dispatch($event);
         });
 
         $app = $this;
         $this->on(\Symfony\Component\HttpKernel\KernelEvents::RESPONSE, function(\Symfony\Component\HttpKernel\Event\FilterResponseEvent $event) use ($app) {
-            if ($this['eccube.event.auth.check']) {
-                $route = $event->getRequest()->attributes->get('_route');
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.render.'.$route.'.before', $event);
-            }
+            $route = $event->getRequest()->attributes->get('_route');
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.render.'.$route.'.before', $event);
         });
 
         // Publication
@@ -644,9 +615,7 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.before', $event);
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.request', $event);
         }, self::LATE_EVENT);
 
         // controller
@@ -655,9 +624,7 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.controller', $event);
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.controller', $event);
         });
 
         // response
@@ -666,9 +633,7 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.response', $event);
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.response', $event);
         });
 
         // exception
@@ -677,17 +642,13 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.exception', $event);
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.exception', $event);
         });
 
         // terminate
         $app = $this;
         $this->on(\Symfony\Component\HttpKernel\KernelEvents::TERMINATE, function (\Symfony\Component\HttpKernel\Event\PostResponseEvent $event) use ($app) {
-            if ($this['eccube.event.auth.check']) {
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.app.terminate', $event);
-            }
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.app.terminate', $event);
         });
 
         // front
@@ -699,10 +660,8 @@ class Application extends ApplicationTrait
             }
             // フロント画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) !== false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.front.request', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) === false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.front.request', $event);
             }
         }, self::LATE_EVENT);
 
@@ -714,10 +673,8 @@ class Application extends ApplicationTrait
             }
             // フロント画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) !== false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.front.controller', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) === false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.front.controller', $event);
             }
         });
 
@@ -729,10 +686,8 @@ class Application extends ApplicationTrait
             }
             // フロント画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) !== false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.front.response', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) === false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.front.response', $event);
             }
         });
 
@@ -744,10 +699,8 @@ class Application extends ApplicationTrait
             }
             // フロント画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) !== false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.front.exception', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) === false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.front.exception', $event);
             }
         });
 
@@ -756,10 +709,8 @@ class Application extends ApplicationTrait
         $this->on(\Symfony\Component\HttpKernel\KernelEvents::TERMINATE, function (\Symfony\Component\HttpKernel\Event\PostResponseEvent $event) use ($app) {
             // フロント画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) !== false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.front.terminate', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) === false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.front.terminate', $event);
             }
         });
 
@@ -772,10 +723,8 @@ class Application extends ApplicationTrait
             }
             // 管理画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) === false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.request', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) !== false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.request', $event);
             }
         }, self::LATE_EVENT);
 
@@ -787,10 +736,8 @@ class Application extends ApplicationTrait
             }
             // 管理画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) === false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.controller', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) !== false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.controller', $event);
             }
         });
 
@@ -802,10 +749,8 @@ class Application extends ApplicationTrait
             }
             // 管理画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) === false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.response', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) !== false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.response', $event);
             }
         });
 
@@ -817,10 +762,8 @@ class Application extends ApplicationTrait
             }
             // 管理画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) === false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.exception', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) !== false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.exception', $event);
             }
         });
 
@@ -829,10 +772,8 @@ class Application extends ApplicationTrait
         $this->on(\Symfony\Component\HttpKernel\KernelEvents::TERMINATE, function (\Symfony\Component\HttpKernel\Event\PostResponseEvent $event) use ($app) {
             // 管理画面の判定
             $route = $event->getRequest()->attributes->get('_route');
-            if ($this['eccube.event.auth.check']) {
-                if (strpos($route, self::ADMIN_ROUTE) === false) {
-                    $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.terminate', $event);
-                }
+            if (strpos(self::ADMIN_ROUTE, $route) !== false) {
+                $app['eccube.event.dispatcher']->dispatch('eccube.event.admin.terminate', $event);
             }
         });
 
@@ -843,10 +784,8 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $route = $event->getRequest()->attributes->get('_route');
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.route'.$route.'.before', $event);
-            }
+            $route = $event->getRequest()->attributes->get('_route');
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.route.'.$route.'.request', $event);
         }, self::LATE_EVENT);
 
         // controller
@@ -855,10 +794,8 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $route = $event->getRequest()->attributes->get('_route');
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.route'.$route.'.controller', $event);
-            }
+            $route = $event->getRequest()->attributes->get('_route');
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.route.'.$route.'.controller', $event);
         });
 
         // response
@@ -867,10 +804,8 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $route = $event->getRequest()->attributes->get('_route');
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.route'.$route.'.response', $event);
-            }
+            $route = $event->getRequest()->attributes->get('_route');
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.route.'.$route.'.response', $event);
         });
 
         // exception
@@ -879,19 +814,15 @@ class Application extends ApplicationTrait
             if (\Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
                 return;
             }
-            if ($this['eccube.event.auth.check']) {
-                $route = $event->getRequest()->attributes->get('_route');
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.route'.$route.'.exception', $event);
-            }
+            $route = $event->getRequest()->attributes->get('_route');
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.route.'.$route.'.exception', $event);
         });
 
         // terminate
         $app = $this;
         $this->on(\Symfony\Component\HttpKernel\KernelEvents::TERMINATE, function (\Symfony\Component\HttpKernel\Event\PostResponseEvent $event) use ($app) {
-            if ($this['eccube.event.auth.check']) {
-                $route = $event->getRequest()->attributes->get('_route');
-                $app['eccube.event.dispatcher']->dispatch('eccube.event.route'.$route.'.terminate', $event);
-            }
+            $route = $event->getRequest()->attributes->get('_route');
+            $app['eccube.event.dispatcher']->dispatch('eccube.event.route.'.$route.'.terminate', $event);
         });
     }
 
@@ -958,6 +889,11 @@ class Application extends ApplicationTrait
                 if (file_exists($dir->getRealPath().'/event.yml')) {
                     foreach (Yaml::parse(file_get_contents($dir->getRealPath().'/event.yml')) as $event => $handlers) {
                         foreach ($handlers as $handler) {
+                            if (!isset($handler[2]) || !$handler[2]) {
+                                if (!$this->isEventAuth()) {
+                                    continue;
+                                }
+                            }
                             if (!isset($priorities[$config['event']][$event][$handler[0]])) { // ハンドラテーブルに登録されていない（ソースにしか記述されていない)ハンドラは一番後ろにする
                                 $priority = \Eccube\Entity\PluginEventHandler::EVENT_PRIORITY_LATEST;
                             } else {
@@ -979,5 +915,22 @@ class Application extends ApplicationTrait
                 }
             }
         }
+    }
+
+    protected function isEventAuth(){
+        $request = Request::createFromGlobals();
+        // front side
+        $uri = $request->server->get('REQUEST_URI');
+        if (preg_match('/'.self::USER_AUTH_ROUTE.'/', $uri)) {
+            if (empty($this['session']->get('_security_customer'))) {
+                return false;
+            }
+        }
+        if (preg_match('/'.$this['config']['admin_route'].'/', $uri)) {
+            if (empty($this['session']->get('_security_admin'))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
