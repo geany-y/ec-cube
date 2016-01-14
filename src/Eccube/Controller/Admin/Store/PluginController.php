@@ -64,16 +64,14 @@ class PluginController extends AbstractController
             $pluginCode = '';
             preg_match('{[^\\\]+$}',$val->getRealPath(), $match);
             $pluginCode = isset($match[0]) ? $match[0] : '';
-            /*
             if(in_array($pluginCode, $legacyPluginCodes)) {
                 continue;
             }
-            */
             $develeopPlugin[$pluginCode] = $val->getRealPath();
         }
 
         $staticPlugins = $PluginService->developPluginInstall($develeopPlugin);
-        return (count($staticPlugins) > 0) ? $staticPlugins : false;
+        return (count($staticPlugins) > 0) ? $staticPlugins : null;
     }
 
     /**
@@ -89,19 +87,13 @@ class PluginController extends AbstractController
         $configPages = array();
 
         $Plugins = $app['eccube.repository.plugin']->findBy(array(), array('name' => 'ASC'));
+        $developerPlugins = $this->getDevelopPlugin($Plugins, $app);
 
         $officialPlugins = array();
         $unofficialPlugins = array();
 
-        $staticPlugins = $this->getDevelopPlugin($Plugins, $app);
-        /*
-        var_dump($staticPlugins);
-        exit();
-        */
-
         //データベース登録プラグイン
         foreach ($Plugins as $Plugin) {
-
             $form = $app['form.factory']
                 ->createNamedBuilder('form' . $Plugin->getId(), 'plugin_management', null, array(
                     'plugin_id' => $Plugin->getId(),
@@ -174,10 +166,13 @@ class PluginController extends AbstractController
             }
         }
 
+
+
         return $app->render('Store/plugin.twig', array(
             'plugin_forms' => $pluginForms,
             'officialPlugins' => $officialPlugins,
             'unofficialPlugins' => $unofficialPlugins,
+            'developerPlugins' => $developerPlugins,
             'configPages' => $configPages
         ));
 

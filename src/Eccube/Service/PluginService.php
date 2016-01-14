@@ -34,8 +34,6 @@ class PluginService
 {
     const CONFIG_YML = 'config.yml';
     const EVENT_YML = 'event.yml';
-    const UNDEVELOPER = true;
-    const DEVELOPER = false;
     private $app;
 
     public function __construct($app)
@@ -45,23 +43,33 @@ class PluginService
 
     public function developPluginInstall(Array $developPlugins){
         // エラーハンドリング
-        if (count($developPlugins) > 0) {
-            return false;
+        if (count($developPlugins) < 1) {
+            return null;
         }
         // プラグイン基本チェック
         try{
             $staticPlugins = array();
+            $p = new \Eccube\Entity\Plugin();
             foreach ($developPlugins as $name => $path) {
+                $pc = clone $p;
                 $this->checkPluginArchiveContent($path);
-                $config = $this->readYml($tmp.'/'.self::CONFIG_YML);
-                $event = $this->readYml($tmp.'/'.self::EVENT_YML);
+                $config = $this->readYml($path.'/'.self::CONFIG_YML);
+                $event = $this->readYml($path.'/'.self::EVENT_YML);
                 $this->checkSamePlugin($config['code']); // 重複していないかチェック
-                $staticPlugins[] = $this->registerDeveloperPlugin($config, $event); // dbにプラグイン登録
+                $pc->setName($config['name'])
+                    ->setEnable(Constant::ENABLED)
+                    ->setClassName(isset($config['event']) ? $config['event'] : '')
+                    ->setVersion($config['version'])
+                    ->setDelflg(Constant::DISABLED)
+                    ->setSource(0)
+                    ->setCode($config['code']);
+
+                $staticPlugins[] = $pc;
             }
         } catch (\PluginException $e) {
-            return false;
+            return null;
         }
-        return (count($staticPlugins) > 0) ? $staticPlugins : false;
+        return (count($staticPlugins) > 0) ? $staticPlugins : null;
     }
 
     public function install($path, $source = 0)
@@ -207,20 +215,8 @@ class PluginService
 
     public function registerPlugin($meta, $event_yml, $source = 0)
     {
-        return $this->register($meta, $event_yml, $source);
-    }
-
-    public function registerDeveloperPlugin($meta, $event_yml)
-    {
-        return $this->register($meta, $event_yml, 0, self::DEVELOPER);
-    }
-
-    public function register($meta, $event_yml, $source = 0, $type = self::UNDEVELOP)
-    {
-        if ($type == self::UNDEVELOP) {
-            $em = $this->app['orm.em'];
-            $em->getConnection()->beginTransaction();
-        }
+        $em = $this->app['orm.em'];
+        $em->getConnection()->beginTransaction();
 
         try {
             $p = new \Eccube\Entity\Plugin();
@@ -233,31 +229,29 @@ class PluginService
                 ->setSource($source)
                 ->setCode($meta['code']);
 
-            if ($type == self::UNDEVELOP) {
-                $em->persist($p);
-                $em->flush();
+            $em->persist($p);
+            $em->flush();
 
-                if (is_array($event_yml)) {
-                    foreach ($event_yml as $event => $handlers) {
-                        foreach ($handlers as $handler) {
-                            if (!$this->checkSymbolName($handler[0])) {
-                                throw new PluginException('Handler name format error');
-                            }
-                            $peh = new \Eccube\Entity\PluginEventHandler();
-                            $peh->setPlugin($p)
-                                ->setEvent($event)
-                                ->setdelFlg(Constant::DISABLED)
-                                ->setHandler($handler[0])
-                                ->setHandlerType($handler[1])
-                                ->setPriority($this->app['eccube.repository.plugin_event_handler']->calcNewPriority($event, $handler[1]));
-                            $em->persist($peh);
-                            $em->flush();
+            if (is_array($event_yml)) {
+                foreach ($event_yml as $event => $handlers) {
+                    foreach ($handlers as $handler) {
+                        if (!$this->checkSymbolName($handler[0])) {
+                            throw new PluginException('Handler name format error');
                         }
+                        $peh = new \Eccube\Entity\PluginEventHandler();
+                        $peh->setPlugin($p)
+                            ->setEvent($event)
+                            ->setdelFlg(Constant::DISABLED)
+                            ->setHandler($handler[0])
+                            ->setHandlerType($handler[1])
+                            ->setPriority($this->app['eccube.repository.plugin_event_handler']->calcNewPriority($event, $handler[1]));
+                        $em->persist($peh);
+                        $em->flush();
                     }
                 }
-
-                $em->persist($p);
             }
+
+            $em->persist($p);
 
             $this->callPluginManagerMethod($meta, 'install');
 
