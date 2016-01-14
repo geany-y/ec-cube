@@ -34,11 +34,34 @@ class PluginService
 {
     const CONFIG_YML = 'config.yml';
     const EVENT_YML = 'event.yml';
+    const UNDEVELOPER = true;
+    const DEVELOPER = false;
     private $app;
 
     public function __construct($app)
     {
         $this->app = $app;
+    }
+
+    public function developPluginInstall(Array $developPlugins){
+        // エラーハンドリング
+        if (count($developPlugins) > 0) {
+            return false;
+        }
+        // プラグイン基本チェック
+        try{
+            $staticPlugins = array();
+            foreach ($developPlugins as $name => $path) {
+                $this->checkPluginArchiveContent($path);
+                $config = $this->readYml($tmp.'/'.self::CONFIG_YML);
+                $event = $this->readYml($tmp.'/'.self::EVENT_YML);
+                $this->checkSamePlugin($config['code']); // 重複していないかチェック
+                $staticPlugins[] = $this->registerDeveloperPlugin($config, $event); // dbにプラグイン登録
+            }
+        } catch (\PluginException $e) {
+            return false;
+        }
+        return (count($staticPlugins) > 0) ? $staticPlugins : false;
     }
 
     public function install($path, $source = 0)
@@ -184,8 +207,21 @@ class PluginService
 
     public function registerPlugin($meta, $event_yml, $source = 0)
     {
-        $em = $this->app['orm.em'];
-        $em->getConnection()->beginTransaction();
+        return $this->register($meta, $event_yml, $source);
+    }
+
+    public function registerDeveloperPlugin($meta, $event_yml)
+    {
+        return $this->register($meta, $event_yml, 0, self::DEVELOPER);
+    }
+
+    public function register($meta, $event_yml, $source = 0, $type = self::UNDEVELOP)
+    {
+        if ($type == self::UNDEVELOP) {
+            $em = $this->app['orm.em'];
+            $em->getConnection()->beginTransaction();
+        }
+
         try {
             $p = new \Eccube\Entity\Plugin();
             // インストール直後はプラグインは有効にしない
@@ -197,29 +233,31 @@ class PluginService
                 ->setSource($source)
                 ->setCode($meta['code']);
 
-            $em->persist($p);
-            $em->flush();
+            if ($type == self::UNDEVELOP) {
+                $em->persist($p);
+                $em->flush();
 
-            if (is_array($event_yml)) {
-                foreach ($event_yml as $event => $handlers) {
-                    foreach ($handlers as $handler) {
-                        if (!$this->checkSymbolName($handler[0])) {
-                            throw new PluginException('Handler name format error');
+                if (is_array($event_yml)) {
+                    foreach ($event_yml as $event => $handlers) {
+                        foreach ($handlers as $handler) {
+                            if (!$this->checkSymbolName($handler[0])) {
+                                throw new PluginException('Handler name format error');
+                            }
+                            $peh = new \Eccube\Entity\PluginEventHandler();
+                            $peh->setPlugin($p)
+                                ->setEvent($event)
+                                ->setdelFlg(Constant::DISABLED)
+                                ->setHandler($handler[0])
+                                ->setHandlerType($handler[1])
+                                ->setPriority($this->app['eccube.repository.plugin_event_handler']->calcNewPriority($event, $handler[1]));
+                            $em->persist($peh);
+                            $em->flush();
                         }
-                        $peh = new \Eccube\Entity\PluginEventHandler();
-                        $peh->setPlugin($p)
-                            ->setEvent($event)
-                            ->setdelFlg(Constant::DISABLED)
-                            ->setHandler($handler[0])
-                            ->setHandlerType($handler[1])
-                            ->setPriority($this->app['eccube.repository.plugin_event_handler']->calcNewPriority($event, $handler[1]));
-                        $em->persist($peh);
-                        $em->flush();
                     }
                 }
-            }
 
-            $em->persist($p);
+                $em->persist($p);
+            }
 
             $this->callPluginManagerMethod($meta, 'install');
 
