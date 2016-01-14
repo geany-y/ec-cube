@@ -31,15 +31,40 @@ use Eccube\Exception\PluginException;
 use Eccube\Util\Cache;
 use Eccube\Util\Str;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class PluginController extends AbstractController
 {
+    public function getDevelopPlugin($legacies, $app){
+        $Finder = new \Symfony\Component\Finder\Finder();
+        $PluginService = $app['eccube.service.plugin'];
+
+        $legacyPluginCodes = array();
+        // DBµÇåhœg¤ß¥×¥é¥°¥¤¥ó¥³©`¥É¤Î¤ßÈ¡µÃ
+        foreach ($legacies as $key => $plugin) {
+            $legacyPluginCodes[] = $plugin->getCode();
+        }
+
+        // DBµÇåhœg¤ß¥×¥é¥°¥¤¥ó¥³©`¥ÉPlugin¥Ç¥£¥ì¥¯¥È¥ê¤«¤éÅÅËû
+        $dirs = $Finder->in($app['config']['plugin_realdir'])->depth(0)->directories();
+        $develeopPlugin = array();
+        foreach ($dirs as $key => $val) {
+            $match = array();
+            $pluginCode = '';
+            preg_match('{[^\\\]+$}',$val->getRealPath(), $match);
+            $pluginCode = isset($match[0]) ? $match[0] : '';
+            if(in_array($pluginCode, $legacyPluginCodes)) {
+                continue;
+            }
+            $develeopPlugin[] = $pluginCode;
+        }
+    }
 
     /**
-     * ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ¸ˆãƒ—ãƒ©ã‚°ã‚¤ãƒ³ç”»é¢
+     * ¥¤¥ó¥¹¥È©`¥ëœg¥×¥é¥°¥¤¥ó»­Ãæ
      *
      * @param Application $app
      * @param Request $request
@@ -55,6 +80,9 @@ class PluginController extends AbstractController
         $officialPlugins = array();
         $unofficialPlugins = array();
 
+        $this->getDevelopPlugin($Plugins, $app);
+
+        //¥Ç©`¥¿¥Ù©`¥¹µÇåh¥×¥é¥°¥¤¥ó
         foreach ($Plugins as $Plugin) {
 
             $form = $app['form.factory']
@@ -66,14 +94,16 @@ class PluginController extends AbstractController
             $pluginForms[$Plugin->getId()] = $form->createView();
 
             try {
-                // ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ç”¨è¨­å®šç”»é¢ãŒã‚ã‚Œã°è¡¨ç¤º(ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ç”¨ã®ã‚µãƒ¼ãƒ“ã‚¹ãƒ—ãƒ­ãƒã‚¤ãƒ€ãƒ¼ã«å®šç¾©ã•ã‚Œã¦ã„ã‚‹ã‹)
+                // ¥×¥é¥°¥¤¥óÓÃÔO¶¨»­Ãæ¤¬¤¢¤ì¤Ğ±íÊ¾(¥×¥é¥°¥¤¥óÓÃ¤Î¥µ©`¥Ó¥¹¥×¥í¥Ğ¥¤¥À©`¤Ë¶¨Áx¤µ¤ì¤Æ¤¤¤ë¤«)
                 $configPages[$Plugin->getCode()] = $app->url('plugin_' . $Plugin->getCode() . '_config');
             } catch (\Exception $e) {
-                // ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã§è¨­å®šç”»é¢ã®ãƒ«ãƒ¼ãƒˆãŒå®šç¾©ã•ã‚Œã¦ã„ãªã„å ´åˆã¯ç„¡è¦–
+                // ¥×¥é¥°¥¤¥ó¤ÇÔO¶¨»­Ãæ¤Î¥ë©`¥È¤¬¶¨Áx¤µ¤ì¤Æ¤¤¤Ê¤¤ˆöºÏ¤ÏŸoÒ•
             }
 
+            $defaultPlugin = $Plugin->getCode();
+
             if ($Plugin->getSource() == 0) {
-                // å•†å“IDãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆã€éå…¬å¼ãƒ—ãƒ©ã‚°ã‚¤ãƒ³
+                // ÉÌÆ·ID¤¬ÔO¶¨¤µ¤ì¤Æ¤¤¤Ê¤¤ˆöºÏ¡¢·Ç¹«Ê½¥×¥é¥°¥¤¥ó
                 $unofficialPlugins[] = $Plugin;
             } else {
                 $officialPlugins[] = $Plugin;
@@ -81,20 +111,20 @@ class PluginController extends AbstractController
 
         }
 
-        // ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢ã‹ã‚‰ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å¯èƒ½ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’å–å¾—
+        // ¥ª©`¥Ê©`¥º¥¹¥È¥¢¤«¤é¥À¥¦¥ó¥í©`¥É¿ÉÄÜ¥×¥é¥°¥¤¥óÇéˆó¤òÈ¡µÃ
         $BaseInfo = $app['eccube.repository.base_info']->get();
 
         $authKey = $BaseInfo->getAuthenticationKey();
 
         if (!is_null($authKey)) {
 
-            // ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢é€šä¿¡
+            // ¥ª©`¥Ê©`¥º¥¹¥È¥¢Í¨ĞÅ
             $url = $app['config']['owners_store_url'] . '?method=list';
             list($json, $httpHeader) = $this->getRequestApi($request, $authKey, $url);
 
             if ($json) {
 
-                // æ¥ç¶šæˆåŠŸæ™‚
+                // ½Ó¾A³É¹¦•r
 
                 $data = json_decode($json, true);
 
@@ -102,19 +132,19 @@ class PluginController extends AbstractController
                     $success = $data['success'];
                     if ($success == '1') {
 
-                        // æ—¢ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ç¢ºèª
+                        // ¼È¤Ë¥¤¥ó¥¹¥È©`¥ë¤µ¤ì¤Æ¤¤¤ë¤«¤É¤¦¤«´_ÕJ
                         foreach ($data['item'] as $item) {
                             foreach ($officialPlugins as $plugin) {
                                 if ($plugin->getSource() == $item['product_id']) {
-                                    // å•†å“IDãŒåŒä¸€ã®æƒ…å ±ã‚’è¨­å®š
+                                    // ÉÌÆ·ID¤¬Í¬Ò»¤ÎÇéˆó¤òÔO¶¨
                                     $plugin->setNewVersion($item['version']);
                                     $plugin->setLastUpdateDate($item['last_update_date']);
                                     $plugin->setProductUrl($item['product_url']);
 
                                     if ($plugin->getVersion() != $item['version']) {
-                                        // ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒç•°ãªã‚‹
+                                        // ¥Ğ©`¥¸¥ç¥ó¤¬®¤Ê¤ë
                                         if (in_array(Constant::VERSION, $item['eccube_version'])) {
-                                            // å¯¾è±¡ãƒãƒ¼ã‚¸ãƒ§ãƒ³
+                                            // ŒÏó¥Ğ©`¥¸¥ç¥ó
                                             $plugin->setUpdateStatus(3);
                                             break;
                                         }
@@ -127,7 +157,6 @@ class PluginController extends AbstractController
             }
         }
 
-
         return $app->render('Store/plugin.twig', array(
             'plugin_forms' => $pluginForms,
             'officialPlugins' => $officialPlugins,
@@ -137,8 +166,14 @@ class PluginController extends AbstractController
 
     }
 
+    /*
+    protected function unofficialPluginsInFolder($dir){
+        $this->finder->in($dir);
+    }
+    */
+
     /**
-     * ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ¸ˆãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‹ã‚‰ã®ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ
+     * ¥¤¥ó¥¹¥È©`¥ëœg¥×¥é¥°¥¤¥ó¤«¤é¤Î¥¢¥Ã¥×¥Ç©`¥È
      *
      * @param Application $app
      * @param Request $request
@@ -206,60 +241,68 @@ class PluginController extends AbstractController
 
 
     /**
-     * å¯¾è±¡ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’æœ‰åŠ¹ã«ã—ã¾ã™ã€‚
+     * ŒÏó¤Î¥×¥é¥°¥¤¥ó¤òÓĞ„¿¤Ë¤·¤Ş¤¹¡£
      *
      * @param Application $app
      * @param $id
      */
     public function enable(Application $app, $id)
     {
-        $this->isTokenValid($app);
+        try{
+            $this->isTokenValid($app);
 
-        $Plugin = $app['eccube.repository.plugin']->find($id);
+            $Plugin = $app['eccube.repository.plugin']->find($id);
 
-        if (!$Plugin) {
-            throw new NotFoundHttpException();
+            if (!$Plugin) {
+                throw new NotFoundHttpException();
+            }
+
+            if ($Plugin->getEnable() == Constant::ENABLED) {
+                $app->addError('admin.plugin.already.enable', 'admin');
+            } else {
+                $app['eccube.service.plugin']->enable($Plugin);
+                $app->addSuccess('admin.plugin.enable.complete', 'admin');
+            }
+
+            return $app->redirect($app->url('admin_store_plugin'));
+        }catch(PluginException $e){
+            $app->addError('¥×¥é¥°¥¤¥ó¤Ë†–î}¤¬¤¢¤ë¤è¤¦¤Ç¤¹', 'admin');
         }
-
-        if ($Plugin->getEnable() == Constant::ENABLED) {
-            $app->addError('admin.plugin.already.enable', 'admin');
-        } else {
-            $app['eccube.service.plugin']->enable($Plugin);
-            $app->addSuccess('admin.plugin.enable.complete', 'admin');
-        }
-
-        return $app->redirect($app->url('admin_store_plugin'));
     }
 
     /**
-     * å¯¾è±¡ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’ç„¡åŠ¹ã«ã—ã¾ã™ã€‚
+     * ŒÏó¤Î¥×¥é¥°¥¤¥ó¤òŸo„¿¤Ë¤·¤Ş¤¹¡£
      *
      * @param Application $app
      * @param $id
      */
     public function disable(Application $app, $id)
     {
-        $this->isTokenValid($app);
+        try{
+            $this->isTokenValid($app);
 
-        $Plugin = $app['eccube.repository.plugin']->find($id);
+            $Plugin = $app['eccube.repository.plugin']->find($id);
 
-        if (!$Plugin) {
-            throw new NotFoundHttpException();
+            if (!$Plugin) {
+                throw new NotFoundHttpException();
+            }
+
+            if ($Plugin->getEnable() == Constant::ENABLED) {
+                $app['eccube.service.plugin']->disable($Plugin);
+                $app->addSuccess('admin.plugin.disable.complete', 'admin');
+            } else {
+                $app->addError('admin.plugin.already.disable', 'admin');
+            }
+
+            return $app->redirect($app->url('admin_store_plugin'));
+        }catch(PluginException $e){
+            $app->addError('¥×¥é¥°¥¤¥ó¤Ë†–î}¤¬¤¢¤ë¤è¤¦¤Ç¤¹', 'admin');
         }
-
-        if ($Plugin->getEnable() == Constant::ENABLED) {
-            $app['eccube.service.plugin']->disable($Plugin);
-            $app->addSuccess('admin.plugin.disable.complete', 'admin');
-        } else {
-            $app->addError('admin.plugin.already.disable', 'admin');
-        }
-
-        return $app->redirect($app->url('admin_store_plugin'));
     }
 
 
     /**
-     * å¯¾è±¡ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’å‰Šé™¤ã—ã¾ã™ã€‚
+     * ŒÏó¤Î¥×¥é¥°¥¤¥ó¤òÏ÷³ı¤·¤Ş¤¹¡£
      *
      * @param Application $app
      * @param $id
@@ -286,7 +329,7 @@ class PluginController extends AbstractController
     {
         $handlers = $app['eccube.repository.plugin_event_handler']->getHandlers();
 
-        // ä¸€æ¬¡å…ƒé…åˆ—ã‹ã‚‰ã‚¤ãƒ™ãƒ³ãƒˆæ¯ã®äºŒæ¬¡å…ƒé…åˆ—ã«å¤‰æ›ã™ã‚‹
+        // Ò»´ÎÔªÅäÁĞ¤«¤é¥¤¥Ù¥ó¥Èš°¤Î¶ş´ÎÔªÅäÁĞ¤Ë‰ä“Q¤¹¤ë
         $HandlersPerEvent = array();
         foreach ($handlers as $handler) {
             $HandlersPerEvent[$handler->getEvent()][$handler->getHandlerType()][] = $handler;
@@ -315,7 +358,7 @@ class PluginController extends AbstractController
     }
 
     /**
-     * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ãƒ•ã‚¡ã‚¤ãƒ«ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ç”»é¢
+     * ¥×¥é¥°¥¤¥ó¥Õ¥¡¥¤¥ë¥¢¥Ã¥×¥í©`¥É»­Ãæ
      *
      * @param Application $app
      * @param Request $request
@@ -340,7 +383,7 @@ class PluginController extends AbstractController
                     $formFile = $form['plugin_archive']->getData();
 
                     $tmpDir = $service->createTempDir();
-                    $tmpFile = sha1(Str::random(32)) . '.' . $formFile->getClientOriginalExtension(); // æ‹¡å¼µå­ã‚’ä»˜ã‘ãªã„ã¨pharãŒå‹•ã‹ãªã„ã®ã§ä»˜ã‘ã‚‹
+                    $tmpFile = sha1(Str::random(32)) . '.' . $formFile->getClientOriginalExtension(); // ’ˆˆ×Ó¤ò¸¶¤±¤Ê¤¤¤Èphar¤¬„Ó¤«¤Ê¤¤¤Î¤Ç¸¶¤±¤ë
 
                     $formFile->move($tmpDir, $tmpFile);
 
@@ -367,11 +410,10 @@ class PluginController extends AbstractController
             'form' => $form->createView(),
             'errors' => $errors,
         ));
-
     }
 
     /**
-     * ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ç”»é¢
+     * ¥ª©`¥Ê©`¥º¥¹¥È¥¢¥×¥é¥°¥¤¥ó¥¤¥ó¥¹¥È©`¥ë»­Ãæ
      *
      * @param Application $app
      * @param Request $request
@@ -379,7 +421,7 @@ class PluginController extends AbstractController
      */
     public function ownersInstall(Application $app, Request $request)
     {
-        // ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢ã‹ã‚‰ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å¯èƒ½ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’å–å¾—
+        // ¥ª©`¥Ê©`¥º¥¹¥È¥¢¤«¤é¥À¥¦¥ó¥í©`¥É¿ÉÄÜ¥×¥é¥°¥¤¥óÇéˆó¤òÈ¡µÃ
         $BaseInfo = $app['eccube.repository.base_info']->get();
 
         $authKey = $BaseInfo->getAuthenticationKey();
@@ -390,18 +432,18 @@ class PluginController extends AbstractController
         $message = '';
         if (!is_null($authKey)) {
 
-            // ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢é€šä¿¡
+            // ¥ª©`¥Ê©`¥º¥¹¥È¥¢Í¨ĞÅ
             $url = $app['config']['owners_store_url'] . '?method=list';
             list($json, $httpHeader) = $this->getRequestApi($request, $authKey, $url);
 
             if ($json === false) {
-                // æ¥ç¶šå¤±æ•—æ™‚
+                // ½Ó¾AÊ§”¡•r
                 $success = 0;
 
                 $message = $this->getResponseErrorMessage($httpHeader);
 
             } else {
-                // æ¥ç¶šæˆåŠŸæ™‚
+                // ½Ó¾A³É¹¦•r
 
                 $data = json_decode($json, true);
 
@@ -410,18 +452,18 @@ class PluginController extends AbstractController
                     if ($success == '1') {
                         $items = array();
 
-                        // æ—¢ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ç¢ºèª
+                        // ¼È¤Ë¥¤¥ó¥¹¥È©`¥ë¤µ¤ì¤Æ¤¤¤ë¤«¤É¤¦¤«´_ÕJ
                         $Plugins = $app['eccube.repository.plugin']->findAll();
                         $status = false;
-                        // update_status 1 : æœªã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã€2 : ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ¸ˆã€ 3 : æ›´æ–°ã‚ã‚Šã€4 : æœ‰æ–™è³¼å…¥
+                        // update_status 1 : Î´¥¤¥ó¥¹¥È©`¥ë¡¢2 : ¥¤¥ó¥¹¥È©`¥ëœg¡¢ 3 : ¸üĞÂ¤¢¤ê¡¢4 : ÓĞÁÏÙÈë
                         foreach ($data['item'] as $item) {
                             foreach ($Plugins as $plugin) {
                                 if ($plugin->getSource() == $item['product_id']) {
                                     if ($plugin->getVersion() == $item['version']) {
-                                        // ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒåŒã˜
+                                        // ¥Ğ©`¥¸¥ç¥ó¤¬Í¬¤¸
                                         $item['update_status'] = 2;
                                     } else {
-                                        // ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒç•°ãªã‚‹
+                                        // ¥Ğ©`¥¸¥ç¥ó¤¬®¤Ê¤ë
                                         $item['update_status'] = 3;
                                     }
                                     $items[] = $item;
@@ -430,31 +472,31 @@ class PluginController extends AbstractController
                                 }
                             }
                             if (!$status) {
-                                // æœªã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+                                // Î´¥¤¥ó¥¹¥È©`¥ë
                                 $item['update_status'] = 1;
                                 $items[] = $item;
                             }
                             $status = false;
                         }
 
-                        // EC-CUBEã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯
-                        // å‚ç…§æ¸¡ã—ã‚’ã—ã¦å€¤ã‚’è¿½åŠ 
+                        // EC-CUBE¤Î¥Ğ©`¥¸¥ç¥ó¥Á¥§¥Ã¥¯
+                        // ²ÎÕÕ¶É¤·¤ò¤·¤Æ‚¤ò×·¼Ó
                         foreach ($items as &$item) {
                             if (in_array(Constant::VERSION, $item['eccube_version'])) {
-                                // å¯¾è±¡ãƒãƒ¼ã‚¸ãƒ§ãƒ³
+                                // ŒÏó¥Ğ©`¥¸¥ç¥ó
                                 $item['version_check'] = 1;
                             } else {
-                                // æœªå¯¾è±¡ãƒãƒ¼ã‚¸ãƒ§ãƒ³
+                                // Î´ŒÏó¥Ğ©`¥¸¥ç¥ó
                                 $item['version_check'] = 0;
                             }
                             if ($item['price'] != '0' && $item['purchased'] == '0') {
-                                // æœ‰æ–™å•†å“ã§æœªè³¼å…¥
+                                // ÓĞÁÏÉÌÆ·¤ÇÎ´ÙÈë
                                 $item['update_status'] = 4;
                             }
                         }
                         unset($item);
 
-                        // promotionã‚¢ã‚¤ãƒ†ãƒ 
+                        // promotion¥¢¥¤¥Æ¥à
                         $i = 0;
                         foreach ($items as $item) {
                             if ($item['promotion'] == 1) {
@@ -469,7 +511,7 @@ class PluginController extends AbstractController
                     }
                 } else {
                     $success = 0;
-                    $message = "EC-CUBEã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¦ã„ã¾ã™ã€‚";
+                    $message = "EC-CUBE¥ª©`¥Ê©`¥º¥¹¥È¥¢¤Ë¥¨¥é©`¤¬°kÉú¤·¤Æ¤¤¤Ş¤¹¡£";
                 }
             }
 
@@ -488,7 +530,7 @@ class PluginController extends AbstractController
     }
 
     /**
-     * ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºãƒ–ãƒ©ã‚°ã‚¤ãƒ³ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã€ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ
+     * ¥ª©`¥Ê©`¥º¥Ö¥é¥°¥¤¥ó¥¤¥ó¥¹¥È©`¥ë¡¢¥¢¥Ã¥×¥Ç©`¥È
      *
      * @param Application $app
      * @param Request $request
@@ -506,17 +548,17 @@ class PluginController extends AbstractController
 
         if (!is_null($authKey)) {
 
-            // ã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢é€šä¿¡
+            // ¥ª©`¥Ê©`¥º¥¹¥È¥¢Í¨ĞÅ
             $url = $app['config']['owners_store_url'] . '?method=download&product_id=' . $id;
             list($json, $httpHeader) = $this->getRequestApi($request, $authKey, $url);
 
             if ($json === false) {
-                // æ¥ç¶šå¤±æ•—æ™‚
+                // ½Ó¾AÊ§”¡•r
 
                 $message = $this->getResponseErrorMessage($httpHeader);
 
             } else {
-                // æ¥ç¶šæˆåŠŸæ™‚
+                // ½Ó¾A³É¹¦•r
 
                 $data = json_decode($json, true);
 
@@ -534,7 +576,7 @@ class PluginController extends AbstractController
                             $tmpDir = $service->createTempDir();
                             $tmpFile = sha1(Str::random(32)) . '.' . $extension;
 
-                            // ãƒ•ã‚¡ã‚¤ãƒ«ä½œæˆ
+                            // ¥Õ¥¡¥¤¥ë×÷³É
                             $fs = new Filesystem();
                             $fs->dumpFile($tmpDir . '/' . $tmpFile, $file);
 
@@ -557,7 +599,7 @@ class PluginController extends AbstractController
                             $fs = new Filesystem();
                             $fs->remove($tmpDir);
 
-                            // ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å®Œäº†é€šçŸ¥å‡¦ç†(æ­£å¸¸çµ‚äº†æ™‚)
+                            // ¥À¥¦¥ó¥í©`¥ÉÍêÁËÍ¨Öª„IÀí(Õı³£½KÁË•r)
                             $url = $app['config']['owners_store_url'] . '?method=commit&product_id=' . $id . '&status=1&version=' . $version;
                             $this->getRequestApi($request, $authKey, $url);
 
@@ -575,12 +617,12 @@ class PluginController extends AbstractController
                         $message = $data['error_code'] . ' : ' . $data['error_message'];
                     }
                 } else {
-                    $message = "EC-CUBEã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¦ã„ã¾ã™ã€‚";
+                    $message = "EC-CUBE¥ª©`¥Ê©`¥º¥¹¥È¥¢¤Ë¥¨¥é©`¤¬°kÉú¤·¤Æ¤¤¤Ş¤¹¡£";
                 }
             }
         }
 
-        // ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å®Œäº†é€šçŸ¥å‡¦ç†(ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿæ™‚)
+        // ¥À¥¦¥ó¥í©`¥ÉÍêÁËÍ¨Öª„IÀí(¥¨¥é©`°kÉú•r)
         $url = $app['config']['owners_store_url'] . '?method=commit&product_id=' . $id . '&status=0&version=' . $version . '&message=' . urlencode($message);
         $this->getRequestApi($request, $authKey, $url);
 
@@ -590,7 +632,7 @@ class PluginController extends AbstractController
     }
 
     /**
-     * èªè¨¼ã‚­ãƒ¼è¨­å®šç”»é¢
+     * ÕJÔ^¥­©`ÔO¶¨»­Ãæ
      *
      * @param Application $app
      * @param Request $request
@@ -602,10 +644,10 @@ class PluginController extends AbstractController
 
         $BaseInfo = $app['eccube.repository.base_info']->get();
 
-        // èªè¨¼ã‚­ãƒ¼ã®å–å¾—
+        // ÕJÔ^¥­©`¤ÎÈ¡µÃ
         $form->add(
             'authentication_key', 'text', array(
-            'label' => 'èªè¨¼ã‚­ãƒ¼',
+            'label' => 'ÕJÔ^¥­©`',
             'constraints' => array(
                 new Assert\Regex(array(
                     'pattern' => "/^[0-9a-zA-Z]+$/",
@@ -620,7 +662,7 @@ class PluginController extends AbstractController
             if ($form->isValid()) {
                 $data = $form->getData();
 
-                // èªè¨¼ã‚­ãƒ¼ã®ç™»éŒ²
+                // ÕJÔ^¥­©`¤ÎµÇåh
                 $BaseInfo->setAuthenticationKey($data['authentication_key']);
                 $app['orm.em']->flush($BaseInfo);
 
@@ -638,7 +680,7 @@ class PluginController extends AbstractController
 
 
     /**
-     * APIãƒªã‚¯ã‚¨ã‚¹ãƒˆå‡¦ç†
+     * API¥ê¥¯¥¨¥¹¥È„IÀí
      *
      * @param Request $request
      * @param $authKey
@@ -668,7 +710,7 @@ class PluginController extends AbstractController
     }
 
     /**
-     * ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ˜ãƒƒãƒ€ãƒ¼ã®ãƒã‚§ãƒƒã‚¯
+     * ¥ì¥¹¥İ¥ó¥¹¥Ø¥Ã¥À©`¤Î¥Á¥§¥Ã¥¯
      *
      * @param $httpHeader
      * @return string
@@ -686,11 +728,11 @@ class PluginController extends AbstractController
                     $message = $statusCode . ' : ' . $message;
                     break;
                 default:
-                    $message = "EC-CUBEã‚ªãƒ¼ãƒŠãƒ¼ã‚ºã‚¹ãƒˆã‚¢ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¦ã„ã¾ã™ã€‚";
+                    $message = "EC-CUBE¥ª©`¥Ê©`¥º¥¹¥È¥¢¤Ë¥¨¥é©`¤¬°kÉú¤·¤Æ¤¤¤Ş¤¹¡£";
                     break;
             }
         } else {
-            $message = "ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã‚¨ãƒ©ãƒ¼ã¾ãŸã¯URLã®æŒ‡å®šã«èª¤ã‚ŠãŒã‚ã‚Šã¾ã™ã€‚";
+            $message = "¥¿¥¤¥à¥¢¥¦¥È¥¨¥é©`¤Ş¤¿¤ÏURL¤ÎÖ¸¶¨¤ËÕ`¤ê¤¬¤¢¤ê¤Ş¤¹¡£";
         }
 
         return $message;
