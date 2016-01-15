@@ -44,7 +44,7 @@ class PluginController extends AbstractController
      * @param array $$legacies
      * @param Eccube\Application $app
      */
-    public function getDevelopPlugin($legacies, $app){
+    public function getDeveloperPlugin($legacies, $app){
         $Finder = new \Symfony\Component\Finder\Finder();
         $PluginService = $app['eccube.service.plugin'];
 
@@ -70,7 +70,7 @@ class PluginController extends AbstractController
             $develeopPlugin[$pluginCode] = $val->getRealPath();
         }
 
-        $staticPlugins = $PluginService->developPluginInstall($develeopPlugin);
+        $staticPlugins = $PluginService->readDeveloperPlugin($develeopPlugin);
         return (count($staticPlugins) > 0) ? $staticPlugins : null;
     }
 
@@ -87,7 +87,7 @@ class PluginController extends AbstractController
         $configPages = array();
 
         $Plugins = $app['eccube.repository.plugin']->findBy(array(), array('name' => 'ASC'));
-        $developerPlugins = $this->getDevelopPlugin($Plugins, $app);
+        $developerPlugins = $this->getDeveloperPlugin($Plugins, $app);
 
         $officialPlugins = array();
         $unofficialPlugins = array();

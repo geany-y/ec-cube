@@ -41,7 +41,7 @@ class PluginService
         $this->app = $app;
     }
 
-    public function developPluginInstall(Array $developPlugins){
+    public function readDeveloperPlugin(Array $developPlugins){
         // エラーハンドリング
         if (count($developPlugins) < 1) {
             return null;
@@ -70,6 +70,26 @@ class PluginService
             return null;
         }
         return (count($staticPlugins) > 0) ? $staticPlugins : null;
+    }
+
+    public function sandBoxExcute($path, $method)
+    {
+        ezd($path);
+        ezd($method);
+        $pluginBaseDir = null;
+
+        try {
+            $this->checkPluginArchiveContent($path);
+            $config = $this->readYml($path.'/'.self::CONFIG_YML);
+            $event = $this->readYml($path.'/'.self::EVENT_YML);
+            $this->callPluginManagerMethod($config, $method); // マイグレーションの実行
+        } catch (PluginException $e) {
+            throw $e;
+        } catch (\Exception $e) { // インストーラがどんなExceptionを上げるかわからないので
+            throw $e;
+        }
+
+        return true;
     }
 
     public function install($path, $source = 0)

@@ -34,19 +34,19 @@ class PluginCommand extends \Knp\Command\Command
 
     protected $app;
 
-    public function __construct(\Eccube\Application $app, $name = null) 
+    public function __construct(\Eccube\Application $app, $name = null)
     {
         parent::__construct($name);
         $this->app = $app;
     }
 
-    protected function configure() 
+    protected function configure()
     {
         $this
             ->setName('plugin:develop')
-            ->addArgument('mode', InputArgument::REQUIRED, 'mode(install/uninstall/enable/disable/update)', null) 
-            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'path of tar or zip') 
-            ->addOption('code', null, InputOption::VALUE_OPTIONAL, 'plugin code') 
+            ->addArgument('mode', InputArgument::REQUIRED, 'mode(install/uninstall/enable/disable/update/reload/sandbox:install/sandbox:uninstall)', null)
+            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'path of tar or zip')
+            ->addOption('code', null, InputOption::VALUE_OPTIONAL, 'plugin code')
             ->setDescription('plugin commandline installer.')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> plugin installer runner for developer;
@@ -55,12 +55,12 @@ EOF
     }
 
 
-    protected function getPluginFromCode($pluginCode) 
+    protected function getPluginFromCode($pluginCode)
     {
         return $this->app['eccube.repository.plugin']->findOneBy(array('del_flg'=>0, 'code'=>$pluginCode));
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) 
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->app->initialize();
         $this->app->boot();
@@ -70,44 +70,83 @@ EOF
         $code = $input->getOption('code');
 
         $service = $this->app['eccube.service.plugin'];
+        try{
+            if ($mode == 'install') {
+                if (empty($path)) {
+                    $output->writeln('path is required.');
+                    return;
+                }
+                if ($service->install($path)) {
+                    $output->writeln('success');
+                    return;
+                }
+            }
+            if ($mode == 'update') {
+                if (empty($code)) {
+                    $output->writeln('code is required.');
+                    return;
+                }
+                if (empty($path)) {
+                    $output->writeln('path is required.');
+                    return;
+                }
+                $plugin = $this->getPluginFromCode($code);
+                if ($service->update($plugin, $path)) {
+                    $output->writeln('success');
+                    return;
+                }
+            }
+            if ($mode == 'reload') {
+                if (empty($path)) {
+                    $output->writeln('path is required.');
+                    return;
+                }
+                $stepFlg = false;
+                if ($service->sandBoxExcute($path, 'uninstall')) {
+                    $stepFlg = true;
+                }
+                if ($stepFlg) {
+                    if ($service->sandBoxExcute($path, 'install')) {
+                        $output->writeln('success');
+                        return;
+                    }
+                }
+            }
+            if ($mode == 'sandbox:install') {
+                if (empty($path)) {
+                    $output->writeln('path is required.');
+                    return;
+                }
+                if ($service->sandBoxExcute($path, 'install')) {
+                    $output->writeln('success');
+                    return;
+                }
+            }
+            if ($mode == 'sandbox:uninstall') {
+                if (empty($path)) {
+                    $output->writeln('path is required.');
+                    return;
+                }
+                if ($service->sandBoxExcute($path, 'uninstall')) {
+                    $output->writeln('success');
+                    return;
+                }
+            }
+            if (in_array($mode, array('enable', 'disable', 'uninstall'), true)) {
+                if (empty($code)) {
+                    $output->writeln('code is required.');
+                    return;
+                }
 
-        if ($mode == 'install') {
-            if (empty($path)) {
-                $output->writeln('path is required.');
-                return;
+                $plugin = $this->getPluginFromCode($code);
+                if ($service->$mode($plugin)) {
+                    $output->writeln('success');
+                    return;
+                }
             }
-            if ($service->install($path)) {
-                $output->writeln('success');
-                return;
-            }
+            $output->writeln('undefined mode.');
+        } catch(\Exception $e) {
+            $output->writeln('Raised exception : '.$e->getMessage());
         }
-        if ($mode == 'update') {
-            if (empty($code)) {
-                $output->writeln('code is required.');
-                return;
-            }
-            if (empty($path)) {
-                $output->writeln('path is required.');
-                return;
-            }
-            $plugin = $this->getPluginFromCode($code);
-            if ($service->update($plugin, $path)) {
-                $output->writeln('success');
-                return;
-            }
-        }
-        if (in_array($mode, array('enable', 'disable', 'uninstall'), true)) {
-            if (empty($code)) {
-                $output->writeln('code is required.');
-                return;
-            }
-
-            $plugin = $this->getPluginFromCode($code);
-            if ($service->$mode($plugin)) {
-                $output->writeln('success');
-                return;
-            }
-        }
-        $output->writeln('undefined mode.');
     }
 }
