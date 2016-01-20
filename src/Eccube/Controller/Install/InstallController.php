@@ -36,8 +36,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
-use Monolog\Logger;
 
 class InstallController
 {
@@ -141,6 +141,7 @@ class InstallController
     //    サイトの設定
     public function step3(InstallApplication $app, Request $request)
     {
+        $this->app = $app;
         $form = $app['form.factory']
             ->createBuilder('install_step3')
             ->getForm();
@@ -152,14 +153,9 @@ class InstallController
             $fs = new Filesystem();
 
             if ($fs->exists($config_file)) {
-                try {
-                    // すでに登録されていた場合、登録データを表示
-                    $this->setPDO();
-                    $stmt = $this->PDO->query("SELECT shop_name, email01 FROM dtb_base_info WHERE id = 1;");
-                }catch (\Exception $e){
-                    $app->log($e, array(), Logger::WARNING);
-                    throw new \Exception('データべ―スに接続できません');
-                }
+                // すでに登録されていた場合、登録データを表示
+                $this->setPDO();
+                $stmt = $this->PDO->query("SELECT shop_name, email01 FROM dtb_base_info WHERE id = 1;");
 
                 foreach ($stmt as $row) {
                     $sessionData['shop_name'] = $row['shop_name'];
@@ -386,7 +382,17 @@ class InstallController
 
         } catch (\Exception $e) {
             $this->PDO->close();
-            throw $e;
+            $html = $this->app['twig']->render('error.twig', array(
+                'error_title' => 'データーベース接続エラー',
+                'error_message' => 'エラーが発生しました.',
+            ));
+
+            $response = new Response();
+            $response->setContent($html);
+            $response->setStatusCode('500');
+            $response->headers->set('Content-Type', 'text/html');
+            $response->send();
+            die();
         }
 
         return $this;
