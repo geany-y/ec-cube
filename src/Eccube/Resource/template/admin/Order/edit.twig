@@ -255,7 +255,7 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                 </div><!-- /.box -->
             </div>
             <div id="customer_info_box"  class="box accordion">
-                <div id="customer_info_box__header" class="box-header toggle active">
+                <div id="customer_info_box__toggle" class="box-header toggle active">
                     <h3 class="box-title">注文者情報<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
                 </div><!-- /.box-header -->
                 <div id="customer_info_box__body" class="box-body accpanel" style="display: block;">
@@ -372,7 +372,7 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
             </div><!-- /.box -->
 
             <div id="product_info_box" class="box accordion">
-                <div id="product_info_box__header" class="box-header toggle active">
+                <div id="product_info_box__toggle" class="box-header toggle active">
                     <h3 class="box-title">受注商品情報<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
                 </div><!-- /.box-header -->
                 <div id="product_info_box__body" class="box-body accpanel" style="display: block;">
@@ -497,7 +497,7 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
 
             {# お支払情報 #}
             <div id="payment_info_box" class="box accordion">
-                <div id="payment_info_box__header" class="box-header toggle active">
+                <div id="payment_info_box__toggle" class="box-header toggle active">
                     <h3 class="box-title">お支払情報<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
                 </div><!-- /.box-header -->
                 <div id="payment_info_box__body" class="box-body accpanel" style="display: block;">
@@ -520,7 +520,7 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
             {% for shippingForm in form.Shippings %}
             {% set shippingIndex = loop.index0 %}
             <div id="shipping_info_box--{{ loop.index }}" class="box accordion">
-                <div id="shipping_info_box__header--{{ loop.index }}" class="box-header toggle active">
+                <div id="shipping_info_box__toggle--{{ loop.index }}" class="box-header toggle active">
                     <h3 class="box-title">お届け先情報{% if form.Shippings|length > 1 %}({{ loop.index }}){% endif %}<svg class="cb cb-angle-down icon_down"> <use xlink:href="#cb-angle-down" /></svg></h3>
                 </div><!-- /.box-header -->
                     <div id="shipping_info_box__body--{{ loop.index }}" class="box-body accpanel" style="display: block;">
@@ -538,9 +538,9 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                         <div class="tableish"
                              id="shipment_item_list{{ loop.index0 }}"
                              data-prototype="
-                                {% filter escape %}
+                             {% filter escape %}
                                      {{ include('Order/shipment_item_prototype.twig', { 'shipmentItemForm': shippingForm.ShipmentItems.vars.prototype }) }}
-                                {% endfilter %}">
+                             {% endfilter %}">
 
                         {% for shipmentItemForm in shippingForm.ShipmentItems %}
                             {{ form_widget(shipmentItemForm.Product) }}
@@ -548,7 +548,7 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                             <div id="shipment_item__id--{{ loop.index }}" class="item_box shipment_item_idx{{ shippingIndex }}">
                                 <div id="shipment_item__detail--{{ loop.index }}" class="item_detail">
                                     <div id="shipment_item__name_detail--{{ loop.index }}" class="item_name_area">
-                                        <strong id="shipment_item__product_code--{{ loop.index }}" class="item_name">{{ shipmentItemForm.vars.value.product_name }}</strong><br>
+                                        <strong id="shipment_item__product_name--{{ loop.index }}" class="item_name">{{ shipmentItemForm.vars.value.product_name }}</strong><br>
                                         <span id="shipment_item__product_code--{{ loop.index }}" class="item_id small">{{ shipmentItemForm.vars.value.product_code }}</span>
                                             <span id="shipment_item__class_category_name--{{ loop.index }}" class="item_pattern small">
                                                 {% if shipmentItemForm.vars.value.class_category_name1 is not empty %}
@@ -704,14 +704,14 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                 <div id="shop_info_box__note" class="box-body">{{ form_widget(form.note) }}</div>
             </div><!-- /.box -->
 
-            <div id="order_info__button_insert" class="row btn_area">
+            <div id="detail__insert_button" class="row btn_area">
                 <p class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4 text-center">
                     <button type="submit" class="btn btn-primary btn-block btn-lg" name="mode" value="register">受注情報を登録</button>
                 </p>
                 <!-- /.col -->
             </div>
 
-            <div id="order_info__button_back" class="row hidden-xs hidden-sm">
+            <div id="detail__back_button" class="row hidden-xs hidden-sm">
                 <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 text-center btn_area">
                     {% if id is not null %}
                         <p><a href="{{ url('admin_order') }}">戻る</a></p>
