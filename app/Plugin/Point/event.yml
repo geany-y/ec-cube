@@ -1,0 +1,67 @@
+# 管理画面 > 基本情報設定 > ポイント機能設定
+#
+#admin.setting.shop.shop.index.initialize:
+#    - [onAdminSettingShopInit, NORMAL]
+#admin.setting.shop.shop.index.complete:
+#    - [onAdminSettingShopEditComplete, NORMAL]
+
+# 管理画面
+## 管理画面 > 商品登録( 編集 ) > ポイント付与率設定
+admin.product.edit.initialize:
+    - [onAdminProductEditInitialize, NORMAL]
+admin.product.edit.complete:
+    - [onAdminProductEditComplete, NORMAL]
+
+## 管理画面 > 会員登録( 編集 ) > 保有ポイント設定
+admin.customer.edit.index.initialize:
+    - [onAdminCustomerEditIndexInitialize, NOMAL]
+admin.customer.edit.index.complete:
+    - [onAdminCustomerEditIndexComplete, NOMAL]
+
+## 管理画面 > 受注登録 (編集) > 利用ポイントフォーム生成
+admin.order.edit.index.initialize:
+    - [onAdminOrderEditIndexInitialize, NOMAL]
+admin.order.edit.index.complete:
+    - [onAdminOrderEditIndexComplete, NOMAL]
+
+# フロント画面
+## フロント画面 > 商品購入確認完了
+front.shopping.confirm.initialize:
+    - [onFrontShoppingConfirmInitialize, NOMAL]
+front.shopping.confirm.processing:
+    - [onFrontShoppingConfirmProcessing, NOMAL]
+
+
+
+#front.shopping.index.initialize:
+#    - [onFrontShoppingIndexInitialize, NOMAL]
+# front.shopping.confirm.processing:
+#   - [onFrontShoppingConfirmProcessing, NOMAL]
+#front.shopping.index.complete:
+#    - [onFrontShoppingIndexComplete, NOMAL]
+
+# 画面レンダリング
+#Admin/Setting/Shop/shop_master.twig:
+#    - [onRenderAdminShopMaster, NORMAL]
+## 商品登録画面( 編集 )
+#Admin/Product/product.twig:
+#    - [onRenderAdminProduct, NORMAL]
+## 管理画面 > 受注編集
+Admin/Order/edit.twig:
+    - [onRenderAdminOrderEdit, NORMAL]
+## マイページ
+Mypage/index.twig:
+    - [onRenderMyPageIndex, NORMAL]
+
+## フロント画面 > 商品購入確認画面
+Shopping/index.twig:
+    - [onRenderShoppingIndex, NORMAL]
+
+## フロント画面 > 商品詳細画面
+Product/detail.twig:
+    - [onRenderProductDetail, NORMAL]
+
+## フロント画面 > カート
+Cart/index.twig:
+    - [onRenderCart, NORMAL]
+
