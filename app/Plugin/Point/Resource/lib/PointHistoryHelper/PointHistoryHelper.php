@@ -50,7 +50,7 @@ class PointHistoryHelper
     const STATE_PRE_ADD = 2;
     const STATE_ADD = 3;
     const STATE_USE = 4;
-    const STATE_ADJUST_USE = 5;
+    //const STATE_ADJUST_USE = 5;
 
     protected $app;
     protected $entities;
@@ -124,12 +124,12 @@ class PointHistoryHelper
         $this->saveHistoryPoint((0 - $point));
     }
 
-        /**
-         * 仮ポイント付与情報を確定し履歴登録
-         *  - ポイント戻し処理を行ってから今回調整ポイントを付与
-         * @param $point
-         */
-        public function saveFixProvisionalAddPoint($point)
+    /**
+     * 仮ポイント付与情報を確定し履歴登録
+     *  - ポイント戻し処理を行ってから今回調整ポイントを付与
+     * @param $point
+     */
+    public function saveFixProvisionalAddPoint($point)
     {
         // 最終設定ポイント戻し処理
         $this->fixProvisionalAddPoint($point);
@@ -205,9 +205,6 @@ class PointHistoryHelper
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_CURRENT;
         $this->historyType = self::STATE_CURRENT;
         $this->saveHistoryPoint($point);
-        $this->refreshEntity();
-        $this->saveHistoryPoint((0 - $point));
-
     }
 
     /**
@@ -219,7 +216,7 @@ class PointHistoryHelper
         $latestUseAdjustPoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->entities['Order']);
         $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADJUST_USE;
-        $this->historyType = self::STATE_ADJUST_USE;
+        $this->historyType = self::STATE_USE;
         $this->saveHistoryPoint((0 - $point));
     }
 
@@ -235,19 +232,30 @@ class PointHistoryHelper
      *  - 最終設定の利用調整ポイントの戻し処理
      * @param $point
      */
-    protected function fixProvisionalAddPoint()
+    protected function fixProvisionalAddPoint($point)
     {
+        if(empty($point)){
+            return false;
+        }
         //$this->refreshEntity();
         // 最終利用ポイントを取得
-        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->entities['Order']);
-        if(!empty($lastUsePoint)){
-            $lastUsePoint = 0;
+        /*
+        $lastProvisionalPoint = $this->app['eccube.plugin.point.repository.point']->fixLastProvisionalAddPointByOrder($this->entities['Order']);
+        if(!empty($lastProvisionalPoint)){
+            $lastProvisionalPoint = 0;
+        }
+        */
+
+        $saveStatus = $this->app['eccube.plugin.point.repository.point']->fixLastProvisionalAddPointByOrder($this->entities['Order']);
+
+        if(!$saveStatus){
+            return false;
         }
 
         $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
-        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADJUST_USE;
-        $this->historyType = self::STATE_ADJUST_USE;
-        $this->saveHistoryPoint(0 - $lastUsePoint);
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
+        $this->historyType = self::STATE_ADD;
+        $this->saveHistoryPoint(0 - $point);
     }
 
     /**
@@ -256,6 +264,15 @@ class PointHistoryHelper
      */
     protected function saveHistoryPoint($point)
     {
+        if(!$this->hasEntity('Order')){
+            return false;
+        }
+        if(!$this->hasEntity('Customer')){
+            return false;
+        }
+        if(!$this->hasEntity('PointInfo')){
+            return false;
+        }
         if (isset($this->entities['Order'])) {
             $this->entities['Point']->setOrder($this->entities['Order']);
         }
@@ -277,6 +294,9 @@ class PointHistoryHelper
      */
     public function saveSnapShot($point)
     {
+        if(!$this->hasEntity('Customer')){
+            return false;
+        }
         $this->entities['SnapShot']->setPlgPointSnapshotId(null);
         $this->entities['SnapShot']->setCustomer($this->entities['Customer']);
         $this->entities['SnapShot']->setPlgPointAdd($point['add']);
@@ -287,4 +307,10 @@ class PointHistoryHelper
         $this->app['orm.em']->flush($this->entities['SnapShot']);
     }
 
+    protected function hasEntity($name){
+        if(isset($this->entities[$name])){
+            return true;
+        }
+        return false;
+    }
 }

@@ -71,10 +71,12 @@ class FrontShopping extends AbstractWorkPlace
         $args = $event->getParameters();
         $order = $args['Order'];
 
+        // オーダーエンティティの確認
         if(empty($order)){
             return false;
         }
 
+        // 利用ポイントの確認
         $pointUse = new PointUse();
         $usePoint = 0;
         if ($this->app['session']->has('usePoint')) {
@@ -82,57 +84,20 @@ class FrontShopping extends AbstractWorkPlace
             $pointUse->setPlgUsePoint($usePoint);
         }
 
-        // ポイント基本設定項目の取得
-        $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
-
-        if(empty($pointInfo)){
-            return  false;
-        }
-
-        // 計算種別判定 ( 利用ポイント減算 あり/なし )
-        $calcType = null;
-        $calculationService = null;
-        if ($pointInfo->getPlgCalculationType() == PointInfo::POINT_CALCULATE_SUBTRACTION) {
-            // 利用ポイント減算処理
-            $calcType = PointInfo::POINT_CALCULATE_SUBTRACTION;
-        } else {
-            if ($pointInfo->getPlgCalculationType() == PointInfo::POINT_CALCULATE_NORMAL) {
-                // 利用ポイント減算なし
-                $calcType = PointInfo::POINT_CALCULATE_NORMAL;
-            }
-        }
-
-        // 計算処理設定値有無確認
-        if (is_null($calcType)) {
-            return true;
-        }
-
         // 計算判定取得
-        $calculationService = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-            $calcType
-        );
+        $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // 計算ヘルパー取得判定
-        if (is_null($calculationService)) {
+        if (is_null($calculator)) {
             return true;
         }
 
         // 計算に必要なエンティティを登録
-        $calculationService->addEntity($order);
-        $calculationService->addEntity($order->getCustomer());
-        $calculationService->addEntity($pointInfo);
-        $calculationService->addEntity($pointUse);
-
-        // ポイント付与率設定
-        $rate_check = $calculationService->attributePointRate();
-
-        //ポイント付与率設定可否判定
-        if (is_null($rate_check)) {
-            return true;
-        }
+        $calculator->addEntity('Order', $order);
+        $calculator->addEntity('Customer', $order->getCustomer());
 
         // 付与ポイント取得
-        $addPoint = $calculationService->getAddPoint();
+        $addPoint = $calculator->getAddPointByOrder();
 
         //付与ポイント取得可否判定
         if (is_null($addPoint)) {
@@ -140,7 +105,7 @@ class FrontShopping extends AbstractWorkPlace
         }
 
         // 現在保有ポイント取得
-        $currentPoint = $calculationService->getPoint();
+        $currentPoint = $calculator->getPoint();
 
         //保有ポイント取得可否判定
         if (is_null($currentPoint)) {
@@ -148,11 +113,10 @@ class FrontShopping extends AbstractWorkPlace
         }
 
         // ポイント使用合計金額取得・設定
-        $amount = $calculationService->getTotalAmount();
+        $amount = $calculator->getTotalAmount();
 
-
+        // 合計金額をセット
         $order->setTotal($amount);
-
 
         // Twigデータ内IDをキーに表示項目を追加
         // ポイント情報表示
@@ -163,7 +127,6 @@ class FrontShopping extends AbstractWorkPlace
             $snipet = $this->createHtmlDisplayPointFormat();
         }
 
-        //$search = '<div id="summary_box__result"';
         $search = '<p id="summary_box__total_amount"';
         $replace = $snipet.$search;
         $source = str_replace($search, $replace, $event->getSource());

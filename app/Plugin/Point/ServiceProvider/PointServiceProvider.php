@@ -14,6 +14,7 @@ namespace Plugin\Point\ServiceProvider;
 use Eccube\Application;
 use Plugin\Point\Doctrine\Listener\ORMListener;
 use Plugin\Point\Resource\lib\EventRoutineWorksHelper\EventRoutineWorksHelperFactory;
+use Plugin\Point\Resource\lib\PointCalculateHelper\PointCalculateHelper;
 use Plugin\Point\Resource\lib\PointCalculateHelper\PointCalculateHelperFactory;
 use Plugin\Point\Resource\lib\PointHistoryHelper\PointHistoryHelper;
 use Silex\Application as BaseApplication;
@@ -169,8 +170,8 @@ class PointServiceProvider implements ServiceProviderInterface
 
         // ポイント計算処理サービスファクトリー登録
         $app['eccube.plugin.point.calculate.helper.factory'] = $app->share(
-            function () {
-                return new PointCalculateHelperFactory();
+            function () use($app) {
+                return new PointCalculateHelper($app);
             }
         );
 

@@ -77,6 +77,7 @@ class AdminOrderNonSubtraction extends PointCalculateHelperImplementor
         return true;
     }
 
+
     /**
      * 仮付与ポイントを返却
      * @return bool|int

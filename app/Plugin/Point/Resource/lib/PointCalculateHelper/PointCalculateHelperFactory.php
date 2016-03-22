@@ -56,14 +56,7 @@ class PointCalculateHelperFactory
                 return new PointCalculateHelper(new FrontCommon());
                 break;
             case PointInfo::POINT_CALCULATE_FRONT_CART :
-                $nonSubtraction = new \Plugin\Point\Resource\lib\PointCalculateHelper\Bridge\CalculateType\FrontCart\NonSubtraction();
-                return new PointCalculateFrontCartHelper($nonSubtraction);
-                break;
-            case PointInfo::POINT_CALCULATE_ADMIN_ORDER_NON_SUBTRACTION :
-                return new PointCalculateHelper(new AdminOrderNonSubtraction());
-                break;
-            case PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION :
-                return new PointCalculateHelper(new AdminOrderSubtraction());
+                return new PointCalculateHelper(new FrontCart());
                 break;
             default :
                 break;

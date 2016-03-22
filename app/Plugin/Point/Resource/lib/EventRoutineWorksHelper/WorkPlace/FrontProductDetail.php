@@ -84,12 +84,12 @@ class FrontProductDetail extends AbstractWorkPlace
         }
 
         // ポイント計算ヘルパーを取得
-        $calculateHelper = null;
-        $calculateHelper = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(PointInfo::POINT_CALCULATE_FRONT_COMMON);
+        $calculator = null;
+        $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // ヘルパーの取得判定
-        if(empty($calculateHelper)){
-            return;
+        if(empty($calculator)){
+            return false;
         }
 
         // カスタマー情報を取得
@@ -100,24 +100,15 @@ class FrontProductDetail extends AbstractWorkPlace
         }
 
         // 計算に必要なエンティティを登録
-        $calculateHelper->addEntity($product);
+        $calculator->addEntity('Product', $product);
         if(!$unCustomer){
-            $calculateHelper->addEntity($customer);
-        }
-        $calculateHelper->addEntity($pointInfo);
-
-        // ポイント付与率設定
-        $rate_check = $calculateHelper->attributePointRate();
-
-        //ポイント付与率設定可否判定
-        if (is_null($rate_check)) {
-            return true;
+            $calculator->addEntity('Customer', $customer);
         }
 
         // 会員保有ポイントを取得
         $currentPoint = 0;
         if(!$unCustomer) {
-            $currentPoint = $calculateHelper->getPoint();
+            $currentPoint = $calculator->getPoint();
 
             // 会員保有ポイント取得判定
             if (empty($currentPoint)) {
@@ -126,7 +117,7 @@ class FrontProductDetail extends AbstractWorkPlace
         }
 
         // 付与ポイント取得
-        $addPoint = $calculateHelper->getAddPoint();
+        $addPoint = $calculator->getAddPointByProduct();
 
         // 付与ポイント取得判定
         if(empty($addPoint)){

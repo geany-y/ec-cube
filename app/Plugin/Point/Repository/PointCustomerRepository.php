@@ -46,6 +46,10 @@ class PointCustomerRepository extends EntityRepository
      */
     public function savePoint($point, $customer)
     {
+        if((!isset($point) && $point != 0) || empty($customer)){
+            return false;
+        }
+
         // エンティティにフォーム取得値とリレーションオブジェクトを設定
         $pointCustomerEntity = new PointCustomer();
         $pointCustomerEntity->setPlgPointCurrent($point);

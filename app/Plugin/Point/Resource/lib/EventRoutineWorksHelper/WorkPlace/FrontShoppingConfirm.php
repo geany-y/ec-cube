@@ -94,63 +94,26 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         if ($this->app['session']->has('usePoint')) {
             $usePoint = $this->app['session']->get('usePoint');
             $pointUse->setPlgUsePoint($usePoint);
-            $this->app['session']->remove('usePoint');
-        }
-
-
-        // ポイント基本設定項目の取得
-        $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
-
-        if(empty($pointInfo)){
-            return false;
-        }
-
-        // 計算種別判定 ( 利用ポイント減算 あり/なし )
-        $calcType = null;
-        $calculationService = null;
-        if ($pointInfo->getPlgCalculationType() == PointInfo::POINT_CALCULATE_SUBTRACTION) {
-            // 利用ポイント減算処理
-            $calcType = PointInfo::POINT_CALCULATE_SUBTRACTION;
-        } else {
-            if ($pointInfo->getPlgCalculationType() == PointInfo::POINT_CALCULATE_NORMAL) {
-                // 利用ポイント減算なし
-                $calcType = PointInfo::POINT_CALCULATE_NORMAL;
-            }
-        }
-
-        // 計算処理設定値有無確認
-        if (is_null($calcType)) {
-            throw new \UnexpectedValueException();
+            //$this->app['session']->remove('usePoint');
         }
 
         // 計算判定取得
-        $calculationService = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-            $calcType
-        );
+        $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // 計算ヘルパー取得判定
-        if (is_null($calculationService)) {
+        if (is_null($calculator)) {
             // 画面がないためエラーをスロー
             throw new UndefinedFunctionException();
         }
 
         // 計算に必要なエンティティを登録
-        $calculationService->addEntity($order);
-        $calculationService->addEntity($order->getCustomer());
-        $calculationService->addEntity($pointInfo);
-        $calculationService->addEntity($pointUse);
-
-        // ポイント付与率設定
-        $rate_check = $calculationService->attributePointRate();
-
-        //ポイント付与率設定可否判定
-        if (is_null($rate_check)) {
-            // 画面がないためエラーをスロー
-            throw new \UnexpectedValueException();
-        }
+        $calculator->addEntity('Order', $order);
+        $calculator->addEntity('Customer', $order->getCustomer());
+        //$calculator->addEntity($pointInfo);
+        //$calculator->addEntity($pointUse);
 
         // 付与ポイント取得
-        $addPoint = $calculationService->getAddPoint();
+        $addPoint = $calculator->getAddPointByOrder();
 
 
         //付与ポイント取得可否判定
@@ -161,7 +124,7 @@ class FrontShoppingConfirm extends AbstractWorkPlace
 
 
         // 現在保有ポイント取得 @todo ポイント取得は履歴からの再計算が必要??
-        $currentPoint = $calculationService->getPoint();
+        $currentPoint = $calculator->getPoint();
 
         //保有ポイント取得可否判定
         if (is_null($currentPoint)) {
@@ -169,10 +132,11 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         }
 
         // ポイント使用合計金額取得・設定
-        $amount = $calculationService->getTotalAmount();
+        $amount = $calculator->getTotalAmount();
 
         // ポイント付与受注ステータスが「新規」の場合、付与ポイントを確定
         $add_point_flg = false;
+        $pointInfo =$this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         // ポイント機能基本設定の付与ポイント受注ステータスを取得
         if ($pointInfo->getPlgAddPointStatus() == $this->app['config']['order_new']) {
             $add_point_flg  = true;
@@ -196,7 +160,9 @@ class FrontShoppingConfirm extends AbstractWorkPlace
 
         // 付与ポイント受注ステータスが新規であれば、ポイント付与
         if ($add_point_flg) {
+            // @todo 仮ポイント打ち消し処理が必要
             $this->app['eccube.plugin.point.history.service']->saveAddPoint($addPoint);
+
             // カスタマーポイントテーブル更新
             // 現在ポイントを履歴から計算
             $calculateCurrentPoint = $this->app['eccube.plugin.point.repository.point']->getCalculateCurrentPointByCustomerId(
@@ -214,9 +180,9 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $this->app['eccube.plugin.point.history.service']->addEntity($order);
         $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
 
-        if ($add_point_flg) {
+        //if ($add_point_flg) {
             $this->app['eccube.plugin.point.history.service']->saveAfterShoppingCurrentPoint($calculateCurrentPoint);
-        }
+        //}
 
         // ポイント保存用変数作成 @todo ここのaddの仮ポイントをどうするか
         $point = array();
@@ -230,5 +196,10 @@ class FrontShoppingConfirm extends AbstractWorkPlace
 
         // 支払い合計金額更新
         $order->setTotal($amount);
+
+        // 利用ポイントクリア
+        if ($this->app['session']->has('usePoint')) {
+            $this->app['session']->remove('usePoint');
+        }
     }
 }

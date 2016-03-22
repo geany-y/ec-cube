@@ -77,14 +77,12 @@ class FrontCart extends AbstractWorkPlace
         }
 
         // ポイント計算ヘルパーを取得
-        $calculateHelper = null;
-        $calculateHelper = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-            PointInfo::POINT_CALCULATE_FRONT_CART
-        );
+        $calculator = null;
+        $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // ヘルパーの取得判定
-        if (empty($calculateHelper)) {
-            return;
+        if (empty($calculator)) {
+            return false;
         }
 
         // カスタマー情報を取得
@@ -102,34 +100,30 @@ class FrontCart extends AbstractWorkPlace
             return false;
         }
 
-        $calculateHelper->addEntityCollection(
-            NonSubtraction::ENTITY_COLLECTION_PRODUCT_CLASS,
-            $parameters['Cart']->getCartItems()
-        );
-        $calculateHelper->addEntity($customer);
-        $calculateHelper->addEntity($pointInfo);
-
-        // ポイント付与率設定
-        $rate_check = $calculateHelper->attributePointRate();
-
-        if(empty($rate_check)){
-            return true;
+        // カートオブジェクトの確認
+        if(!isset($parameters['Cart']) || empty($parameters['Cart'])){
+            return false;
         }
 
-        // ポイント付与率を取得
-        $addPoint = $calculateHelper->getAddPoint();
+        // 計算に必要なエンティティを格納
+        $calculator->addEntity('Customer', $customer);
+        $calculator->addEntity('Cart', $parameters['Cart']);
 
-        // ポイント付与率判定
-        if (empty($addPoint)) {
-            $addPoint = 0;
-        }
 
         // 会員保有ポイントを取得
-        $currentPoint = $calculateHelper->getPoint();
+        $currentPoint = $calculator->getPoint();
 
         // 会員保有ポイント取得判定
         if (empty($currentPoint)) {
             $currentPoint = 0;
+        }
+
+        // 購入商品付与ポイント取得
+        $addPoint = $calculator->getAddPointByCart();
+
+        // 購入商品付与ポイント判定
+        if (empty($addPoint)) {
+            $addPoint = 0;
         }
 
         // 使用ポイントボタン付与

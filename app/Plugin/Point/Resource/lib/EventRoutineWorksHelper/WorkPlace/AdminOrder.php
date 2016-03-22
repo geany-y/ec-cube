@@ -26,9 +26,7 @@ namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
-use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Entity\PointUse;
-use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,19 +47,13 @@ class  AdminOrder extends AbstractWorkPlace
     protected $targetOrder;
     protected $calculateCurrentPoint;
     protected $customer;
-    protected $calculation;
+    protected $calculator;
     protected $history;
     protected $usePoint;
 
     public function __construct()
     {
         parent::__construct();
-        // 計算判定取得
-        /*
-        $this->calculation = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-            PointInfo::POINT_CALCULATE_ADMIN_ORDER
-        );
-        */
         // 履歴管理ヘルパー
         $this->history = $this->app['eccube.plugin.point.history.service'];
 
@@ -70,43 +62,26 @@ class  AdminOrder extends AbstractWorkPlace
         $this->pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         $this->pointType = $this->pointInfo->getPlgCalculationType();
 
-        // 計算ヘルパー生成
-        $this->createCalculator();
+        // 計算ヘルパー取得
+        $this->calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
     }
 
     /**
-     * 設定により計算ヘルパーを返却
-     * 必要な時に呼び出し(基本設定にもとづく)
-     */
-    protected function createCalculator(){
-        try {
-            // 計算処理取得
-            switch ($this->pointType) {
-                case PointInfo::POINT_CALCULATE_NORMAL :
-                    $this->calculation = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-                        PointInfo::POINT_CALCULATE_ADMIN_ORDER_NON_SUBTRACTION
-                    );
-                    break;
-                case PointInfo::POINT_CALCULATE_SUBTRACTION :
-                    $this->calculation = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-                        PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION
-                    );
-                    break;
-            }
-        }catch(ClassNotFoundException $e){
-            throw new \Prophecy\Exception\Doubler\ClassNotFoundException();
-        }
-    }
-
-    /**
-     * 本クラスでは処理なし
+     * フォームを拡張
+     *  -   利用ポイント項目を追加
+     *  -   追加項目の位置はTwig拡張で配備
      * @param FormBuilder $builder
      * @param Request $request
      */
     public function createForm(FormBuilder $builder, Request $request)
     {
-
         $order = $builder->getData();
+
+        if(empty($order) || !preg_match('/Order/', get_class($order))){
+            return false;
+        }
+
+        // 初期値・取得値設定処理
         $lastUsePoint = 0;
         if(!empty($order)){
             $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
@@ -153,28 +128,55 @@ class  AdminOrder extends AbstractWorkPlace
     }
 
     /**
-     * 本クラスでは処理なし
+     * Twigの拡張
+     *  - フォーム追加項目を挿入
      * @param TemplateEvent $event
      */
     public function createTwig(TemplateEvent $event)
     {
         // ポイント情報基本設定を取得
-        $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        //$pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        if(empty($this->pointInfo)){
+            return false;
+        }
 
+        // オーダーエンティティを取得
         $args = $event->getParameters();
+        // オーダーが取得できない際
+        if(!isset($args['Order'])){
+            return false;
+        }
+
         $order = $args['Order'];
 
+        // 利用ポイントをエンティティにセット
         $pointUse = new PointUse();
         $usePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
+
+        if(empty($usePoint)){
+            $usePoint = 0;
+        }
+
+        // 利用ポイントを格納
         $pointUse->setPlgUsePoint($usePoint);
 
         // ポイント基本設定項目の取得
+        /*
         $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        */
+        // ポイント基本設定の確認
+        if(empty($this->pointInfo)){
+            return false;
+        }
 
         // 計算種別判定 ( 利用ポイント減算 あり/なし )
+        /*
         $calcType = null;
         $calculationService = null;
-        if ($pointInfo->getPlgCalculationType() == PointInfo::POINT_CALCULATE_SUBTRACTION) {
+        */
+
+        /*
+        if ($this->pointInfo->getPlgCalculationType() == PointInfo::POINT_CALCULATE_SUBTRACTION) {
             // 利用ポイント減算処理
             $calcType = PointInfo::POINT_CALCULATE_SUBTRACTION;
         } else {
@@ -183,37 +185,22 @@ class  AdminOrder extends AbstractWorkPlace
                 $calcType = PointInfo::POINT_CALCULATE_NORMAL;
             }
         }
+        */
 
-        // 計算処理設定値有無確認
-        if (is_null($calcType)) {
-            return true;
-        }
-
-        $calculationService = $this->app['eccube.plugin.point.calculate.helper.factory']->createCalculateHelperFunction(
-            $calcType
-        );
+        //$calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // 計算ヘルパー取得判定
-        if (is_null($calculationService)) {
+        if (is_null($this->calculator)) {
             return true;
         }
 
         // 計算に必要なエンティティを登録
-        $calculationService->addEntity($order);
-        $calculationService->addEntity($order->getCustomer());
-        $calculationService->addEntity($pointInfo);
-        $calculationService->addEntity($pointUse);
-
-        // ポイント付与率設定
-        $rate_check = $calculationService->attributePointRate();
-
-        //ポイント付与率設定可否判定
-        if (is_null($rate_check)) {
-            return true;
-        }
+        $this->calculator->addEntity('Order', $order);
+        $this->calculator->addEntity('Customer', $order->getCustomer());
+        $this->calculator->setUsePoint($usePoint);
 
         // 付与ポイント取得
-        $addPoint = $calculationService->getAddPoint();
+        $addPoint = $this->calculator->getAddPointByOrder();
 
         //付与ポイント取得可否判定
         if (is_null($addPoint)) {
@@ -221,7 +208,7 @@ class  AdminOrder extends AbstractWorkPlace
         }
 
         // 現在保有ポイント取得
-        $currentPoint = $calculationService->getPoint();
+        $currentPoint = $this->calculator->getPoint();
 
         //保有ポイント取得可否判定
         if (is_null($currentPoint)) {
@@ -286,15 +273,6 @@ EOHTML;
 </dl>
 EOHTML;
     }
-    /*
-    <dl id="product_info_result_box__point_summary" class="dl-horizontal">
-    <dt id="product_info_result_box__point_use">利用ポイント&nbsp;:</dt>
-    <dd><input type="text" id="order_plg_use_point" name="order[plg_use_point]" placeholder="10 ( 正の整数 )" class="form-control" value=""></dd>
-    <dt id="product_info_result_box__point_add">付与ポイント&nbsp;:</dt>
-    <dd>{{ point.add }}&nbsp;pt</dd>
-    </dl>
-     */
-
 
     /**
      * 受注ステータス判定・ポイント更新
@@ -305,15 +283,21 @@ EOHTML;
     {
         // ポイント取得
         $this->usePoint = $event->getArgument('form')->get('plg_use_point')->getData();
+        // 利用ポイント確認
+        if(empty($this->usePoint)){
+            $this->usePoint = 0;
+        }
 
         // 必要情報をセット
-        $this->pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        //$this->pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         $this->targetOrder = $event->getArgument('TargetOrder');
         $this->customer = $event->getArgument('Customer');
 
+        /*
         if(empty($this->pointInfo)){
             return false;
         }
+        */
 
         if(empty($this->targetOrder)){
             return false;
@@ -323,12 +307,13 @@ EOHTML;
             return false;
         }
 
-        // ポイント確定判定処理
+        // 以下受注画面内、イベント処理
+        // 受注ステータス判定→ポイント確定処理
         if ($this->targetOrder->getOrderStatus()->getId() == $this->pointInfo->getPlgAddPointStatus()) {
             $this->pointFixEvent($event);
         }
 
-        // 受注管理ポイント調整時イベント
+        // 利用ポイント調整イベント
         if(!empty($this->usePoint)){
             $this->pointUseEvent($event);
         }
@@ -343,7 +328,7 @@ EOHTML;
 
     /**
      * ポイント確定時処理
-     * @param $event
+     *  -   受注ステータス判定でポイントの付与が確定した際の処理
      * @param $pointInfo
      * @return bool
      */
@@ -361,27 +346,28 @@ EOHTML;
             return false;
         }
 
-        // AdminOrder計算ヘルパーを使用
-        $this->calculation->addEntity($pointInfo);
-        $this->calculation->addEntity($this->targetOrder);
-        $this->calculation->addEntity($this->customer);
+        // 仮付与ポイントがあるか確認
+        $lastProvisionalPoint = $this->app['eccube.plugin.point.repository.point']->getLastProvisionalAddPointByOrder($this->targetOrder);
 
-        // ポイント付与率設定
-        $rate_check = $this->calculation->attributePointRate();
-
-        //ポイント付与率設定可否判定
-        /*
-        if (is_null($rate_check)) {
-            // 画面がないためエラーをスロー
-            throw new \UnexpectedValueException();
+        if(empty($lastProvisionalPoint)){
+            return false;
         }
-        */
-        $provisionalPoint = $this->calculation->getProvisionalAddPoint();
+
+        // AdminOrder計算ヘルパーを使用
+        //$this->calculator->addEntity($pointInfo);
+        $this->calculator->addEntity('Order', $this->targetOrder);
+        $this->calculator->addEntity('Customer', $this->customer);
+
+        // 仮付与ポイントの取得
+        /*
+        $provisionalPoint = $this->calculator->getProvisionalAddPointByOrder();
+
 
         //仮ポイントの有無判定
         if (is_null($provisionalPoint)) {
             return false;
         }
+        */
 
         // @todo 実装未了
         // 現在保有ポイント取得
@@ -399,15 +385,18 @@ EOHTML;
         // 現在保有ポイント取得
         //$currentPoint = $this->calculation->getAddPoint();
 
+        //dump($provisionalPoint);
+        //exit();
+
         // 履歴保存
-        // 仮ポイントのみ取得
-        $this->saveFixOrderHistory($provisionalPoint);
+        // 仮ポイントの保存
+        $this->saveFixOrderHistory($lastProvisionalPoint);
 
         $point = array();
         $this->refreshCurrentPoint();
         $point['current'] = $this->calculateCurrentPoint;
         $point['use'] = 0;
-        $point['add'] = $provisionalPoint;
+        $point['add'] = $lastProvisionalPoint;
 
         // SnapShot保存
         $this->saveFixOrderSnapShot($point);
@@ -434,41 +423,25 @@ EOHTML;
 
         // 計算に使用する基本情報の設定
         $pointUse = new PointUse();
+
+        //$pointUse->setPlgUsePoint(abs($calculateUsePoint));
+
+        // 計算に必要なエンティティをセット
+        $this->calculator->addEntity('Order', $this->targetOrder);
+        $this->calculator->addEntity('Customer', $this->customer);
         // 計算使用値は絶対値
-        $pointUse->setPlgUsePoint(abs($calculateUsePoint));
-        $this->calculation->addEntity($pointUse);
-        $this->calculation->addEntity($this->pointInfo);
-        $this->calculation->addEntity($this->targetOrder);
-        $this->calculation->addEntity($this->customer);
-
-        // ポイント付与率設定
-        $rate_check = $this->calculation->attributePointRate();
-
-        //ポイント付与率設定可否判定
-        if (is_null($rate_check)) {
-            // 画面がないためエラーをスロー
-            throw new \LogicException();
-        }
-
-        // 仮付与ポイント取得
-        //$provisionalPoint = $this->calculation->getProvisionalAddPoint();
-
-        //仮ポイントの有無判定
-        /*
-        if (is_null($provisionalPoint)) {
-            return false;
-        }
-        */
+        $this->calculator->setUsePoint(abs($calculateUsePoint));
 
 
         // 付与ポイント取得
-        $addPoint = $this->calculation->getAddPoint();
+        $addPoint = $this->calculator->getAddPointByOrder();
 
         // 履歴保存
         // 戻し
         $this->history->addEntity($this->targetOrder);
         $this->history->addEntity($this->customer);
-        $this->history->saveUsePointAdjustOrderHistory($calculateUsePoint);
+        // 戻しは以前のポイント
+        $this->history->saveUsePointAdjustOrderHistory($lastUsePoint * -1);
         // 入力
         $this->history->refreshEntity();
         $this->history->addEntity($this->targetOrder);
@@ -522,6 +495,10 @@ EOHTML;
         $this->history->addEntity($this->targetOrder);
         $this->history->addEntity($this->customer);
         $this->history->saveFixProvisionalAddPoint($provisionalPoint);
+        //$this->history->refreshEntity();
+        //$this->history->addEntity($this->targetOrder);
+        //$this->history->addEntity($this->customer);
+        //$this->history->saveFixProvisionalAddPoint($provisionalPoint);
 
 
         // 会員ポイント更新
