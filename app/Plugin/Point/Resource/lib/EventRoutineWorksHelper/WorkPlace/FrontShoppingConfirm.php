@@ -161,7 +161,17 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         // 付与ポイント受注ステータスが新規であれば、ポイント付与
         if ($add_point_flg) {
             // @todo 仮ポイント打ち消し処理が必要
-            $this->app['eccube.plugin.point.history.service']->saveAddPoint($addPoint);
+            $this->app['eccube.plugin.point.history.service']->fixShoppingProvisionalAddPoint(abs($addPoint));
+            $this->app['eccube.plugin.point.history.service']->refreshEntity();
+            $this->app['eccube.plugin.point.history.service']->addEntity($order);
+            $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+            $this->app['eccube.plugin.point.history.service']->saveShoppingFixProvisionalAddPoint(abs($addPoint));
+            $this->app['eccube.plugin.point.history.service']->refreshEntity();
+            /*
+            $this->app['eccube.plugin.point.history.service']->addEntity($order);
+            $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+            $this->app['eccube.plugin.point.history.service']->saveAddPoint(abs($addPoint));
+            */
 
             // カスタマーポイントテーブル更新
             // 現在ポイントを履歴から計算
@@ -176,12 +186,14 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint($calculateCurrentPoint, $order->getCustomer());
 
         // 履歴情報現在ポイント登録
+        /*
         $this->app['eccube.plugin.point.history.service']->refreshEntity();
         $this->app['eccube.plugin.point.history.service']->addEntity($order);
         $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+        */
 
         //if ($add_point_flg) {
-            $this->app['eccube.plugin.point.history.service']->saveAfterShoppingCurrentPoint($calculateCurrentPoint);
+            //$this->app['eccube.plugin.point.history.service']->saveAfterShoppingCurrentPoint($calculateCurrentPoint);
         //}
 
         // ポイント保存用変数作成 @todo ここのaddの仮ポイントをどうするか

@@ -65,6 +65,7 @@ class PointHistoryHelper
     {
         $this->app = \Eccube\Application::getInstance();
         $this->refreshEntity();
+        $this->entities['PointInfo'] = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
     }
 
     /**
@@ -118,10 +119,10 @@ class PointHistoryHelper
      */
     public function saveProvisionalAddPoint($point)
     {
-        $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
+        $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
         $this->historyType = self::STATE_PRE_ADD;
-        $this->saveHistoryPoint((0 - $point));
+        $this->saveHistoryPoint($point);
     }
 
     /**
@@ -133,7 +134,36 @@ class PointHistoryHelper
     {
         // 最終設定ポイント戻し処理
         $this->fixProvisionalAddPoint($point);
+        $this->app['orm.em']->refresh($this->entities['Point']);
         $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
+        $this->historyType = self::STATE_ADD;
+        $this->saveHistoryPoint($point);
+    }
+
+    /**
+     * 仮ポイント付与情報を履歴登録
+     * @param $point
+     */
+    public function saveShoppingProvisionalAddPoint($point)
+    {
+        $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint($point);
+    }
+
+    /**
+     * 仮ポイント付与情報を確定し履歴登録
+     *  - ポイント戻し処理を行ってから今回調整ポイントを付与
+     * @param $point
+     */
+    public function saveShoppingFixProvisionalAddPoint($point)
+    {
+        // 最終設定ポイント戻し処理
+        $this->fixProvisionalAddPoint($point);
+        $this->app['orm.em']->refresh($this->entities['Point']);
+        $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
         $this->historyType = self::STATE_ADD;
         $this->saveHistoryPoint($point);
@@ -163,6 +193,7 @@ class PointHistoryHelper
      * 商品購入後、現在ポイント履歴登録
      * @param $point
      */
+    /*
     public function saveAfterShoppingCurrentPoint($point)
     {
         $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
@@ -170,11 +201,13 @@ class PointHistoryHelper
         $this->historyType = self::STATE_CURRENT;
         $this->saveHistoryPoint($point);
     }
+    */
 
     /**
      * 受注ステータス変更後仮ポイント確定時、現在ポイント履歴登録
      * @param $point
      */
+    /*
     public function saveAfterChangeOrderStatusCurrentPoint($point)
     {
         $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
@@ -182,6 +215,7 @@ class PointHistoryHelper
         $this->historyType = self::STATE_CURRENT;
         $this->saveHistoryPoint($point);
     }
+    */
 
     /**
      * 利用ポイント履歴登録
@@ -213,11 +247,10 @@ class PointHistoryHelper
      */
     public function saveUsePointAdjustOrderHistory($point)
     {
-        $latestUseAdjustPoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->entities['Order']);
         $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADJUST_USE;
         $this->historyType = self::STATE_USE;
-        $this->saveHistoryPoint((0 - $point));
+        $this->saveHistoryPoint($point);
     }
 
     /**
@@ -232,7 +265,7 @@ class PointHistoryHelper
      *  - 最終設定の利用調整ポイントの戻し処理
      * @param $point
      */
-    protected function fixProvisionalAddPoint($point)
+    public function fixProvisionalAddPoint($point)
     {
         if(empty($point)){
             return false;
@@ -246,16 +279,47 @@ class PointHistoryHelper
         }
         */
 
-        $saveStatus = $this->app['eccube.plugin.point.repository.point']->fixLastProvisionalAddPointByOrder($this->entities['Order']);
-
-        if(!$saveStatus){
-            return false;
-        }
-
+        $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint(0 - $point);
+        /*
         $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
-        $this->historyType = self::STATE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint($point);
+        */
+    }
+
+    /**
+     * 仮ポイント確定処理
+     *  - 最終設定の利用調整ポイントの戻し処理
+     * @param $point
+     */
+    public function fixShoppingProvisionalAddPoint($point)
+    {
+        if(empty($point)){
+            return false;
+        }
+        //$this->refreshEntity();
+        // 最終利用ポイントを取得
+        /*
+        $lastProvisionalPoint = $this->app['eccube.plugin.point.repository.point']->fixLastProvisionalAddPointByOrder($this->entities['Order']);
+        if(!empty($lastProvisionalPoint)){
+            $lastProvisionalPoint = 0;
+        }
+        */
+
+        $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
         $this->saveHistoryPoint(0 - $point);
+        /*
+        $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint($point);
+        */
     }
 
     /**
@@ -264,9 +328,11 @@ class PointHistoryHelper
      */
     protected function saveHistoryPoint($point)
     {
+        /*
         if(!$this->hasEntity('Order')){
             return false;
         }
+        */
         if(!$this->hasEntity('Customer')){
             return false;
         }

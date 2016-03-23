@@ -110,6 +110,7 @@ class FrontMyPage extends AbstractWorkPlace
         // 仮ポイント取得
         $previsionAddPoint = $calculator->getProvisionalAddPoint();
 
+
         // 仮ポイント取得判定
         if(empty($previsionAddPoint)){
             $previsionAddPoint = 0;
