@@ -352,6 +352,58 @@ class PointRepository extends EntityRepository
     }
 
     /**
+     * 仮ポイントを受注情報をもとに取得
+     *  -   一番最後に設定された値を取得
+     * @param $customer_id
+     * @return bool|mixed
+     * @throws NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLastAddPointByOrder($order)
+    {
+        if(empty($order)){
+            return false;
+        }
+
+        $needStatus = array();
+        $needStatus[] = PointHistoryHelper::STATE_ADD;
+        $needStatus[] = PointHistoryHelper::STATE_PRE_ADD;
+
+        try {
+            // 会員IDをもとに仮付与ポイントを計算
+            $qb = $this->createQueryBuilder('p');
+                //->addSelect('SUM(p.plg_dynamic_point) as point_sum')
+            $qb->add('where', $qb->expr()->in('p.plg_point_type', $needStatus))
+                ->andWhere('p.customer_id = :customer_id')
+                ->andWhere('p.order_id = :order_id')
+                ->orderBy('p.create_date', 'desc')
+                ->setParameter('customer_id', $order->getCustomer()->getId())
+                ->setParameter('order_id', $order->getId())
+                ->setMaxResults(1);
+
+            $lastAddPoint = $qb->getQuery()->getResult();
+
+            // 仮ポイント取得判定
+            if (count($lastAddPoint) < 1) {
+                return false;
+            }
+
+
+            //$provisionalAddPoint = $provisionalAddPoint[0]->getPlgDynamicPoint() * -1;
+            $lastAddPoint = $lastAddPoint[0]->getPlgDynamicPoint();
+
+            // 仮ポイントがマイナスになった場合はエラー表示
+            if ($lastAddPoint < 0) {
+                return false;
+            }
+
+            return $lastAddPoint;
+        }catch(NoResultException $e){
+            return null;
+        }
+    }
+
+    /**
      * 仮ポイントを受注情報をもとにステータスを変更
      *  -   一番最後に設定されたポイントタイプをステータス変更
      *  -   仮→付与

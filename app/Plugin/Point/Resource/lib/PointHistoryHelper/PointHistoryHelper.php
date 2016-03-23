@@ -182,6 +182,18 @@ class PointHistoryHelper
     }
 
     /**
+     * ポイント付与情報を履歴登録
+     * @param $point
+     */
+    public function cancelAddPoint($point)
+    {
+        $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
+        $this->historyType = self::STATE_ADD;
+        $this->saveHistoryPoint($point);
+    }
+
+    /**
      *
      */
     public function saveAfterAddCurrentPoint()

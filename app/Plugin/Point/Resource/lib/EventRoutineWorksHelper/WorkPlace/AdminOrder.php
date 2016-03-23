@@ -354,6 +354,14 @@ EOHTML;
             $this->history->addEntity($this->customer);
             $this->history->saveProvisionalAddPoint(abs($provisionalPoint) * -1);
         }
+        $lastAddPoint = $this->app['eccube.plugin.point.repository.point']->getLastAddPointByOrder($this->targetOrder);
+
+        if(!empty($lastAddPoint)){
+            $this->history->refreshEntity();
+            $this->history->addEntity($this->targetOrder);
+            $this->history->addEntity($this->customer);
+            $this->history->cancelAddPoint(abs($lastAddPoint) * -1);
+        }
 
         // 履歴保存
         // 仮ポイントの保存
