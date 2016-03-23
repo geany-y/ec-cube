@@ -109,6 +109,7 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         // 計算に必要なエンティティを登録
         $calculator->addEntity('Order', $order);
         $calculator->addEntity('Customer', $order->getCustomer());
+        $calculator->setUsePoint($usePoint);
         //$calculator->addEntity($pointInfo);
         //$calculator->addEntity($pointUse);
 
@@ -206,8 +207,13 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
         $this->app['eccube.plugin.point.history.service']->saveSnapShot($point);
 
+
         // 支払い合計金額更新
+        $order->setPaymentTotal($amount);
         $order->setTotal($amount);
+        $this->app['orm.em']->persist($order);
+        $this->app['orm.em']->flush($order);
+
 
         // 利用ポイントクリア
         if ($this->app['session']->has('usePoint')) {

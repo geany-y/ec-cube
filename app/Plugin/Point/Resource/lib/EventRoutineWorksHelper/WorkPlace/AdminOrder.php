@@ -60,6 +60,9 @@ class  AdminOrder extends AbstractWorkPlace
 
         // ポイント情報基本設定を取得
         $this->pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        if(empty($this->pointInfo)){
+            return false;
+        }
         $this->pointType = $this->pointInfo->getPlgCalculationType();
 
         // 計算ヘルパー取得
@@ -81,9 +84,11 @@ class  AdminOrder extends AbstractWorkPlace
             return false;
         }
 
+        $hasCustomer = $order->getCustomer();
+
         // 初期値・取得値設定処理
         $lastUsePoint = 0;
-        if(!empty($order)){
+        if(!empty($order) && !empty($hasCustomer)){
             $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
 
             // 調整ポイント計算
@@ -135,7 +140,6 @@ class  AdminOrder extends AbstractWorkPlace
     public function createTwig(TemplateEvent $event)
     {
         // ポイント情報基本設定を取得
-        //$pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         if(empty($this->pointInfo)){
             return false;
         }
@@ -148,6 +152,11 @@ class  AdminOrder extends AbstractWorkPlace
         }
 
         $order = $args['Order'];
+        $hasCustomer = $order->getCustomer();
+
+        if(empty($hasCustomer)){
+            return false;
+        }
 
         // 利用ポイントをエンティティにセット
         $pointUse = new PointUse();
@@ -293,18 +302,26 @@ EOHTML;
         $this->targetOrder = $event->getArgument('TargetOrder');
         $this->customer = $event->getArgument('Customer');
 
-        /*
-        if(empty($this->pointInfo)){
-            return false;
-        }
-        */
-
         if(empty($this->targetOrder)){
             return false;
         }
 
         if(empty($this->customer)){
             return false;
+        }
+
+        if(!empty($this->targetOrder) && !empty($this->customer)){
+            $this->calculator->addEntity('Order', $this->targetOrder);
+            $this->calculator->addEntity('Customer', $this->customer);
+            $addPoint = $this->calculator->getAddPointByOrder();
+
+            if(!empty($addPoint)){
+                $provisionalPoint = $this->app['eccube.plugin.point.repository.point']->getProvisionalAddPointByOrder($this->targetOrder);
+                // 現在仮付与ポイントと保存済み付与ポイントに相違があった際はアップデート処理
+                if($provisionalPoint != $addPoint){
+                    $this->updateOrderEvent($addPoint, $provisionalPoint);
+                }
+            }
         }
 
         // 以下受注画面内、イベント処理
@@ -314,16 +331,52 @@ EOHTML;
         }
 
         // 利用ポイント調整イベント
-        if(!empty($this->usePoint)){
-            $this->pointUseEvent($event);
+        //if(!empty($this->usePoint)){
+        $this->pointUseEvent($event);
+        //}
+
+        $this->calculator->setUsePoint($this->usePoint);
+        $total = $addPoint = $this->calculator->getTotalAmount();
+        $this->targetOrder->setTotal($total);
+        $this->targetOrder->setPaymentTotal($total);
+
+        $this->app['orm.em']->persist($this->targetOrder);
+        $this->app['orm.em']->flush($this->targetOrder);
+    }
+
+    public function updateOrderEvent($addPoint, $provisionalPoint){
+        if(empty($addPoint)){
+            return false;
         }
 
-        // ポイント確定判定処理
-        /*
-        if($event->getArgument('form')->get('plg_use_point')->getData()){
-            $this->pointFixEvent($event, $pointInfo);
+        if(!empty($provisionalPoint)) {
+            $this->history->addEntity($this->targetOrder);
+            $this->history->addEntity($this->customer);
+            $this->history->saveProvisionalAddPoint(abs($provisionalPoint) * -1);
         }
-        */
+
+        // 履歴保存
+        // 仮ポイントの保存
+        $this->history->refreshEntity();
+        $this->history->addEntity($this->targetOrder);
+        $this->history->addEntity($this->customer);
+        $this->history->saveProvisionalAddPoint(abs($addPoint));
+
+        $point = array();
+        $this->refreshCurrentPoint();
+        $point['current'] = $this->calculateCurrentPoint;
+        $point['use'] = 0;
+        $point['add'] = $addPoint;
+
+        $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint(
+            $this->calculateCurrentPoint,
+            $this->customer
+        );
+
+        $this->history->refreshEntity();
+        $this->history->addEntity($this->targetOrder);
+        $this->history->addEntity($this->customer);
+        $this->history->saveSnapShot($point);
     }
 
     /**
@@ -334,6 +387,13 @@ EOHTML;
      */
     protected function pointFixEvent($pointInfo)
     {
+        // 本受注最終受注ポイントの種類を判定する
+        $fixFlg = $this->app['eccube.plugin.point.repository.point']->isLastProvisionalFix($this->targetOrder);
+
+        if($fixFlg){
+            return false;
+        }
+
         if(empty($pointInfo)){
             return false;
         }
@@ -346,6 +406,8 @@ EOHTML;
             return false;
         }
 
+        //$res = $this->app['eccube.repository.order']->findOneById($this->targetOrder);
+
         // 仮付与ポイントがあるか確認
         $provisionalPoint = $this->app['eccube.plugin.point.repository.point']->getProvisionalAddPointByOrder($this->targetOrder);
 
@@ -354,11 +416,13 @@ EOHTML;
         }
 
         // 仮付与確定があれば処理キャンセル
+        /*
         $fixProvisionalPoint = $this->app['eccube.plugin.point.repository.point']->getFixProvisionalAddPointByOrder($this->targetOrder);
-
         if(!empty($fixProvisionalPoint)){
             return false;
         }
+        */
+
 
         // AdminOrder計算ヘルパーを使用
         //$this->calculator->addEntity($pointInfo);
@@ -381,9 +445,6 @@ EOHTML;
     }
 
     protected function isSameUsePoint($lastUse){
-        if(empty($lastUse) || empty($this->usePoint)){
-            return false;
-        }
         if($lastUse == $this->usePoint){
             return true;
         }
