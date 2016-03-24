@@ -22,7 +22,7 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\PointHistoryHelper;
+namespace Plugin\Point\Helper\PointHistoryHelper;
 
 use Plugin\Point\Entity\PointSnapshot;
 use Plugin\Point\Entity\Point;

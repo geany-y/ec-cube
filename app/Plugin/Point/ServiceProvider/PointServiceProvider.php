@@ -14,9 +14,8 @@ namespace Plugin\Point\ServiceProvider;
 use Eccube\Application;
 use Plugin\Point\Doctrine\Listener\ORMListener;
 use Plugin\Point\Resource\lib\EventRoutineWorksHelper\EventRoutineWorksHelperFactory;
-use Plugin\Point\Resource\lib\PointCalculateHelper\PointCalculateHelper;
-use Plugin\Point\Resource\lib\PointCalculateHelper\PointCalculateHelperFactory;
-use Plugin\Point\Resource\lib\PointHistoryHelper\PointHistoryHelper;
+use Plugin\Point\Helper\PointCalculateHelper\PointCalculateHelper;
+use Plugin\Point\Helper\PointHistoryHelper\PointHistoryHelper;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 

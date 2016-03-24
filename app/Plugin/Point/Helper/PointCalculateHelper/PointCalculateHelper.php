@@ -22,14 +22,14 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\PointCalculateHelper;
+namespace Plugin\Point\Helper\PointCalculateHelper;
 
 use Plugin\Point\Entity\PointInfo;
 
 /**
  * ポイント計算サービスクラス
  * Class PointCalculateHelper
- * @package Plugin\Point\Resource\lib\PointCalculateHelper
+ * @package Plugin\Point\Helper\PointCalculateHelper
  */
 class PointCalculateHelper
 {
