@@ -22,7 +22,7 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
+namespace Plugin\Point\Event\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
@@ -34,54 +34,49 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * フックポイント汎用処理具象クラス
- *  - 拡張元 : 商品登録( 編集 )
- *  - 拡張項目 : 商品毎ポイント付与率( 編集 )
- * Class ProductHookPointService
- * @package Plugin\Point\Service
+ *  - 拡張元 : 会員登録( 編集 )
+ *  - 拡張項目 : 保有ポイント登録( 編集 )
+ * Class AdminCustomer
+ * @package Plugin\Point\Event\WorkPlace
  */
-class  AdminProduct extends AbstractWorkPlace
+class  AdminCustomer extends AbstractWorkPlace
 {
     /**
-     * 商品フォームポイント付与率項目追加
+     * 会員保有ポイント追加
      * @param FormBuilder $builder
      * @param Request $request
      */
     public function createForm(FormBuilder $builder, Request $request)
     {
-        $productId = $builder->getForm()->getData()->getId();
+        $customerId = $builder->getForm()->getData()->getId();
 
         // 登録済み情報取得処理
-        $lastPointProduct = null;
-        if(!is_null($productId)) {
-            $lastPointProduct = $this->app['eccube.plugin.point.repository.pointproductrate']->getLastPointProductRateById($productId);
+        $lastPoint = null;
+        if (!is_null($customerId)) {
+            $lastPoint = $this->app['eccube.plugin.point.repository.pointcustomer']->getLastPointById($customerId);
         }
 
-        $data = is_null($lastPointProduct) ? '' : $lastPointProduct;
+        $data = is_null($lastPoint) ? '' : $lastPoint;
 
-        // 登録済み情報取得処理
-        //$lastProductRate = $this->app['eccube.plugin.point.repository.pointproductrate']->getLastPointProductRate();
-
-        //$data = is_null($lastProductRate) ? '' : $lastProductRate;
-
-        // ポイント付与率項目拡張
+        // 保有ポイント項目
         $builder
             ->add(
-                'plg_point_product_rate',
+                'plg_point_current',
                 'text',
                 array(
-                    'label' => 'ポイント付与率',
+                    'label' => '保有ポイント',
                     'required' => false,
                     'mapped' => false,
-                    'data' => $data,
                     'empty_data' => null,
+                    'data' => $data,
                     'attr' => array(
-                        'placeholder' => '10.0 ( 小数点 )',
+                        'placeholder' => '1 ( 正の整数 )',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
                             array(
-                                'pattern' => "/^\d+(\.\d+)?$/u",
-                                'message' => 'form.type.float.invalid',
+                                'pattern' => "/^\d+$/u",
+                                'message' => 'form.type.numeric.invalid',
                             )
                         ),
                     ),
@@ -109,7 +104,7 @@ class  AdminProduct extends AbstractWorkPlace
     }
 
     /**
-     * 商品毎ポイント付与率保存
+     * 保有ポイント保存
      * @param EventArgs $event
      * @return bool
      */
@@ -122,18 +117,25 @@ class  AdminProduct extends AbstractWorkPlace
             return false;
         }
 
-        // ポイント付与率取得
-        $pointRate = 0;
-        $pointRate = $form->get('plg_point_product_rate')->getData();
+        // 保有ポイント
+        $pointCurrent = 0;
+        $pointCurrent = $form->get('plg_point_current')->getData();
 
-        // 商品ID取得
-        $productId = 0;
-        $productId = $form->getData()->getId();
+        if(empty($pointCurrent)){
+            return false;
+        }
+
+        // 会員ID取得
+        $customerId = 0;
+        $customerId = $form->getData()->getId();
+
+        if(empty($customerId)){
+            return false;
+        }
 
         // 前回入力値と比較
         $status = false;
-        $status = $this->app['eccube.plugin.point.repository.pointproductrate']->isSamePoint($pointRate, $productId);
-
+        $status = $this->app['eccube.plugin.point.repository.pointcustomer']->isSamePoint($pointCurrent, $customerId);
 
         // 前回入力値と同じ値であれば登録をキャンセル
         if ($status) {
@@ -141,13 +143,27 @@ class  AdminProduct extends AbstractWorkPlace
         }
 
         // プロダクトエンティティを取得
-        $product = $event->getArgument('Product');
+        $customer = $event->getArgument('Customer');
 
-        if(empty($product)){
+        if(empty($customer)){
             return false;
         }
 
         // ポイント付与保存処理
-        $this->app['eccube.plugin.point.repository.pointproductrate']->savePointProductRate($pointRate, $product);
+        $saveEntity = $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint($pointCurrent, $customer);
+
+        // 手動設定ポイントのログ登録
+        $this->app['eccube.plugin.point.history.service']->addEntity($customer);
+        $this->app['eccube.plugin.point.history.service']->saveManualpoint($pointCurrent);
+
+        $point = array();
+        $point['current'] = $pointCurrent;
+        $point['use'] = 0;
+        $point['add'] = $pointCurrent;
+
+        // 手動設定ポイントのスナップショット登録
+        $this->app['eccube.plugin.point.history.service']->refreshEntity();
+        $this->app['eccube.plugin.point.history.service']->addEntity($customer);
+        $this->app['eccube.plugin.point.history.service']->saveSnapShot($point);
     }
 }

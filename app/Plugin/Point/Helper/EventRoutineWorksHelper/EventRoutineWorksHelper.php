@@ -22,11 +22,11 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper;
+namespace Plugin\Point\Helper\EventRoutineWorksHelper;
 
 use \Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\AbstractWorkPlace;
+use Plugin\Point\Event\WorkPlace\AbstractWorkPlace;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * フックポイント定型処理を保持オブジェクトに移譲
  * Class EventRoutineWorksHelper
- * @package Plugin\Point\Resource\lib\EventRoutineWorksHelper
+ * @package Plugin\Point\Helper\EventRoutineWorksHelper
  */
 class EventRoutineWorksHelper
 {

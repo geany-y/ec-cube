@@ -22,11 +22,10 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
+namespace Plugin\Point\Event\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
-use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Entity\PointUse;
 use Symfony\Component\Debug\Exception\UndefinedFunctionException;
 use Symfony\Component\Form\FormBuilder;
@@ -39,6 +38,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * フックポイント汎用処理具象クラス
  *  - 拡張元 : 商品購入確認完了
  *  - 拡張項目 : 履歴データ・ポイント
+ * Class FrontShoppingConfirm
+ * @package Plugin\Point\Event\WorkPlace
  */
 class FrontShoppingConfirm extends AbstractWorkPlace
 {
@@ -110,12 +111,9 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $calculator->addEntity('Order', $order);
         $calculator->addEntity('Customer', $order->getCustomer());
         $calculator->setUsePoint($usePoint);
-        //$calculator->addEntity($pointInfo);
-        //$calculator->addEntity($pointUse);
 
         // 付与ポイント取得
         $addPoint = $calculator->getAddPointByOrder();
-
 
         //付与ポイント取得可否判定
         if (is_null($addPoint)) {
@@ -123,8 +121,7 @@ class FrontShoppingConfirm extends AbstractWorkPlace
             throw new \UnexpectedValueException();
         }
 
-
-        // 現在保有ポイント取得 @todo ポイント取得は履歴からの再計算が必要??
+        // 現在保有ポイント取得
         $currentPoint = $calculator->getPoint();
 
         //保有ポイント取得可否判定
@@ -168,11 +165,6 @@ class FrontShoppingConfirm extends AbstractWorkPlace
             $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
             $this->app['eccube.plugin.point.history.service']->saveShoppingFixProvisionalAddPoint(abs($addPoint));
             $this->app['eccube.plugin.point.history.service']->refreshEntity();
-            /*
-            $this->app['eccube.plugin.point.history.service']->addEntity($order);
-            $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
-            $this->app['eccube.plugin.point.history.service']->saveAddPoint(abs($addPoint));
-            */
 
             // カスタマーポイントテーブル更新
             // 現在ポイントを履歴から計算
@@ -186,18 +178,7 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         // 会員ポイント更新
         $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint($calculateCurrentPoint, $order->getCustomer());
 
-        // 履歴情報現在ポイント登録
-        /*
-        $this->app['eccube.plugin.point.history.service']->refreshEntity();
-        $this->app['eccube.plugin.point.history.service']->addEntity($order);
-        $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
-        */
-
-        //if ($add_point_flg) {
-            //$this->app['eccube.plugin.point.history.service']->saveAfterShoppingCurrentPoint($calculateCurrentPoint);
-        //}
-
-        // ポイント保存用変数作成 @todo ここのaddの仮ポイントをどうするか
+        // ポイント保存用変数作成
         $point = array();
         $point['current'] = $calculateCurrentPoint;
         $point['use'] = 0 - $usePoint;
@@ -206,7 +187,6 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $this->app['eccube.plugin.point.history.service']->addEntity($order);
         $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
         $this->app['eccube.plugin.point.history.service']->saveSnapShot($point);
-
 
         // 支払い合計金額更新
         $order->setPaymentTotal($amount);

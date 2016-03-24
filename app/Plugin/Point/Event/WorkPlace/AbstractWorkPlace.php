@@ -22,7 +22,7 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
+namespace Plugin\Point\Event\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * フックポイント定型処理コンポジションスーパークラス
  * Class AbstractWorkPlace
- * @package Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace
+ * @package Plugin\Point\Event\WorkPlace
  */
 abstract class AbstractWorkPlace
 {
@@ -78,35 +78,4 @@ abstract class AbstractWorkPlace
      * @return mixed
      */
     abstract public function save(EventArgs $event);
-
-    /**
-     * スネークケースからキャメルケースに変換
-     * @param $str
-     * @return mixed
-     */
-    protected function strCamelize($str)
-    {
-        $str = strtr($str, '_', ' ');
-        $str = ucwords($str);
-
-        return str_replace(' ', '', $str);
-    }
-
-    /**
-     * 解析用HTMLを取得
-     *
-     * @param Crawler $crawler
-     * @return string
-     */
-    protected function getHtml(Crawler $crawler)
-    {
-        $html = '';
-        foreach ($crawler as $domElement) {
-            $domElement->ownerDocument->formatOutput = true;
-            $html .= $domElement->ownerDocument->saveHTML();
-        }
-
-        return html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
-    }
-
 }

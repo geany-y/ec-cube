@@ -22,7 +22,7 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
+namespace Plugin\Point\Event\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
@@ -39,7 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  - 拡張項目 : ポイント付与判定・登録・ポイント調整
  *  - 商品明細の変更によるポイントの調整
  * Class AdminOrder
- * @package Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace
+ * @package Plugin\Point\Event\WorkPlace
  */
 class  AdminOrder extends AbstractWorkPlace
 {

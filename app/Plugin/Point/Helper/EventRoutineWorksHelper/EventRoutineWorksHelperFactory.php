@@ -22,22 +22,22 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper;
+namespace Plugin\Point\Helper\EventRoutineWorksHelper;
 
 use Plugin\Point\PointEventHandler;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\AdminCustomer;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\AdminOrder;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\AdminProduct;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\FrontCart;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\FrontMyPage;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\FrontProductDetail;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\FrontShopping;
-use Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace\FrontShoppingConfirm;
+use Plugin\Point\Event\WorkPlace\AdminCustomer;
+use Plugin\Point\Event\WorkPlace\AdminOrder;
+use Plugin\Point\Event\WorkPlace\AdminProduct;
+use Plugin\Point\Event\WorkPlace\FrontCart;
+use Plugin\Point\Event\WorkPlace\FrontMyPage;
+use Plugin\Point\Event\WorkPlace\FrontProductDetail;
+use Plugin\Point\Event\WorkPlace\FrontShopping;
+use Plugin\Point\Event\WorkPlace\FrontShoppingConfirm;
 
 /**
  * フックポイント定型処理ヘルパーのファクトリー
  * Class EventRoutineWorksHelperFactory
- * @package Plugin\Point\Resource\lib\EventRoutineWorksHelper
+ * @package Plugin\Point\Helper\EventRoutineWorksHelper
  */
 class EventRoutineWorksHelperFactory
 {

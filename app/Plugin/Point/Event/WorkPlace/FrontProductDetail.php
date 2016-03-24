@@ -22,11 +22,10 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
+namespace Plugin\Point\Event\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
-use Plugin\Point\Entity\PointInfo;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +36,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * フックポイント汎用処理具象クラス
  *  - 拡張元 : 商品詳細
  *  - 拡張項目 : 画面表示・付与ポイント計算
+ * Class FrontProductDetail
+ * @package Plugin\Point\Event\WorkPlace
  */
 class FrontProductDetail extends AbstractWorkPlace
 {
@@ -169,7 +170,6 @@ EOHTML;
 </p>
 EOHTML;
     }
-
 
     /**
      * 本クラスでは処理なし

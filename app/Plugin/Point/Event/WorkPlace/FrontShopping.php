@@ -22,11 +22,10 @@
  */
 
 
-namespace Plugin\Point\Resource\lib\EventRoutineWorksHelper\WorkPlace;
+namespace Plugin\Point\Event\WorkPlace;
 
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
-use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Entity\PointUse;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +37,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * フックポイント汎用処理具象クラス
  *  - 拡張元 : 商品購入確認
  *  - 拡張項目 : 合計金額・ポイント
+ * Class FrontShopping
+ * @package Plugin\Point\Event\WorkPlace
  */
 class FrontShopping extends AbstractWorkPlace
 {
