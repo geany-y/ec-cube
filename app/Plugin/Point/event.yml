@@ -30,6 +30,8 @@ front.shopping.confirm.initialize:
     - [onFrontShoppingConfirmInitialize, NOMAL]
 front.shopping.confirm.processing:
     - [onFrontShoppingConfirmProcessing, NOMAL]
+front.shopping.confirm.complete:
+    - [onFrontShoppingConfirmComplete, NOMAL]
 
 # メール
 ## 受注メール
@@ -70,4 +72,9 @@ Product/detail.twig:
 ## フロント画面 > カート
 Cart/index.twig:
     - [onRenderCart, NORMAL]
+
+## フロント画面 > マイページ > 履歴
+Mypage/history.twig:
+    - [onRenderHistory, NORMAL]
+
 

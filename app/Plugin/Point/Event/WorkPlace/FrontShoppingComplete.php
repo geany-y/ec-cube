@@ -34,12 +34,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * フックポイント汎用処理具象クラス
- *  - 拡張元 : 受注メール
+ *  - 拡張元 : 商品購入完了
  *  - 拡張項目 : メール内容
  * Class ServiceMail
  * @package Plugin\Point\Event\WorkPlace
  */
-class ServiceMail extends AbstractWorkPlace
+class FrontShoppingComplete extends AbstractWorkPlace
 {
     /**
      * 本クラスでは処理なし
@@ -78,16 +78,15 @@ class ServiceMail extends AbstractWorkPlace
     public function save(EventArgs $event)
     {
         // 基本情報の取得
-        $message = $event->getArgument('message');
         $order = $event->getArgument('Order');
-        $mailTemplate = $event->getArgument('MailTemplate');
+        $mailHistory = $event->getArgument('MailHistory');
 
         // 必要情報判定
-        if(empty($message) || empty($order)){
+        if(empty($order)){
             return false;
         }
 
-        if(empty($order->getCustomer)){
+        if(empty($order->getCustomer())){
             return false;
         }
 
@@ -114,15 +113,11 @@ class ServiceMail extends AbstractWorkPlace
         $pointMessage['use'] = $usePoint;
 
         // オーダー情報更新
-        $order->setPaymentTotal($amount);
-        $order->setTotal($amount);
+        //$order->setPaymentTotal($amount);
+        //$order->setTotal($amount);
 
         // メールボディ取得
-        $body = $this->app->renderView($mailTemplate->getFileName(), array(
-            'header' => $mailTemplate->getHeader(),
-            'footer' => $mailTemplate->getFooter(),
-            'Order' => $order,
-        ));
+        $body = $mailHistory->getMailBody();
 
         // 情報置換用のキーを取得
         $search = array();
@@ -134,7 +129,10 @@ class ServiceMail extends AbstractWorkPlace
         $body = preg_replace('/'.$search[0][0].'/u', $replace, $body);
 
         // メッセージにメールボディをセット
-        $message->setBody($body);
+        $mailHistory->setMailBody($body);
+
+        $this->app['orm.em']->persist($mailHistory);
+        $this->app['orm.em']->flush($mailHistory);
     }
 
     protected function createPointMailMessage($pointMessage){

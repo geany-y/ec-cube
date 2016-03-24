@@ -24,6 +24,8 @@
 
 namespace Plugin\Point\Helper\EventRoutineWorksHelper;
 
+use Plugin\Point\Event\WorkPlace\FrontHistory;
+use Plugin\Point\Event\WorkPlace\FrontShoppingComplete;
 use Plugin\Point\Event\WorkPlace\ServiceMail;
 use Plugin\Point\PointEventHandler;
 use Plugin\Point\Event\WorkPlace\AdminCustomer;
@@ -76,6 +78,9 @@ class EventRoutineWorksHelperFactory
             case PointEventHandler::HELPER_FRONT_SHOPPING_CONFIRM :
                 return new EventRoutineWorksHelper(new FrontShoppingConfirm());
                 break;
+            case PointEventHandler::HELPER_FRONT_SHOPPING_COMPLETE :
+                return new EventRoutineWorksHelper(new FrontShoppingComplete());
+                break;
             case PointEventHandler::HELPER_FRONT_MYPAGE :
                 return new EventRoutineWorksHelper(new FrontMyPage());
                 break;
@@ -87,6 +92,9 @@ class EventRoutineWorksHelperFactory
                 break;
             case PointEventHandler::HELPER_SERVICE_MAIL :
                 return new EventRoutineWorksHelper(new ServiceMail());
+                break;
+            case PointEventHandler::HELPER_FRONT_HISTORY :
+                return new EventRoutineWorksHelper(new FrontHistory());
                 break;
             default :
                 break;

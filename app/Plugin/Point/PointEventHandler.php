@@ -32,9 +32,11 @@ class PointEventHandler
     // フロント画面
     const HELPER_FRONT_SHOPPING = 'FrontShopping';
     const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
+    const HELPER_FRONT_SHOPPING_COMPLETE = 'FrontShoppingComplete';
     const HELPER_FRONT_MYPAGE = 'FrontMypage';
     const HELPER_FRONT_PRODUCT_DETAIL = 'FrontProductDetail';
     const HELPER_FRONT_CART = 'FrontCart';
+    const HELPER_FRONT_HISTORY = 'FrontHistory';
 
     // サービス
     const HELPER_SERVICE_MAIL = 'ServiceMail';
@@ -212,6 +214,25 @@ class PointEventHandler
     }
 
     /**
+     * 商品購入確認完了
+     *  - 利用ポイント・保有ポイント・仮付与ポイントメール反映
+     *  - フロント画面 > 商品購入確認完了
+     * @param EventArgs $event
+     */
+    public function onFrontShoppingConfirmComplete(EventArgs $event)
+    {
+        if(!$this->isAuthRouteFront()){
+            return true;
+        }
+
+        // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
+        $this->setHelper(self::HELPER_FRONT_SHOPPING_COMPLETE);
+
+        // ポイント関連保存処理
+        $this->save($event);
+    }
+
+    /**
      * 商品購入完了メール
      *  - ポイントの表示
      * @param EventArgs $event
@@ -302,6 +323,25 @@ class PointEventHandler
         // ポイント関連保存処理
         $this->createTwig($event);
     }
+
+    /**
+     * マイページ履歴画面
+     *  - 利用ポイント・保有ポイント・仮付与ポイント表示
+     * @param EventArgs $event
+     */
+    public function onRenderHistory(TemplateEvent $event)
+    {
+        if(!$this->isAuthRouteFront()){
+            return true;
+        }
+
+        // フックポイント定形処理ヘルパー取得 ( マイページ履歴 )
+        $this->setHelper(self::HELPER_FRONT_HISTORY);
+
+        // ポイント関連保存処理
+        $this->createTwig($event);
+    }
+
 
     /**
      * 管理画面権確認

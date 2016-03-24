@@ -321,6 +321,7 @@ class PointCalculateHelper
      */
     public function getAddPointByOrder()
     {
+        $this->addPoint = 0;
         if (!$this->hasEntities('Order')) {
             return false;
         }
