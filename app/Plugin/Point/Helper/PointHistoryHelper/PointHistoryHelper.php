@@ -24,20 +24,21 @@
 
 namespace Plugin\Point\Helper\PointHistoryHelper;
 
+use Doctrine\ORM\Mapping\Entity;
 use Plugin\Point\Entity\PointSnapshot;
 use Plugin\Point\Entity\Point;
 
 /**
  * ポイント履歴ヘルパー
  * Class PointHistoryHelper
- * @package Plugin\Point\Resource\lib\PointHistoryHelper
+ * @package Plugin\Point\Helper\PointHistoryHelper
  */
 class PointHistoryHelper
 {
-    const HISTORY_MESSAGE_MANUAL_EDIT = 'ポイント手動編集';     // 管理画面会員管理
-    const HISTORY_MESSAGE_EDIT = 'ポイント購入完了登録';      //購入フロー完了
-    const HISTORY_MESSAGE_ORDER_EDIT = 'ポイント管理画面受注ステータス変更保存';   // 受注編集
-    const HISTORY_MESSAGE_ORDER_CANCEL = 'ポイント管理画面受注ステータスキャンセル保存';  // 受注編集
+    const HISTORY_MESSAGE_MANUAL_EDIT = 'ポイント手動編集';
+    const HISTORY_MESSAGE_EDIT = 'ポイント購入完了登録';
+    const HISTORY_MESSAGE_ORDER_EDIT = 'ポイント管理画面受注ステータス変更保存';
+    const HISTORY_MESSAGE_ORDER_CANCEL = 'ポイント管理画面受注ステータスキャンセル保存';
 
     const HISTORY_MESSAGE_TYPE_CURRENT = '保有';
     const HISTORY_MESSAGE_TYPE_PRE_ADD = '付与(仮)';
@@ -49,6 +50,7 @@ class PointHistoryHelper
     const STATE_PRE_ADD = 2;
     const STATE_ADD = 3;
     const STATE_USE = 4;
+    //const STATE_ADJUST_USE = 5;
 
     protected $app;
     protected $entities;
@@ -66,9 +68,8 @@ class PointHistoryHelper
         $this->entities['PointInfo'] = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
     }
 
-    /*
     /**
-     * 履歴保存に使用するエンティティを新規作成
+     * 履歴保存エンティティを新規作成
      */
     public function refreshEntity()
     {
@@ -84,7 +85,7 @@ class PointHistoryHelper
      */
     public function addEntity($entity)
     {
-        $entityName = explode('/', get_class($entity));
+        $entityName = explode(DIRECTORY_SEPARATOR, get_class($entity));
         $this->entities[array_pop($entityName)] = $entity;
 
         return;
@@ -92,7 +93,7 @@ class PointHistoryHelper
 
     /**
      * 保持エンティティを返却
-     * @return mixed
+     * @return array
      */
     public function getEntities()
     {
@@ -101,18 +102,15 @@ class PointHistoryHelper
 
     /**
      * キーをもとに該当エンティティを削除
-     * @param $targetName
-     * @return bool
+     * @param string $targetName
      */
     public function removeEntity($targetName)
     {
-        // 指定エンティティの有無を確認し削除
         if (in_array($targetName, $this->entities[$targetName], true)) {
             unset($this->entities[$targetName]);
-            return true;
         }
 
-        return false;
+        return;
     }
 
     /**
@@ -171,27 +169,11 @@ class PointHistoryHelper
         $this->saveHistoryPoint($point);
     }
 
-    /**
-     * 最終設定の確定付与ポイントの戻し処理
-     * @param $point
-     */
-    public function fixProvisionalAddPoint($point)
-    {
-        if (empty($point)) {
-            return false;
-        }
-
-        $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
-        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
-        $this->historyType = self::STATE_PRE_ADD;
-        $this->saveHistoryPoint(0 - $point);
-    }
-
-    /**
-     * ポイント付与情報を履歴登録
-     * @param $point
-     */
-    public function saveAddPoint($point)
+        /**
+         * ポイント付与情報を履歴登録
+         * @param $point
+         */
+        public function saveAddPoint($point)
     {
         $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
@@ -200,7 +182,7 @@ class PointHistoryHelper
     }
 
     /**
-     * 確定ポイントの打ち消しポイントの保存
+     * ポイント付与情報を履歴登録
      * @param $point
      */
     public function cancelAddPoint($point)
@@ -210,6 +192,42 @@ class PointHistoryHelper
         $this->historyType = self::STATE_ADD;
         $this->saveHistoryPoint($point);
     }
+
+    /**
+     *
+     */
+    public function saveAfterAddCurrentPoint()
+    {
+        //$this->currentactionname = ;
+    }
+
+    /**
+     * 商品購入後、現在ポイント履歴登録
+     * @param $point
+     */
+    /*
+    public function saveAfterShoppingCurrentPoint($point)
+    {
+        $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_CURRENT;
+        $this->historyType = self::STATE_CURRENT;
+        $this->saveHistoryPoint($point);
+    }
+    */
+
+    /**
+     * 受注ステータス変更後仮ポイント確定時、現在ポイント履歴登録
+     * @param $point
+     */
+    /*
+    public function saveAfterChangeOrderStatusCurrentPoint($point)
+    {
+        $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_CURRENT;
+        $this->historyType = self::STATE_CURRENT;
+        $this->saveHistoryPoint($point);
+    }
+    */
 
     /**
      * 利用ポイント履歴登録
@@ -248,20 +266,72 @@ class PointHistoryHelper
     }
 
     /**
+     * キャンセルポイント履歴登録
+     */
+    public function saveCancelPoint()
+    {
+    }
+
+    /**
+     * 仮ポイント確定処理
+     *  - 最終設定の利用調整ポイントの戻し処理
+     * @param $point
+     */
+    public function fixProvisionalAddPoint($point)
+    {
+        if(empty($point)){
+            return false;
+        }
+        //$this->refreshEntity();
+        // 最終利用ポイントを取得
+        /*
+        $lastProvisionalPoint = $this->app['eccube.plugin.point.repository.point']->fixLastProvisionalAddPointByOrder($this->entities['Order']);
+        if(!empty($lastProvisionalPoint)){
+            $lastProvisionalPoint = 0;
+        }
+        */
+
+        $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint(0 - $point);
+        /*
+        $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint($point);
+        */
+    }
+
+    /**
      * 仮ポイント確定処理
      *  - 最終設定の利用調整ポイントの戻し処理
      * @param $point
      */
     public function fixShoppingProvisionalAddPoint($point)
     {
-        if (empty($point)) {
+        if(empty($point)){
             return false;
         }
+        //$this->refreshEntity();
+        // 最終利用ポイントを取得
+        /*
+        $lastProvisionalPoint = $this->app['eccube.plugin.point.repository.point']->fixLastProvisionalAddPointByOrder($this->entities['Order']);
+        if(!empty($lastProvisionalPoint)){
+            $lastProvisionalPoint = 0;
+        }
+        */
 
         $this->currentActionName = self::HISTORY_MESSAGE_ORDER_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
         $this->historyType = self::STATE_PRE_ADD;
         $this->saveHistoryPoint(0 - $point);
+        /*
+        $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint($point);
+        */
     }
 
     /**
@@ -270,10 +340,15 @@ class PointHistoryHelper
      */
     protected function saveHistoryPoint($point)
     {
-        if (!$this->hasEntity('Customer')) {
+        /*
+        if(!$this->hasEntity('Order')){
             return false;
         }
-        if (!$this->hasEntity('PointInfo')) {
+        */
+        if(!$this->hasEntity('Customer')){
+            return false;
+        }
+        if(!$this->hasEntity('PointInfo')){
             return false;
         }
         if (isset($this->entities['Order'])) {
@@ -293,12 +368,11 @@ class PointHistoryHelper
 
     /**
      * スナップショット情報登録
-     *  - 汎用処理
      * @param $point
      */
     public function saveSnapShot($point)
     {
-        if (!$this->hasEntity('Customer')) {
+        if(!$this->hasEntity('Customer')){
             return false;
         }
         $this->entities['SnapShot']->setPlgPointSnapshotId(null);
@@ -311,17 +385,10 @@ class PointHistoryHelper
         $this->app['orm.em']->flush($this->entities['SnapShot']);
     }
 
-    /**
-     * 引数のエンティティ保持確認
-     * @param $name
-     * @return bool
-     */
-    protected function hasEntity($name)
-    {
-        if (isset($this->entities[$name])) {
+    protected function hasEntity($name){
+        if(isset($this->entities[$name])){
             return true;
         }
-
         return false;
     }
 }
