@@ -33,9 +33,9 @@ use Plugin\Point\Entity\PointInfo;
  */
 class PointCalculateHelper
 {
-    /** @var \Eccube\Application  */
+    /** @var \Eccube\Application */
     protected $app;
-    /** @var \Plugin\Point\Repository\PointInfoRepository  */
+    /** @var \Plugin\Point\Repository\PointInfoRepository */
     protected $baseInfo;
     /** @var  \Eccube\Entity\ */
     protected $entities;
@@ -53,12 +53,12 @@ class PointCalculateHelper
     {
         $this->app = $app;
         // ポイント情報基本設定取得
-        $this->baseInfo =$this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        $this->baseInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         $this->basicRate = $this->baseInfo->getPlgBasicPointRate();
         $this->entities = array();
         // 使用ポイントをセッションから取得
         $this->usePoint = 0;
-        if($this->app['session']->has('usePoint')){
+        if ($this->app['session']->has('usePoint')) {
             $this->usePoint = $this->app['session']->get('usePoint');
         }
     }
@@ -80,9 +80,10 @@ class PointCalculateHelper
      */
     public function getEntities($name)
     {
-        if($this->hasEntities($name)){
+        if ($this->hasEntities($name)) {
             return $this->entities[$name];
         }
+
         return false;
     }
 
@@ -95,8 +96,10 @@ class PointCalculateHelper
     {
         if ($this->hasEntities($name)) {
             unset($this->entities[$name]);
+
             return true;
         }
+
         return false;
     }
 
@@ -107,9 +110,10 @@ class PointCalculateHelper
      */
     public function hasEntities($name)
     {
-        if(isset($this->entities[$name])){
+        if (isset($this->entities[$name])) {
             return true;
         }
+
         return false;
     }
 
@@ -118,8 +122,9 @@ class PointCalculateHelper
      * @param $usePoint
      * @return bool
      */
-    public function setUsePoint($usePoint){
-        if(empty($usePoint) && $usePoint != 0){
+    public function setUsePoint($usePoint)
+    {
+        if (empty($usePoint) && $usePoint != 0) {
             return false;
         }
 
@@ -162,7 +167,7 @@ class PointCalculateHelper
      */
     protected function getOrderDetail()
     {
-        if(!$this->hasEntities('Order')){
+        if (!$this->hasEntities('Order')) {
             return false;
         }
 
@@ -186,7 +191,7 @@ class PointCalculateHelper
      */
     protected function isInRangeCustomerPoint()
     {
-        if(!$this->hasEntities('Customer')){
+        if (!$this->hasEntities('Customer')) {
             return false;
         }
 
@@ -195,8 +200,7 @@ class PointCalculateHelper
         $point = $this->app['eccube.plugin.point.repository.pointcustomer']->getLastPointById($customer_id);
 
         // 使用ポイントが保有ポイント内か判定
-        if($point < $this->usePoint)
-        {
+        if ($point < $this->usePoint) {
             return false;
         }
 
@@ -205,33 +209,36 @@ class PointCalculateHelper
 
     /**
      * 仮付与ポイントを返却
+     *  - 会員IDをもとに返却
      * @return bool
      */
     public function getProvisionalAddPoint()
     {
-        if(!$this->hasEntities('Customer')){
+        if (!$this->hasEntities('Customer')) {
             return false;
         }
 
         $customer_id = $this->entities['Customer']->getId();
         $provisionalPoint = $this->app['eccube.plugin.point.repository.point']->getAllProvisionalAddPoint($customer_id);
 
-        if(!empty($provisionalPoint)){
+        if (!empty($provisionalPoint)) {
             return $provisionalPoint;
         }
+
         return false;
     }
 
     /**
      * 仮付与ポイントを返却
+     *  - オーダー情報をもとに返却
      * @return bool
      */
     public function getProvisionalAddPointByOrder()
     {
-        if(!$this->hasEntities('Customer')){
+        if (!$this->hasEntities('Customer')) {
             return false;
         }
-        if(!$this->hasEntities('Order')){
+        if (!$this->hasEntities('Order')) {
             return false;
         }
 
@@ -239,9 +246,10 @@ class PointCalculateHelper
         $provisionalPoint = $this->app['eccube.plugin.point.repository.point']->getProvisionalAddPointByOrder($order);
 
 
-        if(!empty($provisionalPoint)){
+        if (!empty($provisionalPoint)) {
             return $provisionalPoint;
         }
+
         return false;
     }
 
@@ -252,7 +260,7 @@ class PointCalculateHelper
     public function getAddPointByCart()
     {
         // カートエンティティチェック
-        if(empty($this->entities['Cart'])){
+        if (empty($this->entities['Cart'])) {
             return false;
         }
 
@@ -264,6 +272,7 @@ class PointCalculateHelper
             $cartObjects[] = $cart;                     // 購入数を判定するためのカートオブジェジェクト
         }
 
+        // 商品毎のポイント付与率取得
         $productRates = $this->app['eccube.plugin.point.repository.pointproductrate']->getPointProductRateByEntity(
             $productClasses
         );
@@ -273,31 +282,33 @@ class PointCalculateHelper
             $productRates = false;
         }
 
+        // 商品毎のポイント付与率セット
         $this->productRates = $productRates;
 
         // 取得ポイント付与率商品ID配列を取得
-        if($this->productRates)
-        {
+        if ($this->productRates) {
             $productKeys = array_keys($this->productRates);
         }
 
         // 商品詳細ごとの購入金額にレートをかける
         // レート計算後個数をかける
-        foreach($cartObjects as $node){
+        foreach ($cartObjects as $node) {
             $rate = 1;
             // 商品毎ポイント付与率が設定されていない場合
             $rate = $this->basicRate / 100;
-            if($this->productRates) {
+            if ($this->productRates) {
                 if (in_array($node->getObject()->getProduct()->getId(), $productKeys)) {
                     // 商品ごとポイント付与率が設定されている場合
                     $rate = $this->productRates[$node->getObject()->getProduct()->getId()] / 100;
                 }
             }
-            $this->addPoint += (integer)$this->getRoundValue(($node->getObject()->getPrice01() * $rate * $node->getQuantity()));
+            $this->addPoint += (integer)$this->getRoundValue(
+                ($node->getObject()->getPrice01() * $rate * $node->getQuantity())
+            );
         }
 
         // 減算処理の場合減算値を返却
-        if($this->isSubtraction()){
+        if ($this->isSubtraction()) {
             return $this->getSubtractionCalculate();
         }
 
@@ -306,14 +317,15 @@ class PointCalculateHelper
 
     /**
      * 受注情報をもとに付与ポイントを返却
-     * @return mixed
+     * @return bool|int
      */
     public function getAddPointByOrder()
     {
-        if(!$this->hasEntities('Order')){
+        if (!$this->hasEntities('Order')) {
             return false;
         }
 
+        // 商品詳細情報ををオーダーから取得
         $this->products = $this->getOrderDetail();
 
         // 商品ごとのポイント付与率を取得
@@ -326,31 +338,33 @@ class PointCalculateHelper
             $productRates = false;
         }
 
+        // 商品ごとのポイント付与率セット
         $this->productRates = $productRates;
 
         // 取得ポイント付与率商品ID配列を取得
-        if($this->productRates)
-        {
+        if ($this->productRates) {
             $productKeys = array_keys($this->productRates);
         }
 
         // 商品詳細ごとの購入金額にレートをかける
         // レート計算後個数をかける
-        foreach($this->products as $node){
+        foreach ($this->products as $node) {
             $rate = 1;
             // 商品毎ポイント付与率が設定されていない場合
             $rate = $this->basicRate / 100;
-            if($this->productRates) {
+            if ($this->productRates) {
                 if (in_array($node->getProduct()->getId(), $productKeys)) {
                     // 商品ごとポイント付与率が設定されている場合
                     $rate = $this->productRates[$node->getProduct()->getId()] / 100;
                 }
             }
-            $this->addPoint += (integer)$this->getRoundValue(($node->getProductClass()->getPrice01() * $rate * $node->getQuantity()));
+            $this->addPoint += (integer)$this->getRoundValue(
+                ($node->getProductClass()->getPrice01() * $rate * $node->getQuantity())
+            );
         }
 
         // 減算処理の場合減算値を返却
-        if($this->isSubtraction()){
+        if ($this->isSubtraction()) {
             return $this->getSubtractionCalculate();
         }
 
@@ -363,21 +377,26 @@ class PointCalculateHelper
      */
     public function getAddPointByProduct()
     {
-        if(!$this->hasEntities('Product')){
+        if (!$this->hasEntities('Product')) {
             return false;
         }
 
         // 商品毎のレートが設定されているか確認
-        $pointRate = $this->app['eccube.plugin.point.repository.pointproductrate']->getLastPointProductRateById($this->entities['Product']->getId());
+        $pointRate = $this->app['eccube.plugin.point.repository.pointproductrate']->getLastPointProductRateById(
+            $this->entities['Product']->getId()
+        );
+        // サイト全体でのポイント設定
         $basicPointRate = $this->baseInfo->getPlgBasicPointRate();
 
         // 基本付与率の設定判定
-        if(empty($basicPointRate)){
+        if (empty($basicPointRate)) {
             return false;
         }
 
+        // 商品毎の付与率あればそちらを優先
+        // なければサイト設定ポイントを利用
         $calculateRate = $basicPointRate;
-        if(!empty($pointRate)){
+        if (!empty($pointRate)) {
             $calculateRate = $pointRate;
         }
 
@@ -397,31 +416,34 @@ class PointCalculateHelper
      * ポイント機能基本情報から計算方法を取得し判定
      * @return bool
      */
-    protected function isSubtraction(){
+    protected function isSubtraction()
+    {
         // 基本情報が設定されているか確認
-        if(!empty($this->baseInfo)){
+        if (!empty($this->baseInfo)) {
             return false;
         }
 
         // 計算方法の判定
-        if($this->baseInfo == PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION) {
+        if ($this->baseInfo == PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * 利用ポイント減算処理の際の追加計算
+     * 利用ポイント減算処理
      * @return bool|int
      */
-    protected function getSubtractionCalculate(){
+    protected function getSubtractionCalculate()
+    {
         // 基本情報が設定されているか確認
-        if(!empty($this->baseInfo->getplgPointCalculateType)){
+        if (!empty($this->baseInfo->getplgPointCalculateType)) {
             return false;
         }
 
         // 減算値計算
-        if(!isset($this->usePoint) || empty($this->usePoint)) {
+        if (!isset($this->usePoint) || empty($this->usePoint)) {
             return false;
         }
 
@@ -440,7 +462,7 @@ class PointCalculateHelper
      */
     public function getPoint()
     {
-        if(!$this->hasEntities('Customer')){
+        if (!$this->hasEntities('Customer')) {
             return false;
         }
 
@@ -455,23 +477,23 @@ class PointCalculateHelper
      */
     public function getTotalAmount()
     {
-        if(!$this->hasEntities('Order')){
+        if (!$this->hasEntities('Order')) {
             return false;
         }
 
-        if(count($this->products) < 1){
+        if (count($this->products) < 1) {
             return false;
         }
 
         $total = 0;
-        foreach($this->products as $product){
+        foreach ($this->products as $product) {
             $total += $product->getPrice() * $product->getQuantity();
         }
 
         $nonTaxPrice = $this->entities['Order']->getSubTotal() - $this->entities['Order']->getTax();
 
         // 使用ポイントが保有ポイント内か確認
-        if(!$this->isInRangeCustomerPoint()){
+        if (!$this->isInRangeCustomerPoint()) {
             return false;
         }
 
@@ -485,6 +507,7 @@ class PointCalculateHelper
 
         // ポイント換算値をもとに計算返却
         $conversionRate = $this->baseInfo->getPlgPointConversionRate();
+
         return (integer)$this->getRoundValue($this->entities['Order']->getTotal() - $this->usePoint * $conversionRate);
     }
 }
