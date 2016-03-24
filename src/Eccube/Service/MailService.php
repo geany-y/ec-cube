@@ -243,10 +243,12 @@ class MailService
         );
         $this->app['eccube.event.dispatcher']->dispatch(EccubeEvents::MAIL_ORDER, $event);
 
+        dump($message);
+        exit();
+
         $this->app->mail($message);
 
     }
-
 
     /**
      * Send admin customer confirm mail.

@@ -24,6 +24,7 @@
 
 namespace Plugin\Point\Helper\EventRoutineWorksHelper;
 
+use Plugin\Point\Event\WorkPlace\ServiceMail;
 use Plugin\Point\PointEventHandler;
 use Plugin\Point\Event\WorkPlace\AdminCustomer;
 use Plugin\Point\Event\WorkPlace\AdminOrder;
@@ -83,6 +84,9 @@ class EventRoutineWorksHelperFactory
                 break;
             case PointEventHandler::HELPER_FRONT_CART :
                 return new EventRoutineWorksHelper(new FrontCart());
+                break;
+            case PointEventHandler::HELPER_SERVICE_MAIL :
+                return new EventRoutineWorksHelper(new ServiceMail());
                 break;
             default :
                 break;

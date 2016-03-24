@@ -36,6 +36,10 @@ class PointEventHandler
     const HELPER_FRONT_PRODUCT_DETAIL = 'FrontProductDetail';
     const HELPER_FRONT_CART = 'FrontCart';
 
+    // サービス
+    const HELPER_SERVICE_MAIL = 'ServiceMail';
+
+
     /** @var  \Eccube\Application $app */
     protected $app;
     protected $factory = null;
@@ -177,7 +181,15 @@ class PointEventHandler
      */
     public function onFrontShoppingConfirmInitialize(EventArgs $event)
     {
-        return;
+        if(!$this->isAuthRouteFront()){
+            return true;
+        }
+
+        // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
+        $this->setHelper(self::HELPER_FRONT_SHOPPING_CONFIRM);
+
+        // ポイント関連保存処理
+        $this->save($event);
     }
 
     /**
@@ -194,6 +206,24 @@ class PointEventHandler
 
         // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
         $this->setHelper(self::HELPER_FRONT_SHOPPING_CONFIRM);
+
+        // ポイント関連保存処理
+        $this->save($event);
+    }
+
+    /**
+     * 商品購入完了メール
+     *  - ポイントの表示
+     * @param EventArgs $event
+     */
+    public function onMailOrderComplete(EventArgs $event)
+    {
+        if(!$this->isAuthRouteFront()){
+            return true;
+        }
+
+        // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
+        $this->setHelper(self::HELPER_SERVICE_MAIL);
 
         // ポイント関連保存処理
         $this->save($event);

@@ -31,6 +31,12 @@ front.shopping.confirm.initialize:
 front.shopping.confirm.processing:
     - [onFrontShoppingConfirmProcessing, NOMAL]
 
+# メール
+## 受注メール
+mail.order:
+    - [onMailOrderComplete, NOMAL]
+
+
 
 
 #front.shopping.index.initialize:
