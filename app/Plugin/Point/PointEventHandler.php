@@ -133,7 +133,8 @@ class PointEventHandler
      *  - フォーム項目追加
      *  - 管理画面 > 受注登録 ( 編集 )
      */
-    public function onAdminOrderEditIndexInitialize(EventArgs $event){
+    public function onAdminOrderEditIndexInitialize(EventArgs $event)
+    {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用 )
         $this->setHelper(self::HELPER_ADMIN_ORDER);
 
@@ -147,7 +148,8 @@ class PointEventHandler
      *  - 管理画面 > 受注登録 ( 編集 )
      * @param EventArgs $event
      */
-    public function onAdminOrderEditIndexComplete(EventArgs $event){
+    public function onAdminOrderEditIndexComplete(EventArgs $event)
+    {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用 )
         $this->setHelper(self::HELPER_ADMIN_ORDER);
 
@@ -164,7 +166,7 @@ class PointEventHandler
      */
     public function onRenderShoppingIndex(TemplateEvent $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 
@@ -183,6 +185,7 @@ class PointEventHandler
      */
     public function onFrontShoppingConfirmInitialize(EventArgs $event)
     {
+        /*
         if(!$this->isAuthRouteFront()){
             return true;
         }
@@ -192,6 +195,7 @@ class PointEventHandler
 
         // ポイント関連保存処理
         $this->save($event);
+        */
     }
 
     /**
@@ -202,7 +206,7 @@ class PointEventHandler
      */
     public function onFrontShoppingConfirmProcessing(EventArgs $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 
@@ -221,7 +225,7 @@ class PointEventHandler
      */
     public function onFrontShoppingConfirmComplete(EventArgs $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 
@@ -239,7 +243,7 @@ class PointEventHandler
      */
     public function onMailOrderComplete(EventArgs $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 
@@ -275,7 +279,7 @@ class PointEventHandler
      */
     public function onRenderMyPageIndex(TemplateEvent $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 
@@ -313,7 +317,7 @@ class PointEventHandler
      */
     public function onRenderCart(TemplateEvent $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 
@@ -331,7 +335,7 @@ class PointEventHandler
      */
     public function onRenderHistory(TemplateEvent $event)
     {
-        if(!$this->isAuthRouteFront()){
+        if (!$this->isAuthRouteFront()) {
             return true;
         }
 

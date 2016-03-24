@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * フックポイント汎用処理具象クラス
  *  - 拡張元 : 商品購入完了
  *  - 拡張項目 : メール内容
- * Class ServiceMail
+ * Class FrontShoppingComplete
  * @package Plugin\Point\Event\WorkPlace
  */
 class FrontShoppingComplete extends AbstractWorkPlace
@@ -82,11 +82,11 @@ class FrontShoppingComplete extends AbstractWorkPlace
         $mailHistory = $event->getArgument('MailHistory');
 
         // 必要情報判定
-        if(empty($order)){
+        if (empty($order)) {
             return false;
         }
 
-        if(empty($order->getCustomer())){
+        if (empty($order->getCustomer())) {
             return false;
         }
 
@@ -95,26 +95,25 @@ class FrontShoppingComplete extends AbstractWorkPlace
 
         // 利用ポイントの取得と設定
         $usePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
+        if (empty($usePoint)) {
+            $usePoint = 0;
+        }
+
         $calculator->setUsePoint($usePoint);
 
         // 計算に必要なエンティティの設定
-        $calculator->addEntity('Order',  $order);
-        $calculator->addEntity('Customer',  $order->getCustomer());
+        $calculator->addEntity('Order', $order);
+        $calculator->addEntity('Customer', $order->getCustomer());
 
         // 計算値取得
         $addPoint = $calculator->getAddPointByOrder();
         $point = $calculator->getPoint();
-        $amount = $calculator->getTotalAmount();
 
         // ポイント配列作成
         $pointMessage = array();
-        $pointMessage['add'] =  $addPoint;
+        $pointMessage['add'] = $addPoint;
         $pointMessage['point'] = $point;
-        $pointMessage['use'] = $usePoint;
-
-        // オーダー情報更新
-        //$order->setPaymentTotal($amount);
-        //$order->setTotal($amount);
+        $pointMessage['use'] = 0 - $usePoint;
 
         // メールボディ取得
         $body = $mailHistory->getMailBody();
@@ -135,10 +134,17 @@ class FrontShoppingComplete extends AbstractWorkPlace
         $this->app['orm.em']->flush($mailHistory);
     }
 
-    protected function createPointMailMessage($pointMessage){
+    /**
+     * メール用のポイント表示を作成返却
+     * @param $pointMessage
+     * @return string
+     */
+    protected function createPointMailMessage($pointMessage)
+    {
         $message = '付与予定ポイント :'.$pointMessage['add'].PHP_EOL;
-        $message.= '現在保有ポイント :'.$pointMessage['point'].PHP_EOL;
-        $message.= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
+        $message .= '現在保有ポイント :'.$pointMessage['point'].PHP_EOL;
+        $message .= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
+
         return $message;
     }
 }

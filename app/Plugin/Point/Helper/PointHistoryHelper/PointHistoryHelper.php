@@ -50,7 +50,6 @@ class PointHistoryHelper
     const STATE_PRE_ADD = 2;
     const STATE_ADD = 3;
     const STATE_USE = 4;
-    //const STATE_ADJUST_USE = 5;
 
     protected $app;
     protected $entities;
@@ -169,11 +168,11 @@ class PointHistoryHelper
         $this->saveHistoryPoint($point);
     }
 
-        /**
-         * ポイント付与情報を履歴登録
-         * @param $point
-         */
-        public function saveAddPoint($point)
+    /**
+     * ポイント付与情報を履歴登録
+     * @param $point
+     */
+    public function saveAddPoint($point)
     {
         $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
@@ -279,7 +278,7 @@ class PointHistoryHelper
      */
     public function fixProvisionalAddPoint($point)
     {
-        if(empty($point)){
+        if (empty($point)) {
             return false;
         }
         //$this->refreshEntity();
@@ -310,7 +309,7 @@ class PointHistoryHelper
      */
     public function fixShoppingProvisionalAddPoint($point)
     {
-        if(empty($point)){
+        if (empty($point)) {
             return false;
         }
         //$this->refreshEntity();
@@ -345,10 +344,10 @@ class PointHistoryHelper
             return false;
         }
         */
-        if(!$this->hasEntity('Customer')){
+        if (!$this->hasEntity('Customer')) {
             return false;
         }
-        if(!$this->hasEntity('PointInfo')){
+        if (!$this->hasEntity('PointInfo')) {
             return false;
         }
         if (isset($this->entities['Order'])) {
@@ -372,7 +371,7 @@ class PointHistoryHelper
      */
     public function saveSnapShot($point)
     {
-        if(!$this->hasEntity('Customer')){
+        if (!$this->hasEntity('Customer')) {
             return false;
         }
         $this->entities['SnapShot']->setPlgPointSnapshotId(null);
@@ -385,10 +384,12 @@ class PointHistoryHelper
         $this->app['orm.em']->flush($this->entities['SnapShot']);
     }
 
-    protected function hasEntity($name){
-        if(isset($this->entities[$name])){
+    protected function hasEntity($name)
+    {
+        if (isset($this->entities[$name])) {
             return true;
         }
+
         return false;
     }
 }

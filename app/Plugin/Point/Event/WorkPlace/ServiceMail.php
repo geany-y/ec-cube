@@ -83,11 +83,10 @@ class ServiceMail extends AbstractWorkPlace
         $mailTemplate = $event->getArgument('MailTemplate');
 
         // 必要情報判定
-        if(empty($message) || empty($order)){
+        if (empty($message) || empty($order)) {
             return false;
         }
-
-        if(empty($order->getCustomer)){
+        if (empty($order->getCustomer)) {
             return false;
         }
 
@@ -99,8 +98,8 @@ class ServiceMail extends AbstractWorkPlace
         $calculator->setUsePoint($usePoint);
 
         // 計算に必要なエンティティの設定
-        $calculator->addEntity('Order',  $order);
-        $calculator->addEntity('Customer',  $order->getCustomer());
+        $calculator->addEntity('Order', $order);
+        $calculator->addEntity('Customer', $order->getCustomer());
 
         // 計算値取得
         $addPoint = $calculator->getAddPointByOrder();
@@ -109,20 +108,23 @@ class ServiceMail extends AbstractWorkPlace
 
         // ポイント配列作成
         $pointMessage = array();
-        $pointMessage['add'] =  $addPoint;
+        $pointMessage['add'] = $addPoint;
         $pointMessage['point'] = $point;
-        $pointMessage['use'] = $usePoint;
+        $pointMessage['use'] = 0 - $usePoint;
 
         // オーダー情報更新
         $order->setPaymentTotal($amount);
         $order->setTotal($amount);
 
         // メールボディ取得
-        $body = $this->app->renderView($mailTemplate->getFileName(), array(
-            'header' => $mailTemplate->getHeader(),
-            'footer' => $mailTemplate->getFooter(),
-            'Order' => $order,
-        ));
+        $body = $this->app->renderView(
+            $mailTemplate->getFileName(),
+            array(
+                'header' => $mailTemplate->getHeader(),
+                'footer' => $mailTemplate->getFooter(),
+                'Order' => $order,
+            )
+        );
 
         // 情報置換用のキーを取得
         $search = array();
@@ -137,10 +139,17 @@ class ServiceMail extends AbstractWorkPlace
         $message->setBody($body);
     }
 
-    protected function createPointMailMessage($pointMessage){
+    /**
+     * メールポイント表示生成・返却
+     * @param $pointMessage
+     * @return string
+     */
+    protected function createPointMailMessage($pointMessage)
+    {
         $message = '付与予定ポイント :'.$pointMessage['add'].PHP_EOL;
-        $message.= '現在保有ポイント :'.$pointMessage['point'].PHP_EOL;
-        $message.= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
+        $message .= '現在保有ポイント :'.$pointMessage['point'].PHP_EOL;
+        $message .= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
+
         return $message;
     }
 }

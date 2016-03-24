@@ -69,11 +69,11 @@ class FrontHistory extends AbstractWorkPlace
     {
         // 必要情報の取得と判定
         $parameters = $event->getParameters();
-        if(!isset($parameters['Order']) || empty($parameters['Order'])){
+        if (!isset($parameters['Order']) || empty($parameters['Order'])) {
             return false;
         }
 
-        if(is_null($parameters['Order']->getCustomer())){
+        if (is_null($parameters['Order']->getCustomer())) {
             return false;
         }
 
@@ -82,7 +82,7 @@ class FrontHistory extends AbstractWorkPlace
         $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // ヘルパーの取得判定
-        if(empty($calculator)){
+        if (empty($calculator)) {
             return false;
         }
 
@@ -98,7 +98,7 @@ class FrontHistory extends AbstractWorkPlace
         $point = $calculator->getPoint();
 
         // 保有ポイント取得判定
-        if(empty($point)){
+        if (empty($point)) {
             $point = 0;
         }
 
@@ -106,7 +106,7 @@ class FrontHistory extends AbstractWorkPlace
         $addPoint = $calculator->getAddPointByOrder();
 
         // 付与ポイント取得判定
-        if(empty($addPoint)){
+        if (empty($addPoint)) {
             $addPoint = 0;
         }
 
@@ -114,13 +114,10 @@ class FrontHistory extends AbstractWorkPlace
         $amount = $calculator->getTotalAmount();
 
         // 合計金額取得判定
-        if(empty($amount)){
+        if (empty($amount)) {
             $amount = 0;
         }
 
-        // 受注情報を更新
-        $parameters['Order']->setTotal($amount);
-        $parameters['Order']->setPaymentTotal($amount);
 
         // Twigデータ内IDをキーに表示項目を追加
         // ポイント情報表示
@@ -146,7 +143,7 @@ class FrontHistory extends AbstractWorkPlace
         if ($amount == false) {
             $point['use_error'] = 'front.point.display.usepointe.error';
         } else {
-            $pointCollection['use'] = $usePoint;
+            $pointCollection['use'] = 0 - $usePoint;
         }
         $pointCollection['add'] = $addPoint;
 

@@ -26,8 +26,8 @@ admin.order.edit.index.complete:
 
 # フロント画面
 ## フロント画面 > 商品購入確認完了
-front.shopping.confirm.initialize:
-    - [onFrontShoppingConfirmInitialize, NOMAL]
+#front.shopping.confirm.initialize:
+##    - [onFrontShoppingConfirmInitialize, NOMAL]
 front.shopping.confirm.processing:
     - [onFrontShoppingConfirmProcessing, NOMAL]
 front.shopping.confirm.complete:

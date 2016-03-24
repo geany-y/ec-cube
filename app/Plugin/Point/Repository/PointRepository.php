@@ -209,7 +209,6 @@ class PointRepository extends EntityRepository
         try {
             // 受注をもとに仮付与ポイントを計算
             $qb = $this->createQueryBuilder('p')
-                //->addSelect('SUM(p.plg_dynamic_point) as point_sum')
                 ->andWhere('p.plg_point_type = :pointType')
                 ->andWhere('p.customer_id = :customer_id')
                 ->andWhere('p.order_id = :order_id')
