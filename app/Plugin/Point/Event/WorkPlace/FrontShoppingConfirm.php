@@ -150,30 +150,25 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $this->app['eccube.plugin.point.history.service']->refreshEntity();
         $this->app['eccube.plugin.point.history.service']->addEntity($order);
         $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+        $this->app['eccube.plugin.point.history.service']->saveProvisionalAddPoint($addPoint);
+
+
+        // 付与ポイント受注ステータスが新規であれば、ポイント付与
+        if ($add_point_flg) {
+            $this->app['eccube.plugin.point.history.service']->refreshEntity();
+            $this->app['eccube.plugin.point.history.service']->addEntity($order);
+            $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+            $this->app['eccube.plugin.point.history.service']->fixShoppingProvisionalAddPoint($addPoint);
+            $this->app['eccube.plugin.point.history.service']->refreshEntity();
+            $this->app['eccube.plugin.point.history.service']->addEntity($order);
+            $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+            $this->app['eccube.plugin.point.history.service']->saveShoppingFixProvisionalAddPoint($addPoint);
+        }
 
         // 現在ポイントを履歴から計算
         $calculateCurrentPoint = $this->app['eccube.plugin.point.repository.point']->getCalculateCurrentPointByCustomerId(
             $order->getCustomer()->getId()
         );
-
-        // 付与ポイント受注ステータスが新規であれば、ポイント付与
-        if ($add_point_flg) {
-            // @todo 仮ポイント打ち消し処理が必要
-            $this->app['eccube.plugin.point.history.service']->fixShoppingProvisionalAddPoint(abs($addPoint));
-            $this->app['eccube.plugin.point.history.service']->refreshEntity();
-            $this->app['eccube.plugin.point.history.service']->addEntity($order);
-            $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
-            $this->app['eccube.plugin.point.history.service']->saveShoppingFixProvisionalAddPoint(abs($addPoint));
-            $this->app['eccube.plugin.point.history.service']->refreshEntity();
-
-            // カスタマーポイントテーブル更新
-            // 現在ポイントを履歴から計算
-            $calculateCurrentPoint = $this->app['eccube.plugin.point.repository.point']->getCalculateCurrentPointByCustomerId(
-                $order->getCustomer()->getId()
-            );
-        } else {
-            $this->app['eccube.plugin.point.history.service']->saveProvisionalAddPoint($addPoint);
-        }
 
         // 会員ポイント更新
         $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint($calculateCurrentPoint, $order->getCustomer());

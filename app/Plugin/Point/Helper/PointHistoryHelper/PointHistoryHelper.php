@@ -160,7 +160,7 @@ class PointHistoryHelper
     public function saveShoppingFixProvisionalAddPoint($point)
     {
         // 最終設定ポイント戻し処理
-        $this->fixProvisionalAddPoint($point);
+        $this->fixShoppingProvisionalAddPoint($point);
         $this->app['orm.em']->refresh($this->entities['Point']);
         $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_ADD;
