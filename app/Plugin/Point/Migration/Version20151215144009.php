@@ -30,8 +30,8 @@ class Version20151215144009 extends AbstractMigration
             $t = $schema->createTable(self::PLG_POINT_INFO);
             $t->addColumn('plg_point_info_id', 'integer', array('NotNull' => true, 'autoincrement' => true));
             $t->addColumn('plg_add_point_status', 'smallint', array('NotNull' => true, 'Default' => 0));
-            $t->addColumn('plg_basic_point_rate', 'float', array('NotNull' => true, 'Default' => 0));
-            $t->addColumn('plg_point_conversion_rate', 'float', array('NotNull' => true, 'Default' => 0));
+            $t->addColumn('plg_basic_point_rate', 'integer', array('NotNull' => true, 'Default' => 0));
+            $t->addColumn('plg_point_conversion_rate', 'integer', array('NotNull' => true, 'Default' => 0));
             $t->addColumn('plg_round_type', 'smallint', array('NotNull' => true, 'Default' => 0));
             $t->addColumn('plg_calculation_type', 'smallint', array('NotNull' => true, 'Default' => 0));
             $t->addColumn('create_date', 'datetime', array('NotNull' => true));
@@ -87,7 +87,7 @@ class Version20151215144009 extends AbstractMigration
             $t = $schema->createTable(self::PLG_POINT_PRODUCT_RATE);
             $t->addColumn('plg_point_product_rate_id', 'integer', array('NotNull' => true, 'autoincrement' => true));
             $t->addColumn('product_id', 'integer', array('NotNull' => true));
-            $t->addColumn('plg_point_product_rate', 'float', array('NotNull' => false, 'Default' => null));
+            $t->addColumn('plg_point_product_rate', 'integer', array('NotNull' => false, 'Default' => null));
             $t->addColumn('create_date', 'datetime', array('NotNull' => true));
             $t->addColumn('update_date', 'datetime', array('NotNull' => true));
             $t->setPrimaryKey(array('plg_point_product_rate_id'));

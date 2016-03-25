@@ -44,7 +44,7 @@ class PointProductRate extends \Eccube\Entity\AbstractEntity
      */
     private $Product;
     /**
-     * @var float
+     * @var integer
      */
     private $plg_point_product_rate;
     /**
@@ -133,7 +133,7 @@ class PointProductRate extends \Eccube\Entity\AbstractEntity
     /**
      * Get plg_point_product_rate
      *
-     * @param float $plg_point_product_rate
+     * @param integer $plg_point_product_rate
      *
      * @return PointProductRate
      */
@@ -145,7 +145,7 @@ class PointProductRate extends \Eccube\Entity\AbstractEntity
     /**
      * Set plg_point_product_rate
      *
-     * @param float $plg_point_product_rate
+     * @param integer $plg_point_product_rate
      * @return PointProductRate
      */
     public function setPlgPointProductRate($plg_point_product_rate)

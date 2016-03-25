@@ -59,13 +59,13 @@ class PointProductRateType extends AbstractType
                     'mapped' => true,
                     'empty_data' => 0,
                     'attr' => array(
-                        'placeholder' => '10.0 ( 少数 )',
+                        'placeholder' => 'ポイント計算時に使用する付与率（ 商品毎の設定値で計算 （％））例. 1',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
                             array(
-                                'pattern' => "/^\d+(\.\d+)?$/u",
-                                'message' => 'form.type.float.invalid',
+                                'pattern' => "/^\d+$/u",
+                                'message' => 'form.type.numeric.invalid',
                             )
                         ),
                     ),

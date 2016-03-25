@@ -17,13 +17,15 @@ Plugin\Point\Entity\PointInfo:
             options:
                 default: 0
         plg_basic_point_rate:
-            type: float
+            type: integer
+            unsigned: false
             nullable: false
             options:
                 default: 0
         plg_point_conversion_rate:
-            type: float
+            type: integer
             nullable: false
+            unsigned: false
             options:
                 default: 0
         plg_round_type:

@@ -51,11 +51,11 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
      */
     private $plg_point_info_id;
     /**
-     * @var float
+     * @var integer
      */
     private $plg_basic_point_rate;
     /**
-     * @var float
+     * @var integer
      */
     private $plg_point_conversion_rate;
     /**
@@ -109,7 +109,7 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
     /**
      * Set plg_basic_point_rate
      *
-     * @param float $plg_basic_point_rate
+     * @param integer $plg_basic_point_rate
      * @return PointInfo
      */
     public function setPlgBasicPointRate($plg_basic_point_rate)
@@ -122,7 +122,7 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
     /**
      * Get plg_basic_point_rate
      *
-     * @return float
+     * @return integer
      */
     public function getPlgBasicPointRate()
     {
@@ -132,7 +132,7 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
     /**
      * Set plg_point_conversion_rate
      *
-     * @param float $plg_point_conversion_rate
+     * @param integer $plg_point_conversion_rate
      * @return PointInfo
      */
     public function setPlgPointConversionRate($plg_point_conversion_rate)
@@ -145,7 +145,7 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
     /**
      * Get plg_point_conversion_rate
      *
-     * @return float
+     * @return integer
      */
     public function getPlgPointConversionRate()
     {

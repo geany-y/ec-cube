@@ -18,8 +18,9 @@ Plugin\Point\Entity\PointProductRate:
             options:
                 default: 0
         plg_point_product_rate:
-            type: float
+            type: integer
             nullable: true
+            unsigned: false
             options:
                 default: 0
         create_date:

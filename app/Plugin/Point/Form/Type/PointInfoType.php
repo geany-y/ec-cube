@@ -75,27 +75,12 @@ class PointInfoType extends AbstractType
                     'mapped' => true,
                 )
             )
-            /*
-            ->add(
-                'PointInfoAddStatus',
-                'collection',
-                array(
-                    'type' => new \Plugin\Point\Form\Type\PointInfoAddStatusType($this->app),
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'prototype' => true,
-                )
-            )
-            */
             ->add(
                 'plg_add_point_status',
                 'choice',
                 array(
                     'label' => 'ポイント付与タイミング',
-                    'choices' => $this->orderStatus,//array(
-                    //=> '利用ポイント減算',
-                    //\Plugin\Point\Entity\PointInfo::POINT_CALCULATE_NORMAL => '減算なし',
-                    //),
+                    'choices' => $this->orderStatus,
                     'mapped' => true,
                     'expanded' => false,
                     'multiple' => false,
@@ -124,13 +109,13 @@ class PointInfoType extends AbstractType
                     'mapped' => true,
                     'empty_data' => 0,
                     'attr' => array(
-                        'placeholder' => '10.0 ( 小数点 )',
+                        'placeholder' => 'ポイント付与計算に使用するサイト全体の付与率（ ％ ）例. 1',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
                             array(
-                                'pattern' => "/^\d+(\.\d+)?$/u",
-                                'message' => 'form.type.float.invalid',
+                                'pattern' => "/^\d+$/u",
+                                'message' => 'form.type.numeric.invalid',
                             )
                         ),
                     ),
@@ -145,7 +130,7 @@ class PointInfoType extends AbstractType
                     'mapped' => true,
                     'empty_data' => 0,
                     'attr' => array(
-                        'placeholder' => '1 ( 正の整数 )',
+                        'placeholder' => 'ポイント利用時に何円で計算するかの換算率（ 円 ）例. 1',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
