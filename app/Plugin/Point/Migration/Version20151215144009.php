@@ -39,6 +39,7 @@ class Version20151215144009 extends AbstractMigration
             $t->setPrimaryKey(array('plg_point_info_id'));
         }
 
+
         // ポイント付与タイミング受注ステータス格納テーブル
         if (!$schema->hasTable(self::PLG_POINT_INFO_ADD_STATUS)) {
             $t = $schema->createTable(self::PLG_POINT_INFO_ADD_STATUS);

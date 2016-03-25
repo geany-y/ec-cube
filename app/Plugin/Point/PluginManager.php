@@ -11,6 +11,7 @@
 
 namespace Plugin\Point;
 
+use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Eccube\Plugin\AbstractPluginManager;
 
 /**
@@ -31,8 +32,11 @@ class PluginManager extends AbstractPluginManager
      */
     protected $imgDst;
 
+    protected $app;
+
     public function __construct()
     {
+        $this->app = \Eccube\Application::getInstance();
     }
 
     /**
@@ -42,6 +46,7 @@ class PluginManager extends AbstractPluginManager
     public function install($config, $app)
     {
         $this->migrationSchema($app, __DIR__.'/Migration', $config['code']);
+        $this->insertDefaultToPointInfo();
     }
 
     /**
@@ -66,6 +71,22 @@ class PluginManager extends AbstractPluginManager
     public function update($config, $app)
     {
 
+    }
+
+    protected function insertDefaultToPointInfo(){
+        // ポイント基本情報初期値設定
+        try {
+            $pointInfo = new Entity\PointInfo();
+            $pointInfo->setPlgAddPointStatus(1);
+            $pointInfo->setPlgBasicPointRate(1);
+            $pointInfo->setPlgPointConversionRate(1);
+            $pointInfo->setPlgRoundType(0);
+            $pointInfo->setPlgCalculationType(0);
+            $this->app['orm.em']->persist($pointInfo);
+            $this->app['orm.em']->flush($pointInfo);
+        }catch(DatabaseObjectNotFoundException $e){
+            throw new DatabaseObjectNotFoundException();
+        }
     }
 
 }
