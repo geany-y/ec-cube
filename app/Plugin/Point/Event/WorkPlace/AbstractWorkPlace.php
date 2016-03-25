@@ -38,7 +38,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractWorkPlace
 {
-    /** @var \Eccube\Application  */
+    /** @var \Eccube\Application */
     protected $app;
 
     /**
@@ -78,4 +78,28 @@ abstract class AbstractWorkPlace
      * @return mixed
      */
     abstract public function save(EventArgs $event);
+
+    /**
+     * ビューをsearchをキーにsnippetと置き換え返却
+     * @param TemplateEvent $event
+     * @param $snippet
+     * @param $search
+     */
+    protected function replaceView(TemplateEvent $event, $snippet, $search)
+    {
+        if(empty($event)){
+            return false;
+        }
+        if(empty($snippet)){
+            return false;
+        }
+        if(empty($search)){
+            return false;
+        }
+
+        $replace = $snippet.$search;
+        $source = str_replace($search, $replace, $event->getSource());
+        $event->setSource($source);
+        return true;
+    }
 }

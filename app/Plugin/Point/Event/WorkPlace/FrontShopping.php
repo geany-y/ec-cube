@@ -119,28 +119,6 @@ class FrontShopping extends AbstractWorkPlace
         // 合計金額をセット
         $order->setTotal($amount);
 
-        // Twigデータ内IDをキーに表示項目を追加
-        // ポイント情報表示
-        // false が返却された際は、利用ポイント値が保有ポイント値を超えている
-        if ($amount == false) {
-            $snipet = $this->createHtmlDisplayPointUseOverErrorFormat();
-        } else {
-            $snipet = $this->createHtmlDisplayPointFormat();
-        }
-
-        $search = '<p id="summary_box__total_amount"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
-        // 使用ポイントボタン付与
-        // twigコードに利用ポイントを挿入
-        $snipet = $this->createHtmlUsePointButton();
-        $search = '<a id="confirm_box__quantity_edit_button"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
         // ポイント表示用変数作成
         $point = array();
         $point['current'] = $currentPoint;
@@ -153,68 +131,39 @@ class FrontShopping extends AbstractWorkPlace
         }
         $point['add'] = $addPoint;
 
-        // twigパラメータにポイント情報を追加
-        $parameters = $event->getParameters();
-        $parameters['point'] = $point;
-        $event->setParameters($parameters);
-    }
+        // Twigデータ内IDをキーに表示項目を追加
+        // ポイント情報表示
+        // false が返却された際は、利用ポイント値が保有ポイント値を超えている
+        if ($amount == false) {
+            //$snippet = $this->createHtmlDisplayPointUseOverErrorFormat();
+            $snippet = $this->app->render(
+                'Point/Resource/template/default/Event/ShoppingConfirm/point_summary_error.twig',
+                array(
+                    'point' => $point,
+                )
+            )->getContent();
+        } else {
+            //$snippet = $this->createHtmlDisplayPointFormat();
+            $snippet = $this->app->render(
+                'Point/Resource/template/default/Event/ShoppingConfirm/point_summary.twig',
+                array(
+                    'point' => $point,
+                )
+            )->getContent();
+        }
+        $search = '<p id="summary_box__total_amount"';
+        $this->replaceView($event, $snippet, $search);
 
-    /**
-     * 使用ポイント画面遷移ボタンHTML生成
-     * @return string
-     */
-    protected function createHtmlUsePointButton()
-    {
-        return <<<EOHTML
-<a id="confirm_box__use_point_edit_button" href="{{ url('point_use') }}" class="btn btn-default btn-sm">ポイントを利用する</a>
-EOHTML;
-    }
-
-    /**
-     * 商品購入確認画面ポイント表示HTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayPointFormat()
-    {
-        return <<<EOHTML
-<br />
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">現在のポイント</dt>
-<dd>{{ point.current }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">今回利用ポイント</dt>
-<dd class="text-primary">{{ point.use }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">付与予定ポイント</dt>
-<dd>{{ point.add }}</dd>
-</dl>
-EOHTML;
-    }
-
-    /**
-     * 商品購入確認画面ポイント表示HTML生成
-     *  - エラー表示
-     * @return string
-     */
-    protected function createHtmlDisplayPointUseOverErrorFormat()
-    {
-        return <<<EOHTML
-<br />
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">現在のポイント</dt>
-<dd>{{ point.current }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">今回利用ポイント</dt>
-<dd class="text-primary">{{ point.use_error }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">付与予定ポイント</dt>
-<dd>{{ point.add }}</dd>
-</dl>
-EOHTML;
+        // 使用ポイントボタン付与
+        // twigコードに利用ポイントを挿入
+        $snippet = $this->app->render(
+            'Point/Resource/template/default/Event/ShoppingConfirm/use_point_button.twig',
+            array(
+                'point' => $point,
+            )
+        )->getContent();
+        $search = '<a id="confirm_box__quantity_edit_button"';
+        $this->replaceView($event, $snippet, $search);
     }
 
     /**

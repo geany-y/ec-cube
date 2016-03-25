@@ -130,7 +130,7 @@ class PointController
                     'empty_data' => '',
                     'data' => $usePoint,
                     'attr' => array(
-                        'placeholder' => '1 ( 正の整数 )',
+                        'placeholder' => '使用するポイントを入力 例. 1',
                     ),
                     'constraints' => array(
                         new Assert\LessThanOrEqual(array(

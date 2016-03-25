@@ -70,13 +70,13 @@ class  AdminProduct extends AbstractWorkPlace
                     'data' => $data,
                     'empty_data' => null,
                     'attr' => array(
-                        'placeholder' => '10.0 ( 小数点 )',
+                        'placeholder' => 'ポイント計算時に使用する付与率（ 商品毎の設定値で計算 （％））例. 1',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
                             array(
-                                'pattern' => "/^\d+(\.\d+)?$/u",
-                                'message' => 'form.type.float.invalid',
+                                'pattern' => "/^\d+$/u",
+                                'message' => 'form.type.numeric.invalid',
                             )
                         ),
                     ),

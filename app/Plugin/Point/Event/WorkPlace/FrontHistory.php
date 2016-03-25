@@ -118,86 +118,39 @@ class FrontHistory extends AbstractWorkPlace
             $amount = 0;
         }
 
+        $point_buff = $point;
+        // ポイント表示用変数作成
+        $point = array();
+        $point['current'] = $point_buff;
+        // エラー判定
+        // false が返却された際は、利用ポイント値が保有ポイント値を超えている
+        $point['add'] = $addPoint;
 
         // Twigデータ内IDをキーに表示項目を追加
         // ポイント情報表示
         // false が返却された際は、利用ポイント値が保有ポイント値を超えている
-        if ($amount == false) {
-            $snipet = $this->createHtmlDisplayPointUseOverErrorFormat();
+        if ($amount != false) {
+            $point['use'] = 0 - $usePoint;
+            $snippet = $this->app->render(
+                'Point/Resource/template/default/Event/History/point_summary.twig',
+                array(
+                    'point' => $point,
+                )
+            )->getContent();
         } else {
-            $snipet = $this->createHtmlDisplayPointFormat();
+            $point['use_error'] = '利用制限を超えています';
+            $snippet = $this->app->render(
+                'Point/Resource/template/default/Event/History/point_summary_error.twig',
+                array(
+                    'point' => $point,
+                )
+            )->getContent();
         }
 
 
-        // twigコードに利用ポイントを挿入
         $search = '<p id="summary_box__payment_total"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
+        $this->replaceView($event, $snippet, $search);
 
-        // ポイント表示用変数作成
-        $pointCollection = array();
-        $pointCollection['current'] = $point;
-        // エラー判定
-        // false が返却された際は、利用ポイント値が保有ポイント値を超えている
-        if ($amount == false) {
-            $point['use_error'] = 'front.point.display.usepointe.error';
-        } else {
-            $pointCollection['use'] = 0 - $usePoint;
-        }
-        $pointCollection['add'] = $addPoint;
-
-        // twigパラメータにポイント情報を追加
-        $parameters = $event->getParameters();
-        $parameters['point'] = $pointCollection;
-        $event->setParameters($parameters);
-    }
-
-    /**
-     * マイページ履歴画面ポイント表示HTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayPointFormat()
-    {
-        return <<<EOHTML
-<br />
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">現在のポイント</dt>
-<dd>{{ point.current }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">今回利用ポイント</dt>
-<dd class="text-primary">{{ point.use }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">付与予定ポイント</dt>
-<dd>{{ point.add }}</dd>
-</dl>
-EOHTML;
-    }
-
-    /**
-     * マイページ履歴画面ポイント表示HTML生成
-     *  - エラー表示
-     * @return string
-     */
-    protected function createHtmlDisplayPointUseOverErrorFormat()
-    {
-        return <<<EOHTML
-<br />
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">現在のポイント</dt>
-<dd>{{ point.current }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">今回利用ポイント</dt>
-<dd class="text-primary">{{ point.use_error }}</dd>
-</dl>
-<dl id = "summary_box__customer_point">
-<dt class="text-primary">付与予定ポイント</dt>
-<dd>{{ point.add }}</dd>
-</dl>
-EOHTML;
     }
 
     /**

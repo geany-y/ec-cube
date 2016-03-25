@@ -118,57 +118,36 @@ class FrontProductDetail extends AbstractWorkPlace
         }
 
         // 付与ポイント取得
-        $addPoint = $calculator->getAddPointByProduct();
+        $point = $calculator->getAddPointByProduct();
 
         // 付与ポイント取得判定
-        if(empty($addPoint)){
-            $addPoint['min'] = 0;
-            $addPoint['max'] = 0;
+        if(empty($point)){
+            $point['min'] = 0;
+            $point['max'] = 0;
         }
 
         // 使用ポイントボタン付与
         // twigコードにポイント表示欄を追加
-        if($addPoint['min'] == $addPoint['max']) {
-            $snipet = $this->createHtmlDisplayPointNotHasClassFormat();
+        if($point['min'] == $point['max']) {
+            //$snippet = $this->createHtmlDisplayPointNotHasClassFormat();
+            $snippet = $this->app->render(
+                'Point/Resource/template/default/Event/ProductDetail/detail_point.twig',
+                array(
+                    'point' => $point,
+                )
+            )->getContent();
         }else{
-            $snipet = $this->createHtmlDisplayPointHasClassFormat();
+            //$snippet = $this->createHtmlDisplayPointHasClassFormat();
+            $snippet = $this->app->render(
+                'Point/Resource/template/default/Event/ProductDetail/detail_point_error.twig',
+                array(
+                    'point' => $point,
+                )
+            )->getContent();
         }
 
         $search = '<p id="detail_description_box__item_range_code"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
-        // twigパラメータにポイント情報を追加
-        $parameters = $event->getParameters();
-        $parameters['point'] = $addPoint;
-        $event->setParameters($parameters);
-    }
-
-    /**
-     * 商品詳細付与率クラスなし表示HTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayPointNotHasClassFormat()
-    {
-        return <<<EOHTML
-<p id="detail_description_box__sale_point" class="text-primary">
-    付与ポイント&nbsp;:&nbsp;<span>{{ point.max }}</span>&nbsp;<span class="small">pt</span>
-</p>
-EOHTML;
-    }
-
-    /**
-     * 商品詳細付与率クラスあり表示HTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayPointHasClassFormat()
-    {
-        return <<<EOHTML
-<p id="detail_description_box__sale_point" class="text-primary">
-    付与ポイント&nbsp;:&nbsp;<span>{{ point.min }}</span>&nbsp;<span class="small">pt</span>&nbsp;～&nbsp;<span>{{ point.max }}</span>&nbsp;<span class="small">pt</span>
-</p>
-EOHTML;
+        $this->replaceView($event, $snippet, $search);
     }
 
     /**

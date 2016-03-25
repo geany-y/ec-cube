@@ -115,43 +115,23 @@ class FrontMyPage extends AbstractWorkPlace
             $previsionAddPoint = 0;
         }
 
-        // 使用ポイントボタン付与
-        // twigコードにポイント表示欄を追加
-        $snipet = $this->createHtmlDisplayPointFormat();
-        $search = '<div id="history_list"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
         // ポイント表示用変数作成
         $point = array();
         $point['current'] = $currentPoint;
         $point['pre'] = $previsionAddPoint;
         $point['rate'] = $point_rate;
 
-        // twigパラメータにポイント情報を追加
-        $parameters = $event->getParameters();
-        $parameters['point'] = $point;
-        $event->setParameters($parameters);
+        // 使用ポイントボタン付与
+        // twigコードにポイント表示欄を追加
+        $snippet = $this->app->render(
+            'Point/Resource/template/default/Event/MypageTop/point_box.twig',
+            array(
+                'point' => $point,
+            )
+        )->getContent();
+        $search = '<div id="history_list"';
+        $this->replaceView($event, $snippet, $search);
     }
-
-    /**
-     * マイページポイント表示HTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayPointFormat()
-    {
-        return <<<EOHTML
-<div class="message_box">
-    <p>
-        現在の保有ポイントは<span class="text-primary">&nbsp;{{ point.current }}pt&nbsp;</span>です<br />
-        現在の仮ポイントは<span class="text-primary">&nbsp;{{ point.pre }}pt&nbsp;</span>です<br />
-        ※1pt<span class="text-primary">&nbsp;{{ point.rate }}円&nbsp;</span>でご利用いただけます
-    </p>
-</div>
-EOHTML;
-    }
-
 
     /**
      * ポイントデータの保存

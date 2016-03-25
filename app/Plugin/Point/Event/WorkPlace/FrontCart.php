@@ -127,39 +127,21 @@ class FrontCart extends AbstractWorkPlace
             $addPoint = 0;
         }
 
-        // 使用ポイントボタン付与
-        // twigコードにポイント表示欄を追加
-        $snipet = $this->createHtmlDisplayPointFormat();
-        $search = '<div id="cart_item_list"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
         // ポイント表示用変数作成
         $point = array();
         $point['current'] = $currentPoint;
         $point['add'] = $addPoint;
 
-        // twigパラメータにポイント情報を追加
-        $parameters = $event->getParameters();
-        $parameters['point'] = $point;
-        $event->setParameters($parameters);
+        // 使用ポイントボタン付与
+        $snippet = $this->app->render(
+            'Point/Resource/template/default/Event/Cart/point_box.twig',
+            array(
+                'point' => $point,
+            )
+        )->getContent();
+        $search = '<div id="cart_item_list"';
+        $this->replaceView($event, $snippet, $search);
     }
-
-    /**
-     * マイページポイント表示HTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayPointFormat()
-    {
-        return <<<EOHTML
-<p id="cart_item__info" class="message">
-現在の保有ポイントは「<strong class="text-primary">&nbsp;{{ point.current }}pt&nbsp;</strong>」です。<br />
-商品購入で付与されるポイントは「<strong class="text-primary">&nbsp;{{ point.add }}pt&nbsp;</strong>」です。
-</p>
-EOHTML;
-    }
-
 
     /**
      * ポイントデータの保存

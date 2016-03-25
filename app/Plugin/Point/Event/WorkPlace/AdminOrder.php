@@ -116,7 +116,8 @@ class  AdminOrder extends AbstractWorkPlace
                 'data' => abs($lastUsePoint),
                 'empty_data' => null,
                 'attr' => array(
-                    'placeholder' => '10 ( 正の整数 )',
+                    'placeholder' => '手動調整可能なカスタマーの利用ポイント',
+                    'class' => 'form-control',
                 ),
                 'constraints' => array(
                     new Assert\Regex(
@@ -157,6 +158,11 @@ class  AdminOrder extends AbstractWorkPlace
         $args = $event->getParameters();
         // オーダーが取得判定
         if (!isset($args['Order'])) {
+            return false;
+        }
+
+        // フォームの有無を判定
+        if (!isset($args['form'])) {
             return false;
         }
 
@@ -212,21 +218,6 @@ class  AdminOrder extends AbstractWorkPlace
             $currentPoint = 0;
         }
 
-        // twigコードに利用ポイントを挿入
-        // 会員情報に保有ポイントを表示
-        $snipet = $this->createHtmlCustomerCurrentPoint();
-        $search = '<div id="customer_info_list__message"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
-        // 受注商品情報に受注ポイント情報を表示
-        $snipet = $this->createHtmlDisplayOrderPoint();
-        $search = '<dl id="product_info_result_box__body_summary"';
-        $replace = $snipet.$search;
-        $source = str_replace($search, $replace, $event->getSource());
-        $event->setSource($source);
-
         // ポイント表示用変数作成
         $point = array();
         $point['current'] = $currentPoint;
@@ -234,41 +225,26 @@ class  AdminOrder extends AbstractWorkPlace
         $point['add'] = $addPoint;
 
         // twigパラメータにポイント情報を追加
-        $parameters = $event->getParameters();
-        $parameters['point'] = $point;
-        $event->setParameters($parameters);
-    }
+        // twigコードに利用ポイントを挿入
+        $snippet = $this->app->render(
+            'Point/Resource/template/admin/Event/AdminOrder/customerCurrentPoint.twig',
+            array(
+                'point' => $point,
+            )
+        )->getContent();
+        $search = '<div id="customer_info_list__message"';
+        $this->replaceView($event, $snippet, $search);
 
-    /**
-     * 受注確認画面会員保有ポイントHTML生成
-     * @return string
-     */
-    protected function createHtmlCustomerCurrentPoint()
-    {
-        return <<<EOHTML
-<div id="customer_info_list__current_point" class="form-group">
-<label class="col-sm-2 control-label">保有ポイント</label>
-<div class="col-sm-9 col-lg-10">
-<p>{{ point.current }}pt</p>
-</div>
-</div>
-EOHTML;
-    }
-
-    /**
-     * 受注確認画面受注情報表示ポイントHTML生成
-     * @return string
-     */
-    protected function createHtmlDisplayOrderPoint()
-    {
-        return <<<EOHTML
-<dl id="product_info_result_box__point_summary" class="dl-horizontal">
-<dt id="product_info_result_box__point_add">利用ポイント&nbsp;:</dt>
-<dd>{{ form_widget(form.plg_use_point) }}&nbsp;pt</dd>
-<dt id="product_info_result_box__point_add">付与ポイント&nbsp;:</dt>
-<dd>{{ point.add }}&nbsp;pt</dd>
-</dl>
-EOHTML;
+        // 受注商品情報に受注ポイント情報を表示
+        $snippet = $this->app->render(
+            'Point/Resource/template/admin/Event/AdminOrder/orderPoint.twig',
+            array(
+                'form' => $args['form'],
+                'point' => $point,
+            )
+        )->getContent();
+        $search = '<dl id="product_info_result_box__body_summary"';
+        $this->replaceView($event, $snippet, $search);
     }
 
     /**
