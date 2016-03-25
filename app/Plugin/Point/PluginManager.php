@@ -46,7 +46,7 @@ class PluginManager extends AbstractPluginManager
     public function install($config, $app)
     {
         $this->migrationSchema($app, __DIR__.'/Migration', $config['code']);
-        $this->insertDefaultToPointInfo();
+        //$this->insertDefaultToPointInfo();
     }
 
     /**

@@ -12,18 +12,50 @@ use Plugin\Point\Entity;
  */
 class Version20151215144009 extends AbstractMigration
 {
-    const PLG_POINT_INFO = 'plg_point_info';
-    const PLG_POINT_INFO_ADD_STATUS = 'plg_point_info_add_status';
-    const PLG_POINT = 'plg_point';
-    const PLG_POINT_CUSTOMER = 'plg_point_customer';
-    const PLG_POINT_PRODUCT_RATE = 'plg_point_product_rate';
-    const PLG_POINT_SNAP_SHOT = 'plg_point_snapshot';
+    const PLG_POINT_INFO = 'PointInfo';
+    const PLG_POINT_INFO_ADD_STATUS = 'PointInfoAddStatus';
+    const PLG_POINT = 'Point';
+    const PLG_POINT_CUSTOMER = 'PointCustomer';
+    const PLG_POINT_PRODUCT_RATE = 'PointProductRate';
+    const PLG_POINT_SNAP_SHOT = 'PointSnapshot';
 
     /**
      * @param Schema $schema
      */
     public function up(Schema $schema)
     {
+        $classes = array(
+            self::PLG_POINT_INFO,
+            self::PLG_POINT_INFO_ADD_STATUS,
+            self::PLG_POINT,
+            self::PLG_POINT_CUSTOMER,
+            self::PLG_POINT_PRODUCT_RATE,
+            self::PLG_POINT_SNAP_SHOT,
+        );
+
+        // this up() migration is auto-generated, please modify it to your needs
+        $app = \Eccube\Application::getInstance();
+        $em = $app['orm.em'];
+        foreach ($classes as $class) {
+            $metadatas[] = $em->getMetadataFactory()->getMetadataFor('\\Plugin\\Point\\Entity\\'.$class);
+        }
+        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool->dropSchema($metadatas);
+        $schemaTool->createSchema($metadatas);
+
+        /*
+        $scopes = array('read', 'write', 'openid', 'offline_access');
+        foreach ($scopes as $scope) {
+            $Scope = new \Plugin\EccubeApi\Entity\OAuth2\Scope();
+            $Scope->setScope($scope);
+            $Scope->setDefault(true);
+            $em->persist($Scope);
+        }
+        $em->flush();
+        */
+
+
+        /*
         // this up() migration is auto-generated, please modify it to your needs
         // ポイント機能基本情報格納テーブルを追加
         if (!$schema->hasTable(self::PLG_POINT_INFO)) {
@@ -112,6 +144,7 @@ class Version20151215144009 extends AbstractMigration
             $t->addColumn('update_date', 'datetime', array('NotNull' => true));
             $t->setPrimaryKey(array('plg_point_snapshot_id'));
         }
+        */
     }
 
     /**
@@ -119,6 +152,26 @@ class Version20151215144009 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
+        $classes = array(
+            self::PLG_POINT_INFO,
+            self::PLG_POINT_INFO_ADD_STATUS,
+            self::PLG_POINT,
+            self::PLG_POINT_CUSTOMER,
+            self::PLG_POINT_PRODUCT_RATE,
+            self::PLG_POINT_SNAP_SHOT,
+        );
+
+        // this up() migration is auto-generated, please modify it to your needs
+        $app = \Eccube\Application::getInstance();
+        $em = $app['orm.em'];
+        foreach ($classes as $class) {
+            $metadatas[] = $em->getMetadataFactory()->getMetadataFor('\\Plugin\\Point\\Entity\\'.$class);
+        }
+        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool->dropSchema($metadatas);
+        $schemaTool->createSchema($metadatas);
+
+        /*
         // this down() migration is auto-generated, please modify it to your needs
         if ($schema->hasTable(self::PLG_POINT_INFO)) {
             $schema->dropTable(self::PLG_POINT_INFO);
@@ -138,5 +191,6 @@ class Version20151215144009 extends AbstractMigration
         if ($schema->hasTable(self::PLG_POINT_SNAP_SHOT)) {
             $schema->dropTable(self::PLG_POINT_SNAP_SHOT);
         }
+        */
     }
 }
