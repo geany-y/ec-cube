@@ -160,7 +160,7 @@ class PointController
 
         // フォーム項目名称描画用文字配
         return $app->render(
-            'Point/Resource/template/default/pointuse.twig',
+            'Point/Resource/template/default/point_use.twig',
             array(
                 'form' => $form->createView(),
                 'usePoint' => $usePoint,

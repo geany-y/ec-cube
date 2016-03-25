@@ -227,7 +227,7 @@ class  AdminOrder extends AbstractWorkPlace
         // twigパラメータにポイント情報を追加
         // twigコードに利用ポイントを挿入
         $snippet = $this->app->render(
-            'Point/Resource/template/admin/Event/AdminOrder/customerCurrentPoint.twig',
+            'Point/Resource/template/admin/Event/AdminOrder/customer_current_point.twig',
             array(
                 'point' => $point,
             )
@@ -237,7 +237,7 @@ class  AdminOrder extends AbstractWorkPlace
 
         // 受注商品情報に受注ポイント情報を表示
         $snippet = $this->app->render(
-            'Point/Resource/template/admin/Event/AdminOrder/orderPoint.twig',
+            'Point/Resource/template/admin/Event/AdminOrder/order_point.twig',
             array(
                 'form' => $args['form'],
                 'point' => $point,
