@@ -43,6 +43,17 @@ class Version20151215144009 extends AbstractMigration
         $schemaTool->dropSchema($metadatas);
         $schemaTool->createSchema($metadatas);
 
+        $em = $app['orm.em'];
+        $pointInfo = new Entity\PointInfo();
+        $pointInfo->setPlgBasicPointRate(1);
+        $pointInfo->setPlgCalculationType(0);
+        $pointInfo->setPlgRoundType(0);
+        $pointInfo->setPlgPointConversionRate(1);
+        $pointInfo->setPlgAddPointStatus(1);
+
+        $em->persist($pointInfo);
+        $em->flush();
+
         /*
         $scopes = array('read', 'write', 'openid', 'offline_access');
         foreach ($scopes as $scope) {

@@ -29,7 +29,7 @@ Plugin\Point\Entity\PointCustomer:
         update_date:
             type: datetime
             nullable: false
-    oneToOne:
+    manyToOne:
         Customer:
             targetEntity: Eccube\Entity\Customer
             joinColumn:

@@ -36,13 +36,16 @@ class PointInfoType extends AbstractType
         $this->app = $app;
         // 全受注ステータス ID・名称 取得保持
         $this->orderStatus = array();
+        $this->app['orm.em']->getFilters()->enable('incomplete_order_status_hidden');
         foreach ($this->app['eccube.repository.order_status']->findAllArray() as $id => $node) {
+            /*
             if ($id == $this->app['config']['order_cancel']){
                 continue;
             }
             if($id == $this->app['config']['order_processing']) {
                 continue;
             }
+            */
             $this->orderStatus[$id] = $node['name'];
         }
 

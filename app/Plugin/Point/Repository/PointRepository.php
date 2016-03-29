@@ -49,7 +49,6 @@ class PointRepository extends EntityRepository
         $needStatus[] = PointHistoryHelper::STATE_CURRENT;  // 現在ポイント
         $needStatus[] = PointHistoryHelper::STATE_USE;      // 利用ポイント
 
-
         try {
             // ログテーブルからポイントを計算
             $qb = $this->createQueryBuilder('p');

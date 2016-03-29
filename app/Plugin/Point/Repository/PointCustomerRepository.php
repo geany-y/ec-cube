@@ -50,8 +50,10 @@ class PointCustomerRepository extends EntityRepository
             return false;
         }
 
+
         // エンティティにフォーム取得値とリレーションオブジェクトを設定
         $pointCustomerEntity = new PointCustomer();
+        //$pointCustomerEntity->setPlgPointCustomerId(null);
         $pointCustomerEntity->setPlgPointCurrent($point);
         $pointCustomerEntity->setCustomer($customer);
 
@@ -60,7 +62,7 @@ class PointCustomerRepository extends EntityRepository
             // DB更新
             $em = $this->getEntityManager();
             $em->persist($pointCustomerEntity);
-            $em->flush($pointCustomerEntity);
+            $em->flush();
 
             return $pointCustomerEntity;
         } catch (DatabaseObjectNotFoundException $e) {
