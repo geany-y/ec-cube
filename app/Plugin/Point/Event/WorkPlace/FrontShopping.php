@@ -119,6 +119,8 @@ class FrontShopping extends AbstractWorkPlace
         // 合計金額をセット
         $order->setTotal($amount);
 
+        // ポイント基本情報を取得
+        $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         // ポイント表示用変数作成
         $point = array();
         $point['current'] = $currentPoint;
@@ -130,6 +132,7 @@ class FrontShopping extends AbstractWorkPlace
             $point['use'] = 0 - $usePoint;
         }
         $point['add'] = $addPoint;
+        $point['rate'] = $pointInfo->getPlgBasicPointRate();
 
         // Twigデータ内IDをキーに表示項目を追加
         // ポイント情報表示
@@ -162,7 +165,7 @@ class FrontShopping extends AbstractWorkPlace
                 'point' => $point,
             )
         )->getContent();
-        $search = '<a id="confirm_box__quantity_edit_button"';
+        $search = '<h2 class="heading02">お問い合わせ欄</h2>';
         $this->replaceView($event, $snippet, $search);
     }
 

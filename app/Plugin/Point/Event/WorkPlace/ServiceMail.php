@@ -139,28 +139,14 @@ class ServiceMail extends AbstractWorkPlace
         $snipet2 = PHP_EOL;
         $snipet2 .= PHP_EOL;
         $snipet2 .= '***********************************************'.PHP_EOL;
-        $snipet2 .= '                      ポイント情報              '.PHP_EOL;
+        $snipet2 .= '　ポイント情報                                 '.PHP_EOL;
         $snipet2 .= '***********************************************'.PHP_EOL;
-        $snipet2 .= '付与予定ポイント :'.$pointMessage['use'].PHP_EOL;
+        $snipet2 .= '加算ポイント :'.$pointMessage['use'].PHP_EOL;
         $snipet2 .= PHP_EOL;
         $replace = $search[0][0].$snipet2;
         $body = preg_replace('/'.$search[0][0].'/u', $replace, $body);
 
         // メッセージにメールボディをセット
         $message->setBody($body);
-    }
-
-    /**
-     * メールポイント表示生成・返却
-     * @param $pointMessage
-     * @return string
-     */
-    protected function createPointMailMessage($pointMessage)
-    {
-        $message = '付与予定ポイント :'.$pointMessage['add'].PHP_EOL;
-        $message .= '現在保有ポイント :'.$pointMessage['point'].PHP_EOL;
-        $message .= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
-
-        return $message;
     }
 }

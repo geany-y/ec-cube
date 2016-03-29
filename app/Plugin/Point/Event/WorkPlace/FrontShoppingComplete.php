@@ -129,7 +129,7 @@ class FrontShoppingComplete extends AbstractWorkPlace
         $snipet2 = PHP_EOL;
         $snipet2 .= PHP_EOL;
         $snipet2 .= '***********************************************'.PHP_EOL;
-        $snipet2 .= '                ポイント情報                   '.PHP_EOL;
+        $snipet2 .= '　ポイント情報                                 '.PHP_EOL;
         $snipet2 .= '***********************************************'.PHP_EOL;
         $snipet2 .= '加算ポイント :'.$pointMessage['add'].PHP_EOL;
         $snipet2 .= PHP_EOL;
@@ -140,18 +140,5 @@ class FrontShoppingComplete extends AbstractWorkPlace
 
         $this->app['orm.em']->persist($mailHistory);
         $this->app['orm.em']->flush($mailHistory);
-    }
-
-    /**
-     * メール用のポイント表示を作成返却
-     * @param $pointMessage
-     * @return string
-     */
-    protected function createPointMailMessage($pointMessage)
-    {
-        $message = '加算ポイント :'.$pointMessage['add'].PHP_EOL;
-        $message .= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
-
-        return $message;
     }
 }

@@ -317,9 +317,11 @@ class PointEventHandler
      */
     public function onRenderCart(TemplateEvent $event)
     {
+        /*
         if (!$this->isAuthRouteFront()) {
             return true;
         }
+        */
 
         // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
         $this->setHelper(self::HELPER_FRONT_CART);
