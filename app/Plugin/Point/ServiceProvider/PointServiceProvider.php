@@ -104,13 +104,13 @@ class PointServiceProvider implements ServiceProviderInterface
         // 管理画面 > 設定 > 基本情報設定 > ポイント基本情報設定画面
         $app->match(
             '/'.$app['config']['admin_route'].'/point/setting',
-            'Plugin\Point\Controller\PointController::index'
+            'Plugin\Point\Controller\AdminPointController::index'
         )->bind('point_info');
 
         // フロント画面 > 商品購入確認画面
         $app->match(
             '/shopping/use_point',
-            'Plugin\Point\Controller\PointController::usePoint'
+            'Plugin\Point\Controller\FrontPointController::usePoint'
         )->bind('point_use');
     }
 

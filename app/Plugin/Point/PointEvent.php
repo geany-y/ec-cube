@@ -18,10 +18,10 @@ use HttpException\NotFoundHttpException;
 
 /**
  * ポイントプラグインイベント処理ルーティングクラス
- * Class PointEventHandler
+ * Class PointEvent
  * @package Plugin\Point
  */
-class PointEventHandler
+class PointEvent
 {
     // ヘルパー呼び出し用
     // 管理画面

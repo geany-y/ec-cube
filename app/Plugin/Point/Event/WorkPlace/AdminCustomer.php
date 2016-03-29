@@ -70,7 +70,7 @@ class  AdminCustomer extends AbstractWorkPlace
                     'empty_data' => null,
                     'data' => $data,
                     'attr' => array(
-                        'placeholder' => 'カスタマーに手動で付与するポイント 例. 1',
+                        'placeholder' => '入力した値でカスタマーの保有ポイントを更新します ( pt )',
                     ),
                     'constraints' => array(
                         new Assert\Regex(

@@ -36,25 +36,19 @@
         <form name="form1" role="form" class="form-horizontal" id="point_form" method="post"
               action="{{ url('point_info') }}">
             {{ form_widget(form._token) }}
-            {#{{ form_widget(form.id) }}#}
             <div class="col-md-9">
                 <div class="box">
                     <div class="box-header">
                         <h3 class="box-title">ポイント付与タイミング</h3>
                     </div><!-- /.box-header -->
                     <div class="box-body">
-                        {#{% for pointInfoAddStatus in form.PointInfoAddStatus.children %}#}
-                            {#{% set status = pointInfoAddStatus.vars.value.plg_point_info_add_status %}#}
-                            {#{% if status != app.config.order_cancel and status != app.config.order_processing %}#}
-                                <div class="form-group">
-                                    <div class="col-sm-3 col-lg-3">ポイント付与タイミング{#{{ orderStatus[status] }}#}</div>
-                                    <div class="col-sm-9 col-lg-9">
-                                        {{ form_widget(form.plg_add_point_status) }}
-                                        {{ form_errors(form.plg_add_point_status) }}
-                                    </div>
-                                </div>
-                        {#{% endif %}#}
-                        {#{% endfor %}#}
+                        <div class="form-group">
+                            <div class="col-sm-3 col-lg-3">ポイント付与タイミング{#{{ orderStatus[status] }}#}</div>
+                            <div class="col-sm-9 col-lg-9">
+                                {{ form_widget(form.plg_add_point_status) }}
+                                {{ form_errors(form.plg_add_point_status) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="box">
@@ -100,7 +94,8 @@
                         <div class="form-group">
                             <div class="col-sm-12 col-lg-12">
                                 <p>ポイント機能プラグインを利用する際において、お客様との間で無用なトラブルを避けるために以下のサンプルを参考に、「特定商取引法に基づく表記」表記などに必ず「利用規約」を明記してください。</p>
-                                <p>以下のサンプルは<a href="https://point.rakuten.co.jp/guidance/agreement/" target="_blank">「楽天スーパーポイント」</a>の利用規約を抜粋改定したものです。</p>
+                                <p>ポイント利用に関する約款を「経済産業省ホームページ」<a href="http://www.meti.go.jp/committee/kenkyukai/safety_security.html" target="_blank">企業ポイント研究会</a>を参考に作成ください</p>
+                                <!--
                                 <dl>
                                     <dt>第１条（目的）</dt>
                                     <dd>
@@ -238,6 +233,7 @@
                                         </ol>
                                     </dd>
                                 </dl>
+                                -->
                             </div>
                         </div>
                     </div>

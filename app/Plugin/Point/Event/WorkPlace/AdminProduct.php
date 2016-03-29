@@ -70,7 +70,7 @@ class  AdminProduct extends AbstractWorkPlace
                     'data' => $data,
                     'empty_data' => null,
                     'attr' => array(
-                        'placeholder' => 'ポイント計算時に使用する付与率（ 商品毎の設定値で計算 （％））例. 1',
+                        'placeholder' => '設定されていると本商品のみ設定値をもとにポイントを計算します。',
                     ),
                     'constraints' => array(
                         new Assert\Regex(

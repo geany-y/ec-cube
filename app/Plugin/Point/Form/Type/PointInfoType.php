@@ -38,14 +38,6 @@ class PointInfoType extends AbstractType
         $this->orderStatus = array();
         $this->app['orm.em']->getFilters()->enable('incomplete_order_status_hidden');
         foreach ($this->app['eccube.repository.order_status']->findAllArray() as $id => $node) {
-            /*
-            if ($id == $this->app['config']['order_cancel']){
-                continue;
-            }
-            if($id == $this->app['config']['order_processing']) {
-                continue;
-            }
-            */
             $this->orderStatus[$id] = $node['name'];
         }
 
@@ -112,7 +104,7 @@ class PointInfoType extends AbstractType
                     'mapped' => true,
                     'empty_data' => 0,
                     'attr' => array(
-                        'placeholder' => 'ポイント付与計算に使用するサイト全体の付与率（ ％ ）例. 1',
+                        'placeholder' => '「商品毎の付与率」が設定されていない場合に本値が適用されます。( ％ )',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
@@ -133,7 +125,7 @@ class PointInfoType extends AbstractType
                     'mapped' => true,
                     'empty_data' => 0,
                     'attr' => array(
-                        'placeholder' => 'ポイント利用時に何円で計算するかの換算率（ 円 ）例. 1',
+                        'placeholder' => 'ポイント利用時の換算値です( 1 → 1pt = 1円 )',
                     ),
                     'constraints' => array(
                         new Assert\Regex(
@@ -145,22 +137,6 @@ class PointInfoType extends AbstractType
                     ),
                 )
             )
-            /*
-            ->add(
-                'plg_calculation_type',
-                'choice',
-                array(
-                    'label' => 'ポイント計算方法',
-                    'choices' => array(
-                        \Plugin\Point\Entity\PointInfo::POINT_CALCULATE_SUBTRACTION => '利用ポイント減算',
-                        \Plugin\Point\Entity\PointInfo::POINT_CALCULATE_NORMAL => '減算なし',
-                    ),
-                    'mapped' => true,
-                    'expanded' => false,
-                    'multiple' => false,
-                )
-            )
-            */
             ->add(
                 'plg_round_type',
                 'choice',
