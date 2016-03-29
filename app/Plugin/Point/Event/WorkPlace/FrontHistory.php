@@ -94,14 +94,6 @@ class FrontHistory extends AbstractWorkPlace
         $calculator->addEntity('Customer', $parameters['Order']->getCustomer());
         $calculator->setUsePoint($usePoint);
 
-        // 保有ポイントを取得
-        $point = $calculator->getPoint();
-
-        // 保有ポイント取得判定
-        if (empty($point)) {
-            $point = 0;
-        }
-
         // 付与ポイント取得
         $addPoint = $calculator->getAddPointByOrder();
 
@@ -118,10 +110,9 @@ class FrontHistory extends AbstractWorkPlace
             $amount = 0;
         }
 
-        $point_buff = $point;
         // ポイント表示用変数作成
         $point = array();
-        $point['current'] = $point_buff;
+
         // エラー判定
         // false が返却された際は、利用ポイント値が保有ポイント値を超えている
         $point['add'] = $addPoint;

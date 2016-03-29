@@ -131,8 +131,19 @@ class ServiceMail extends AbstractWorkPlace
         preg_match_all('/合　計 ¥ .*\\n/u', $body, $search);
 
         // メール本文置換
-        $snipet = $this->createPointMailMessage($pointMessage);
+        //$snipet = $this->createPointMailMessage($pointMessage);
+        $snipet = 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
         $replace = $snipet.$search[0][0];
+        $body = preg_replace('/'.$search[0][0].'/u', $replace, $body);
+
+        $snipet2 = PHP_EOL;
+        $snipet2 .= PHP_EOL;
+        $snipet2 .= '***********************************************'.PHP_EOL;
+        $snipet2 .= '                      ポイント情報              '.PHP_EOL;
+        $snipet2 .= '***********************************************'.PHP_EOL;
+        $snipet2 .= '付与予定ポイント :'.$pointMessage['use'].PHP_EOL;
+        $snipet2 .= PHP_EOL;
+        $replace = $search[0][0].$snipet2;
         $body = preg_replace('/'.$search[0][0].'/u', $replace, $body);
 
         // メッセージにメールボディをセット

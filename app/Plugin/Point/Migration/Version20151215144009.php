@@ -5,6 +5,7 @@ namespace DoctrineMigrations;
 use Eccube\Application;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Eccube\Entity\PageLayout;
 use Plugin\Point\Entity;
 
 /**
@@ -18,6 +19,7 @@ class Version20151215144009 extends AbstractMigration
     const PLG_POINT_CUSTOMER = 'PointCustomer';
     const PLG_POINT_PRODUCT_RATE = 'PointProductRate';
     const PLG_POINT_SNAP_SHOT = 'PointSnapshot';
+    const PLG_POINT_DTB_PAGE_LAYOUT = 'PageLayout';
 
     /**
      * @param Schema $schema

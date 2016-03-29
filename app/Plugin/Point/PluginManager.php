@@ -12,6 +12,8 @@
 namespace Plugin\Point;
 
 use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
+use Eccube\Entity\Master\DeviceType;
+use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
 
 /**
@@ -61,11 +63,42 @@ class PluginManager extends AbstractPluginManager
     public function enable($config, $app)
     {
 
+        $deviceType = $this->app['eccube.repository.master.device_type']->findOneById(10);
+        $pageLayout = new PageLayout();
+        $pageLayout->setId(null);
+        $pageLayout->setDeviceType($deviceType);
+        $pageLayout->setFileName('../../Plugin/Point/Resource/template/default/point_use');
+        $pageLayout->setEditFlg(2);
+        $pageLayout->setMetaRobots('noindex');
+        $pageLayout->setUrl('point_use');
+        $pageLayout->setName('商品購入確認/利用ポイント');
+
+        $this->app['orm.em']->persist($pageLayout);
+        $this->app['orm.em']->flush($pageLayout);
     }
 
     public function disable($config, $app)
     {
+        // ログテーブルからポイントを計算
+        //$qb = $this->createQueryBuilder('pl');
+        /*
+        $qb = $this->app['orm.em']->createQueryBuilder();
+        $qb->delete()
+            ->from('PageLayout', 'pl')
+            ->where('pl.url = :url')
+            ->andWhere('pl.file_name = :file_name')
+            ->setParameter('url', 'point_use')
+            ->setParameter('file_name', '../../Plugin/Point/Resource/template/default/point_use');
+        */
 
+        /*
+        dump($qb->getDql());
+        exit();
+        */
+
+        //dump($qb->getDQL());
+        //exit();
+        //$qb->getQuery()->execute();
     }
 
     public function update($config, $app)

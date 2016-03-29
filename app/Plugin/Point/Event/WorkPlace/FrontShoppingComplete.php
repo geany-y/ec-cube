@@ -107,12 +107,10 @@ class FrontShoppingComplete extends AbstractWorkPlace
 
         // 計算値取得
         $addPoint = $calculator->getAddPointByOrder();
-        $point = $calculator->getPoint();
 
         // ポイント配列作成
         $pointMessage = array();
         $pointMessage['add'] = $addPoint;
-        $pointMessage['point'] = $point;
         $pointMessage['use'] = 0 - $usePoint;
 
         // メールボディ取得
@@ -123,10 +121,20 @@ class FrontShoppingComplete extends AbstractWorkPlace
         preg_match_all('/合　計 ¥ .*\\n/u', $body, $search);
 
         // メール本文置換
-        $snipet = $this->createPointMailMessage($pointMessage);
+        //$snipet = $this->createPointMailMessage($pointMessage);
+        $snipet = 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
         $replace = $snipet.$search[0][0];
         $body = preg_replace('/'.$search[0][0].'/u', $replace, $body);
 
+        $snipet2 = PHP_EOL;
+        $snipet2 .= PHP_EOL;
+        $snipet2 .= '***********************************************'.PHP_EOL;
+        $snipet2 .= '                ポイント情報                   '.PHP_EOL;
+        $snipet2 .= '***********************************************'.PHP_EOL;
+        $snipet2 .= '加算ポイント :'.$pointMessage['add'].PHP_EOL;
+        $snipet2 .= PHP_EOL;
+        $replace = $search[0][0].$snipet2;
+        $body = preg_replace('/'.$search[0][0].'/u', $replace, $body);
         // メッセージにメールボディをセット
         $mailHistory->setMailBody($body);
 
@@ -141,8 +149,7 @@ class FrontShoppingComplete extends AbstractWorkPlace
      */
     protected function createPointMailMessage($pointMessage)
     {
-        $message = '付与予定ポイント :'.$pointMessage['add'].PHP_EOL;
-        $message .= '現在保有ポイント :'.$pointMessage['point'].PHP_EOL;
+        $message = '加算ポイント :'.$pointMessage['add'].PHP_EOL;
         $message .= 'ご利用ポイント :'.$pointMessage['use'].PHP_EOL;
 
         return $message;

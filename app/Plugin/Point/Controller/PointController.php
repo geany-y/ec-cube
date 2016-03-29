@@ -11,6 +11,8 @@
 namespace Plugin\Point\Controller;
 
 use Eccube\Application;
+use Eccube\Entity\Master\DeviceType;
+use Eccube\Entity\PageLayout;
 use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Form\Type;
 use Symfony\Component\HttpFoundation\Request;
@@ -158,12 +160,34 @@ class PointController
             }
         }
 
+        $DeviceType = $this->app['orm.em']->getRepository('Eccube\Entity\Master\DeviceType')->find(DeviceType::DEVICE_TYPE_PC);
+
+        $PageLayout = $this->app['eccube.repository.page_layout']->findOneBy(array(
+            'url' => $request->getUri(),
+            'DeviceType' => $DeviceType,
+            'edit_flg' => PageLayout::EDIT_FLG_USER,
+        ));
+
+        $PageLayout = new PageLayout();
+
+        if (is_null($PageLayout)) {
+            throw new HttpException\NotFoundHttpException();
+        }
+
+        // user_dataディレクトリを探索パスに追加.
+        $paths = array();
+        $paths[] = $this->app['config']['user_data_realdir'];
+        $this->app['twig.loader']->addLoader(new \Twig_Loader_Filesystem($paths));
+
+        //$file = $PageLayout->getFileName() . '.twig';
+
         // フォーム項目名称描画用文字配
         return $app->render(
             'Point/Resource/template/default/point_use.twig',
             array(
                 'form' => $form->createView(),
                 'usePoint' => $usePoint,
+                '$PageLayout' => $PageLayout,
             )
         );
     }
