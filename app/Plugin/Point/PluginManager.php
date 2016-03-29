@@ -80,16 +80,8 @@ class PluginManager extends AbstractPluginManager
     public function disable($config, $app)
     {
         // ログテーブルからポイントを計算
-        //$qb = $this->createQueryBuilder('pl');
-        /*
-        $qb = $this->app['orm.em']->createQueryBuilder();
-        $qb->delete()
-            ->from('PageLayout', 'pl')
-            ->where('pl.url = :url')
-            ->andWhere('pl.file_name = :file_name')
-            ->setParameter('url', 'point_use')
-            ->setParameter('file_name', '../../Plugin/Point/Resource/template/default/point_use');
-        */
+        //$qb = $this->createQueryBuilder();
+        $pageLayout = $this->app['eccube.repository.page_layout']->findByUrl('point_use');
 
         /*
         dump($qb->getDql());
@@ -98,7 +90,12 @@ class PluginManager extends AbstractPluginManager
 
         //dump($qb->getDQL());
         //exit();
-        //$qb->getQuery()->execute();
+        foreach($pageLayout as $deleteNode) {
+            $this->app['orm.em']->persist($deleteNode);
+            $this->app['orm.em']->remove($deleteNode);
+        }
+        $this->app['orm.em']->flush();
+
     }
 
     public function update($config, $app)

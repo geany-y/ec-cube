@@ -109,16 +109,51 @@ class PointController
             throw new HttpException\NotFoundHttpException;
         }
 
+        $cartService = $this->app['eccube.service.cart'];
+
+        // カートチェック
+        if (!$cartService->isLocked()) {
+            // カートが存在しない、カートがロックされていない時はエラー
+            return $this->app->redirect($this->app->url('cart'));
+        }
+
+        $Order = $this->app['eccube.service.shopping']->getOrder($this->app['config']['order_processing']);
+        if (!$Order) {
+            $this->app->addError('front.shopping.order.error');
+            return $this->app->redirect($this->app->url('shopping_error'));
+        }
+
         // 最終保存のポイント設定情報取得
-        $usePoint = null;
+        $usePoint = 0;
         if ($this->app['session']->has('usePoint')) {
             $usePoint = $this->app['session']->get('usePoint');
         }
 
-        // 現在保有ポイント
-        $customer_id = $this->app['security']->getToken()->getUser()->getId();
+        // 必要エンティティ取得
+        $customer = $this->app['security']->getToken()->getUser();
 
-        $customerPoint = $this->app['eccube.plugin.point.repository.pointcustomer']->getLastPointById($customer_id);
+        // 計算用ヘルパー呼び出し
+        $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
+
+        // 計算に必要なエンティティを格納
+        $calculator->addEntity('Customer', $customer);
+        $calculator->addEntity('Order', $Order);
+        $calculator->setUsePoint($usePoint);
+
+        // 保有ポイント
+        $point = $calculator->getPoint();
+        // 加算ポイント
+        $addPoint = $calculator->getAddPointByOrder();
+        // 合計金額
+        $total = number_format($calculator->getTotalAmount());
+
+
+        // ポイント換算レート
+        $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        if(empty($pointInfo)){
+            return false;
+        }
+        $pointRate = $pointInfo->getPlgBasicPointRate();
 
         //フォーム生成
         $form = $this->app['form.factory']
@@ -136,7 +171,7 @@ class PointController
                     ),
                     'constraints' => array(
                         new Assert\LessThanOrEqual(array(
-                            'value' => $customerPoint,
+                            'value' => $point,
                             'message' => 'front.point.enter.usepointe.error',
                         )),
                         new Assert\Regex(
@@ -160,34 +195,15 @@ class PointController
             }
         }
 
-        $DeviceType = $this->app['orm.em']->getRepository('Eccube\Entity\Master\DeviceType')->find(DeviceType::DEVICE_TYPE_PC);
-
-        $PageLayout = $this->app['eccube.repository.page_layout']->findOneBy(array(
-            'url' => $request->getUri(),
-            'DeviceType' => $DeviceType,
-            'edit_flg' => PageLayout::EDIT_FLG_USER,
-        ));
-
-        $PageLayout = new PageLayout();
-
-        if (is_null($PageLayout)) {
-            throw new HttpException\NotFoundHttpException();
-        }
-
-        // user_dataディレクトリを探索パスに追加.
-        $paths = array();
-        $paths[] = $this->app['config']['user_data_realdir'];
-        $this->app['twig.loader']->addLoader(new \Twig_Loader_Filesystem($paths));
-
-        //$file = $PageLayout->getFileName() . '.twig';
-
         // フォーム項目名称描画用文字配
         return $app->render(
             'Point/Resource/template/default/point_use.twig',
             array(
                 'form' => $form->createView(),
                 'usePoint' => $usePoint,
-                '$PageLayout' => $PageLayout,
+                'pointRate' => $pointRate,
+                'point' => $point,
+                'total' => $total,
             )
         );
     }
