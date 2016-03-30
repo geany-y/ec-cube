@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Event\WorkPlace;
@@ -62,16 +41,16 @@ class FrontMyPage extends AbstractWorkPlace
     }
 
     /**
-     * 本クラスでは処理なし
+     * マイページにポイント情報を差し込む
      * @param TemplateEvent $event
+     * @return bool
      */
     public function createTwig(TemplateEvent $event)
     {
         $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
 
         $point_rate = 0;
-        if(!empty($pointInfo))
-        {
+        if (!empty($pointInfo)) {
             $point_rate = (integer)$pointInfo->getPlgPointConversionRate();
         }
 
@@ -80,18 +59,18 @@ class FrontMyPage extends AbstractWorkPlace
         $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // ヘルパーの取得判定
-        if(empty($calculator)){
+        if (empty($calculator)) {
             return false;
         }
 
         // カスタマー情報を取得
         $customer = $this->app['security']->getToken()->getUser();
 
-        if(empty($customer)){
+        if (empty($customer)) {
             return false;
         }
 
-        if(empty($pointInfo)){
+        if (empty($pointInfo)) {
             return false;
         }
 
@@ -102,7 +81,7 @@ class FrontMyPage extends AbstractWorkPlace
         $currentPoint = $calculator->getPoint();
 
         // 会員保有ポイント取得判定
-        if(empty($currentPoint)){
+        if (empty($currentPoint)) {
             $currentPoint = 0;
         }
 
@@ -111,7 +90,7 @@ class FrontMyPage extends AbstractWorkPlace
 
 
         // 仮ポイント取得判定
-        if(empty($previsionAddPoint)){
+        if (empty($previsionAddPoint)) {
             $previsionAddPoint = 0;
         }
 
@@ -136,7 +115,6 @@ class FrontMyPage extends AbstractWorkPlace
     /**
      * ポイントデータの保存
      * @param EventArgs $event
-     * @return bool
      */
     public function save(EventArgs $event)
     {

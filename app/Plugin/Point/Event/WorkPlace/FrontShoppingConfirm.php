@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Event\WorkPlace;
@@ -74,10 +53,9 @@ class FrontShoppingConfirm extends AbstractWorkPlace
 
     /**
      * ポイントデータの保存
-     * @todo ロジックが送品購入画面とほぼ同内容
-     * @todo データの引き渡しをセッションで検討
      * @param EventArgs $event
      * @return bool
+     * @throws UndefinedFunctionException
      */
     public function save(EventArgs $event)
     {
@@ -85,7 +63,7 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $args = $event->getArguments();
         $order = $args['Order'];
 
-        if(empty($order)){
+        if (empty($order)) {
             return false;
         }
 
@@ -134,10 +112,10 @@ class FrontShoppingConfirm extends AbstractWorkPlace
 
         // ポイント付与受注ステータスが「新規」の場合、付与ポイントを確定
         $add_point_flg = false;
-        $pointInfo =$this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         // ポイント機能基本設定の付与ポイント受注ステータスを取得
         if ($pointInfo->getPlgAddPointStatus() == $this->app['config']['order_new']) {
-            $add_point_flg  = true;
+            $add_point_flg = true;
         }
 
         // 履歴情報登録
@@ -171,7 +149,10 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         );
 
         // 会員ポイント更新
-        $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint($calculateCurrentPoint, $order->getCustomer());
+        $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint(
+            $calculateCurrentPoint,
+            $order->getCustomer()
+        );
 
         // ポイント保存用変数作成
         $point = array();

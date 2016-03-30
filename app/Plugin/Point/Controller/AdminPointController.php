@@ -1,18 +1,8 @@
 <?php
-/*
-* This file is part of EC-CUBE
-*
-* Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+
 namespace Plugin\Point\Controller;
 
 use Eccube\Application;
-use Eccube\Entity\Master\DeviceType;
-use Eccube\Entity\PageLayout;
 use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Form\Type;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +10,6 @@ use Symfony\Component\HttpKernel\Exception as HttpException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class PointController
  * ポイント設定画面用コントローラー
  * Class AdminPointController
  * @package Plugin\Point\Controller
@@ -31,7 +20,7 @@ class AdminPointController
     protected $app;
 
     /**
-     * PointController constructor.
+     * AdminPointController constructor.
      */
     public function __construct()
     {
@@ -68,15 +57,15 @@ class AdminPointController
         $form->handleRequest($request);
         // 保存処理
         if ($form->isSubmitted() && $form->isValid()) {
-                $saveData = $form->getData();
-                $status = $this->app['eccube.plugin.point.repository.pointinfo']->save($saveData);
-                if ($status) {
-                    $app->addSuccess('admin.point.save.complete', 'admin');
+            $saveData = $form->getData();
+            $status = $this->app['eccube.plugin.point.repository.pointinfo']->save($saveData);
+            if ($status) {
+                $app->addSuccess('admin.point.save.complete', 'admin');
 
-                    return $app->redirect($app->url('point_info'));
-                } else {
-                    $app->addError('admin.point.save.error', 'admin');
-                }
+                return $app->redirect($app->url('point_info'));
+            } else {
+                $app->addError('admin.point.save.error', 'admin');
+            }
         }
 
         // フォーム項目名称描画用文字配列

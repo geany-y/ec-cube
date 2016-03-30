@@ -1,19 +1,8 @@
 <?php
-/*
-* This file is part of EC-CUBE
-*
-* Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+
 namespace Plugin\Point\Controller;
 
 use Eccube\Application;
-use Eccube\Entity\Master\DeviceType;
-use Eccube\Entity\PageLayout;
-use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Form\Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception as HttpException;
@@ -31,7 +20,7 @@ class FrontPointController
     protected $app;
 
     /**
-     * PointController constructor.
+     * FrontPointController constructor.
      */
     public function __construct()
     {
@@ -42,7 +31,7 @@ class FrontPointController
      * 利用ポイント入力画面
      * @param Application $app
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return bool|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function usePoint(Application $app, Request $request)
     {
@@ -62,6 +51,7 @@ class FrontPointController
         $Order = $this->app['eccube.service.shopping']->getOrder($this->app['config']['order_processing']);
         if (!$Order) {
             $this->app->addError('front.shopping.order.error');
+
             return $this->app->redirect($this->app->url('shopping_error'));
         }
 
@@ -92,7 +82,7 @@ class FrontPointController
 
         // ポイント換算レート
         $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
-        if(empty($pointInfo)){
+        if (empty($pointInfo)) {
             return false;
         }
         $pointRate = $pointInfo->getPlgBasicPointRate();
@@ -112,10 +102,12 @@ class FrontPointController
                         'placeholder' => '使用するポイントを入力 例. 1',
                     ),
                     'constraints' => array(
-                        new Assert\LessThanOrEqual(array(
-                            'value' => $point,
-                            'message' => 'front.point.enter.usepointe.error',
-                        )),
+                        new Assert\LessThanOrEqual(
+                            array(
+                                'value' => $point,
+                                'message' => 'front.point.enter.usepointe.error',
+                            )
+                        ),
                         new Assert\Regex(
                             array(
                                 'pattern' => "/^\d+$/u",
@@ -131,6 +123,7 @@ class FrontPointController
         if ($form->isSubmitted() && $form->isValid()) {
             $saveData = $form->get('plg_use_point')->getData();
             $this->app['session']->set('usePoint', $saveData);
+
             return $this->app->redirect($this->app->url('shopping'));
         }
 

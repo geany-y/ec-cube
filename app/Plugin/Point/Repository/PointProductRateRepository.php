@@ -1,33 +1,11 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
 
 namespace Plugin\Point\Repository;
 
-use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Plugin\Point\Entity\PointProductRate;
+
 /**
  * Class PointProductRateRepository
  * @package Plugin\Point\Repository
@@ -69,7 +47,6 @@ class PointProductRateRepository extends EntityRepository
         // 商品IDをもとに最終設定値を取得
         $lastPointRate = $this->getLastPointProductRateById($productId);
 
-
         // 値が同じ場合
         if ((float)$pointRate === (float)$lastPointRate) {
             return true;
@@ -82,7 +59,6 @@ class PointProductRateRepository extends EntityRepository
      * 商品IDをもとに一番最後に保存したポイント付与率を取得
      * @param $productId
      * @return null
-     * @throws NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLastPointProductRateById($productId)
@@ -126,7 +102,6 @@ class PointProductRateRepository extends EntityRepository
     /**
      * 一番最後に保存したポイント付与率を取得
      * @return null
-     * @throws NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLastPointProductRate()
@@ -164,13 +139,12 @@ class PointProductRateRepository extends EntityRepository
 
         // IDの配列を作成
         $ids = array();
-        foreach($entity as $node)
-        {
+        foreach ($entity as $node) {
             $ids[] = $node->getProduct()->getId();
         }
 
         // エラーハンドリング
-        if(count($ids) < 1){
+        if (count($ids) < 1) {
             return false;
         }
 
@@ -190,8 +164,7 @@ class PointProductRateRepository extends EntityRepository
 
             // キー商品ID、値が付与率の連想配列を作成
             $productRates = array();
-            foreach($result as $node)
-            {
+            foreach ($result as $node) {
                 $productRates[$node->getProductId()] = $node->getPlgPointProductRate();
             }
 

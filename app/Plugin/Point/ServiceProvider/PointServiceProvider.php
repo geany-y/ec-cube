@@ -1,17 +1,7 @@
 <?php
-/*
-* This file is part of EC-CUBE
-*
-* Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
 
 namespace Plugin\Point\ServiceProvider;
 
-use Eccube\Application;
 use Plugin\Point\Doctrine\Listener\ORMListener;
 use Plugin\Point\Helper\EventRoutineWorksHelper\EventRoutineWorksHelperFactory;
 use Plugin\Point\Helper\PointCalculateHelper\PointCalculateHelper;
@@ -22,7 +12,6 @@ use Silex\ServiceProviderInterface;
 /**
  * Class PointServiceProvider
  * @package Plugin\Point\ServiceProvider
- * @pram Eccube\Application
  */
 class PointServiceProvider implements ServiceProviderInterface
 {
@@ -87,7 +76,6 @@ class PointServiceProvider implements ServiceProviderInterface
                 'form.types',
                 function ($types) use ($app) {
                     $types[] = new \Plugin\Point\Form\Type\PointInfoType($app);
-                    $types[] = new \Plugin\Point\Form\Type\PointInfoAddStatusType($app);
 
                     return $types;
                 }
@@ -169,7 +157,7 @@ class PointServiceProvider implements ServiceProviderInterface
 
         // ポイント計算処理サービスファクトリー登録
         $app['eccube.plugin.point.calculate.helper.factory'] = $app->share(
-            function () use($app) {
+            function () use ($app) {
                 return new PointCalculateHelper($app);
             }
         );
@@ -198,6 +186,11 @@ class PointServiceProvider implements ServiceProviderInterface
         );
     }
 
+    /**
+     * 初期化時処理
+     *  - 本クラスでは使用せず
+     * @param BaseApplication $app
+     */
     public function boot(BaseApplication $app)
     {
     }

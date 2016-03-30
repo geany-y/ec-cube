@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Entity;
@@ -28,7 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * PointInfo
+ * Class PointInfo
+ * @package Plugin\Point\Entity
  */
 class PointInfo extends \Eccube\Entity\AbstractEntity
 {
@@ -220,45 +200,6 @@ class PointInfo extends \Eccube\Entity\AbstractEntity
     {
         return $this->plg_add_point_status;
     }
-
-    /**
-     * Set PointInfoAddStatus
-     *
-     * @param \Plugin\Point\Entity\PointInfoAddStatus $pointInfoAddStatus
-     * @return PointInfo
-     */
-    /*
-    public function setPointInfoAddStatus(\Plugin\Point\Entity\PointInfoAddStatus $pointInfoAddStatus)
-    {
-        $this->PointInfoAddStatus[] = $pointInfoAddStatus;
-
-        return $this;
-    }
-    */
-
-    /**
-     * Remove PointInfo
-     *
-     * @param \Plugin\Point\Entity\PointInfoAddStatus $pointInfoAddStatus
-     */
-    /*
-    public function removePointInfoAddStatus(\Plugin\Point\Entity\PointInfoAddStatus $pointInfoAddStatus)
-    {
-        $this->PointInfoAddStatus->removeElement($pointInfoAddStatus);
-    }
-    */
-
-    /**
-     * Get PointInfoAddStatus
-     *
-     * @return \Plugin\Point\Entity\PointInfoAddStatus
-     */
-    /*
-    public function getPointInfoAddStatus()
-    {
-        return $this->PointInfoAddStatus;
-    }
-    */
 
     /**
      * Set create_date

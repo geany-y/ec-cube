@@ -1,24 +1,15 @@
 <?php
-/*
-* This file is part of EC-CUBE
-*
-* Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
 
 namespace Plugin\Point;
 
 use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
-use Eccube\Entity\Master\DeviceType;
 use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
 
 /**
- * Class PluginManager
  * インストールハンドラー
+ * Class PluginManager
+ * @package Plugin\Point
  */
 class PluginManager extends AbstractPluginManager
 {
@@ -34,24 +25,29 @@ class PluginManager extends AbstractPluginManager
      */
     protected $imgDst;
 
+    /** @var \Eccube\Application */
     protected $app;
 
+    /**
+     * PluginManager constructor.
+     */
     public function __construct()
     {
         $this->app = \Eccube\Application::getInstance();
     }
 
     /**
+     * インストール時に実行
      * @param $config
      * @param $app
      */
     public function install($config, $app)
     {
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
-        //$this->insertDefaultToPointInfo();
     }
 
     /**
+     * アンインストール時に実行
      * @param $config
      * @param $app
      */
@@ -60,9 +56,14 @@ class PluginManager extends AbstractPluginManager
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
 
+    /**
+     * プラグイン有効化時に実行
+     * @param $config
+     * @param $app
+     */
     public function enable($config, $app)
     {
-
+        // ページレイアウトにプラグイン使用時の値を代入
         $deviceType = $this->app['eccube.repository.master.device_type']->findOneById(10);
         $pageLayout = new PageLayout();
         $pageLayout->setId(null);
@@ -72,51 +73,43 @@ class PluginManager extends AbstractPluginManager
         $pageLayout->setMetaRobots('noindex');
         $pageLayout->setUrl('point_use');
         $pageLayout->setName('商品購入確認/利用ポイント');
-
-        $this->app['orm.em']->persist($pageLayout);
-        $this->app['orm.em']->flush($pageLayout);
+        try {
+            $this->app['orm.em']->persist($pageLayout);
+            $this->app['orm.em']->flush($pageLayout);
+        } catch (DatabaseObjectNotFoundException $e) {
+            return false;
+        }
     }
 
+    /**
+     * プラグイン無効化時実行
+     * @param $config
+     * @param $app
+     */
     public function disable($config, $app)
     {
         // ログテーブルからポイントを計算
-        //$qb = $this->createQueryBuilder();
         $pageLayout = $this->app['eccube.repository.page_layout']->findByUrl('point_use');
 
-        /*
-        dump($qb->getDql());
-        exit();
-        */
-
-        //dump($qb->getDQL());
-        //exit();
-        foreach($pageLayout as $deleteNode) {
+        // 重複登録対応
+        foreach ($pageLayout as $deleteNode) {
             $this->app['orm.em']->persist($deleteNode);
             $this->app['orm.em']->remove($deleteNode);
         }
-        $this->app['orm.em']->flush();
+        try {
+            $this->app['orm.em']->flush();
+        } catch (DatabaseObjectNotFoundException $e) {
+            return false;
+        }
 
     }
 
+    /**
+     * アップデート時に行う処理
+     * @param $config
+     * @param $app
+     */
     public function update($config, $app)
     {
-
     }
-
-    protected function insertDefaultToPointInfo(){
-        // ポイント基本情報初期値設定
-        try {
-            $pointInfo = new Entity\PointInfo();
-            $pointInfo->setPlgAddPointStatus(1);
-            $pointInfo->setPlgBasicPointRate(1);
-            $pointInfo->setPlgPointConversionRate(1);
-            $pointInfo->setPlgRoundType(0);
-            $pointInfo->setPlgCalculationType(0);
-            $this->app['orm.em']->persist($pointInfo);
-            $this->app['orm.em']->flush($pointInfo);
-        }catch(DatabaseObjectNotFoundException $e){
-            throw new DatabaseObjectNotFoundException();
-        }
-    }
-
 }

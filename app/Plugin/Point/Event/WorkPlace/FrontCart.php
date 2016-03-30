@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Event\WorkPlace;
@@ -65,6 +44,7 @@ class FrontCart extends AbstractWorkPlace
     /**
      * カートページにポイント情報を表示
      * @param TemplateEvent $event
+     * @return bool
      */
     public function createTwig(TemplateEvent $event)
     {
@@ -82,7 +62,7 @@ class FrontCart extends AbstractWorkPlace
         $point = array();
 
         // ポイント換算率取得
-        if($isAuth) {
+        if ($isAuth) {
             // ポイント計算ヘルパーを取得
             $calculator = null;
             $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
@@ -140,14 +120,14 @@ class FrontCart extends AbstractWorkPlace
 
         // 使用ポイントボタン付与
         // 権限判定
-        if ($this->app->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($isAuth) {
             $snippet = $this->app->render(
                 'Point/Resource/template/default/Event/Cart/point_box.twig',
                 array(
                     'point' => $point,
                 )
             )->getContent();
-        }else{
+        } else {
             $snippet = $this->app->render(
                 'Point/Resource/template/default/Event/Cart/point_box_no_customer.twig',
                 array(
@@ -162,7 +142,6 @@ class FrontCart extends AbstractWorkPlace
     /**
      * ポイントデータの保存
      * @param EventArgs $event
-     * @return bool
      */
     public function save(EventArgs $event)
     {

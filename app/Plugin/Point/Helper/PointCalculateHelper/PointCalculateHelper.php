@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Helper\PointCalculateHelper;
@@ -39,10 +18,15 @@ class PointCalculateHelper
     protected $baseInfo;
     /** @var  \Eccube\Entity\ */
     protected $entities;
+    /** @var */
     protected $products;
+    /** @var */
     protected $basicRate;
+    /** @var */
     protected $addPoint;
+    /** @var */
     protected $productRates;
+    /** @var */
     protected $usePoint;
 
     /**
@@ -66,7 +50,7 @@ class PointCalculateHelper
     /**
      * 計算に必要なエンティティを追加
      * @param $name
-     * @param \Eccube\Entity $entity
+     * @param $entity
      */
     public function addEntity($name, $entity)
     {
@@ -106,7 +90,7 @@ class PointCalculateHelper
     /**
      * 保持エンティティを確認
      * @param $name
-     * @return array|bool|\Eccube\Entity\
+     * @return bool
      */
     public function hasEntities($name)
     {
@@ -124,6 +108,7 @@ class PointCalculateHelper
      */
     public function setUsePoint($usePoint)
     {
+        // 引数の判定
         if (empty($usePoint) && $usePoint != 0) {
             return false;
         }
@@ -167,6 +152,7 @@ class PointCalculateHelper
      */
     protected function getOrderDetail()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Order')) {
             return false;
         }
@@ -191,6 +177,7 @@ class PointCalculateHelper
      */
     protected function isInRangeCustomerPoint()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Customer')) {
             return false;
         }
@@ -214,6 +201,7 @@ class PointCalculateHelper
      */
     public function getProvisionalAddPoint()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Customer')) {
             return false;
         }
@@ -228,6 +216,7 @@ class PointCalculateHelper
         return false;
     }
 
+
     /**
      * 仮付与ポイントを返却
      *  - オーダー情報をもとに返却
@@ -235,6 +224,7 @@ class PointCalculateHelper
      */
     public function getProvisionalAddPointByOrder()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Customer')) {
             return false;
         }
@@ -321,6 +311,7 @@ class PointCalculateHelper
      */
     public function getAddPointByOrder()
     {
+        // 必要エンティティを判定
         $this->addPoint = 0;
         if (!$this->hasEntities('Order')) {
             return false;
@@ -378,6 +369,7 @@ class PointCalculateHelper
      */
     public function getAddPointByProduct()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Product')) {
             return false;
         }
@@ -463,6 +455,7 @@ class PointCalculateHelper
      */
     public function getPoint()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Customer')) {
             return false;
         }
@@ -475,9 +468,11 @@ class PointCalculateHelper
 
     /**
      * 計算後の販売価格を返却
+     * @return bool|int
      */
     public function getTotalAmount()
     {
+        // 必要エンティティを判定
         if (!$this->hasEntities('Order')) {
             return false;
         }

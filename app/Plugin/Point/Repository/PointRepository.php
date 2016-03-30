@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Repository;
@@ -27,7 +6,6 @@ namespace Plugin\Point\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Eccube\Entity\Order;
-use Plugin\Point\Entity\PointInfo;
 use Plugin\Point\Helper\PointHistoryHelper\PointHistoryHelper;
 
 /**
@@ -157,6 +135,7 @@ class PointRepository extends EntityRepository
      */
     public function getFixProvisionalAddPointByOrder($order)
     {
+        // 必要エンティティ判定
         if (empty($order)) {
             return false;
         }
@@ -193,7 +172,6 @@ class PointRepository extends EntityRepository
         }
     }
 
-
     /**
      * 仮ポイントレコードを受注情報を基に返却
      * @param $order
@@ -201,6 +179,7 @@ class PointRepository extends EntityRepository
      */
     public function getProvisionalAddPointByOrder($order)
     {
+        // 必要エンティティ判定
         if (empty($order)) {
             return false;
         }
@@ -245,6 +224,7 @@ class PointRepository extends EntityRepository
      */
     public function getLastProvisionalAddPointByOrder($order)
     {
+        // 必要エンティティ判定
         if (empty($order)) {
             return false;
         }
@@ -291,10 +271,12 @@ class PointRepository extends EntityRepository
      */
     public function getLastAddPointByOrder($order)
     {
+        // 必要エンティティ判定
         if (empty($order)) {
             return false;
         }
 
+        // 必要ステータス
         $needStatus = array();
         $needStatus[] = PointHistoryHelper::STATE_ADD;
         $needStatus[] = PointHistoryHelper::STATE_PRE_ADD;
@@ -362,6 +344,7 @@ class PointRepository extends EntityRepository
         }
     }
 
+    //
     /**
      * 受注情報をもとに、最終保存の仮ポイントが確定かどうか判定
      * @param $order
@@ -369,10 +352,12 @@ class PointRepository extends EntityRepository
      */
     public function isLastProvisionalFix($order)
     {
+        // 必要エンティティ判定
         if (empty($order)) {
             return false;
         }
 
+        // 必要ステータス設定
         $needStatus = array();
         $needStatus[] = PointHistoryHelper::STATE_PRE_ADD;
         $needStatus[] = PointHistoryHelper::STATE_ADD;

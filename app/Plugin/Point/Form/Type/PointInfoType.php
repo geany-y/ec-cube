@@ -1,17 +1,8 @@
 <?php
-/*
-* This file is part of EC-CUBE
-*
-* Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+
 namespace Plugin\Point\Form\Type;
 
 use Plugin\Point\Entity\PointInfo;
-use Plugin\Point\Entity\PointInfoAddStatus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,11 +11,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class PointInfoType
  * @package Plugin\Point\Form\Type
- * @param Eccube\Applicaion
  */
 class PointInfoType extends AbstractType
 {
+    /** @var \Eccube\Application */
     protected $app;
+    /** @var array */
     protected $orderStatus;
 
     /**
@@ -45,10 +37,8 @@ class PointInfoType extends AbstractType
 
     /**
      * Build config type form
-     *
      * @param FormBuilderInterface $builder
      * @param array $options
-     * @return type
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -162,9 +152,10 @@ class PointInfoType extends AbstractType
      */
     protected function isEmptyAddStatus(FormBuilderInterface $builder)
     {
+        // ポスト値を判定
         $entity = $builder->getData();
 
-        if(!$entity){
+        if (!$entity) {
             return true;
         }
 
@@ -177,7 +168,7 @@ class PointInfoType extends AbstractType
 
     /**
      * ポイント付与受注ステータスエンティティを受注ステータス分セット
-     * @remark 子要素がある場合
+     *  - 子要素がある場合
      * @param FormBuilderInterface $builder
      * @return bool
      */
@@ -190,7 +181,6 @@ class PointInfoType extends AbstractType
 
         // PointInfoAddStatusのエンティティを取得
         $entity = $builder->getData();
-        //$addStatus = $entity->getPlgAddPointStatus();
 
         // PointInfoにフォーム取得基本情報をセット
         $pointInfo = new PointInfo();
@@ -199,13 +189,6 @@ class PointInfoType extends AbstractType
         $pointInfo->setPlgRoundType($entity->getPlgRoundType());
         $pointInfo->setPlgCalculationType($entity->getPlgCalculationType());
         $pointInfo->setPlgAddPointStatus($entity->getPlgAddPointStatus());
-        //$pointInfo->setPointAddStatus($entity->addStatus());
-        // PointInfoAddStatusに受注ステータスをセット
-        /*
-        foreach ($addStatus as $key => $val) {
-            $pointInfo->setPointAddStatus($val->getPointAddStatus());
-        }
-        */
 
         // 編集値をフォームに再格納
         $builder->setData($pointInfo);
@@ -215,7 +198,7 @@ class PointInfoType extends AbstractType
 
     /**
      * 新規ポイント付与受注ステータスエンティティを受注ステータス分セット
-     * @remark 子要素がない場合
+     *  - 子要素がない場合
      * @param FormBuilderInterface $builder
      * @return bool
      */
@@ -225,18 +208,6 @@ class PointInfoType extends AbstractType
         if (count($this->orderStatus) < 1) {
             return false;
         }
-
-        // PointInfoAddStatusに受注ステータスをセット
-        /*
-        $entity = $builder->getData();
-        foreach ($this->orderStatus as $key => $val) {
-            $pointInfoAddStatus = new PointInfoAddStatus();
-            $pointInfoAddStatus->setPlgPointInfoAddStatus($key);
-            $entity->setPointInfoAddStatus($pointInfoAddStatus);
-            $pointInfoAddStatus->setPointInfo($entity);
-        }
-        $builder->setData($entity);
-        */
 
         return true;
     }

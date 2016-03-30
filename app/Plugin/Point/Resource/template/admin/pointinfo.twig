@@ -1,26 +1,3 @@
-{#
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-#}
 {% extends 'default_frame.twig' %}
 
 {% set menus = ['setting', 'shop', 'shop_index'] %}
@@ -88,13 +65,20 @@
                 </div><!-- /.box -->
                 <div id="point_info_box" class="box accordion">
                     <div id="point_info_box__toggle" class="box-header toggle">
-                        <h3 class="box-title">約款のサンプル<svg class="cb cb-angle-down icon_down"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cb-angle-down"></use></svg></h3>
+                        <h3 class="box-title">約款のサンプル
+                            <svg class="cb cb-angle-down icon_down">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cb-angle-down"></use>
+                            </svg>
+                        </h3>
                     </div><!-- /.box-header -->
                     <div id="point_info_box__body" class="box-body accpanel" style="display: block;">
                         <div class="form-group">
                             <div class="col-sm-12 col-lg-12">
-                                <p>ポイント機能プラグインを利用する際において、お客様との間で無用なトラブルを避けるために以下のサンプルを参考に、「特定商取引法に基づく表記」表記などに必ず「利用規約」を明記してください。</p>
-                                <p>ポイント利用に関する約款を「経済産業省ホームページ」<a href="http://www.meti.go.jp/committee/kenkyukai/safety_security.html" target="_blank">企業ポイント研究会</a>を参考に作成ください</p>
+                                <p>
+                                    ポイント機能プラグインを利用する際において、お客様との間で無用なトラブルを避けるために以下のサンプルを参考に、「特定商取引法に基づく表記」表記などに必ず「利用規約」を明記してください。</p>
+                                <p>ポイント利用に関する約款を「経済産業省ホームページ」<a
+                                            href="http://www.meti.go.jp/committee/kenkyukai/safety_security.html"
+                                            target="_blank">企業ポイント研究会</a>を参考に作成ください</p>
                                 <!--
                                 <dl>
                                     <dt>第１条（目的）</dt>

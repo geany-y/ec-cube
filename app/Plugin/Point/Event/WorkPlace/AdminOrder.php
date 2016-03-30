@@ -1,29 +1,9 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Event\WorkPlace;
 
+use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
 use Plugin\Point\Entity\PointUse;
@@ -43,13 +23,21 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class  AdminOrder extends AbstractWorkPlace
 {
+    /** @var */
     protected $pointInfo;
+    /** @var */
     protected $pointType;
+    /** @var */
     protected $targetOrder;
+    /** @var */
     protected $calculateCurrentPoint;
+    /** @var */
     protected $customer;
+    /** @var */
     protected $calculator;
+    /** @var */
     protected $history;
+    /** @var */
     protected $usePoint;
 
     /**
@@ -225,18 +213,6 @@ class  AdminOrder extends AbstractWorkPlace
         $point['add'] = $addPoint;
 
         // twigパラメータにポイント情報を追加
-        // twigコードに利用ポイントを挿入
-        /*
-        $snippet = $this->app->render(
-            'Point/Resource/template/admin/Event/AdminOrder/customer_current_point.twig',
-            array(
-                'point' => $point,
-            )
-        )->getContent();
-        $search = '<div id="customer_info_list__message"';
-        $this->replaceView($event, $snippet, $search);
-        */
-
         // 受注商品情報に受注ポイント情報を表示
         $snippet = $this->app->render(
             'Point/Resource/template/admin/Event/AdminOrder/order_point.twig',
@@ -310,9 +286,12 @@ class  AdminOrder extends AbstractWorkPlace
         $total = $addPoint = $this->calculator->getTotalAmount();
         $this->targetOrder->setTotal($total);
         $this->targetOrder->setPaymentTotal($total);
-
-        $this->app['orm.em']->persist($this->targetOrder);
-        $this->app['orm.em']->flush($this->targetOrder);
+        try {
+            $this->app['orm.em']->persist($this->targetOrder);
+            $this->app['orm.em']->flush($this->targetOrder);
+        } catch (DatabaseObjectNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
@@ -325,6 +304,7 @@ class  AdminOrder extends AbstractWorkPlace
      */
     public function updateOrderEvent($addPoint, $provisionalPoint)
     {
+        // 引数判定
         if (empty($addPoint)) {
             return false;
         }
@@ -381,7 +361,7 @@ class  AdminOrder extends AbstractWorkPlace
     /**
      * ポイント確定時処理
      *  -   受注ステータス判定でポイントの付与が確定した際の処理
-     * @param $pointInfo
+     * @param $event
      * @return bool
      */
     protected function pointFixEvent($event)
@@ -514,6 +494,7 @@ class  AdminOrder extends AbstractWorkPlace
      */
     protected function isSameUsePoint($lastUse)
     {
+        // 必要値判定
         if ($lastUse == $this->usePoint) {
             return true;
         }
@@ -528,6 +509,7 @@ class  AdminOrder extends AbstractWorkPlace
      */
     protected function saveFixOrderHistory($provisionalPoint)
     {
+        // 必要エンティティ判定
         if (empty($this->targetOrder)) {
             return false;
         }
@@ -568,6 +550,7 @@ class  AdminOrder extends AbstractWorkPlace
      */
     protected function saveAdjustUseOrderSnapShot($point)
     {
+        // 必要エンティティ判定
         if (empty($this->targetOrder)) {
             return false;
         }
@@ -586,9 +569,11 @@ class  AdminOrder extends AbstractWorkPlace
      * スナップショットテーブルへの保存
      *  - 付与ポイント確定時のスナップショット
      * @param $point
+     * @return bool
      */
     protected function saveFixOrderSnapShot($point)
     {
+        // 必要エンティティ判定
         if (empty($this->targetOrder)) {
             return false;
         }

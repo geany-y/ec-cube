@@ -1,25 +1,4 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 
 namespace Plugin\Point\Event\WorkPlace;
@@ -64,6 +43,7 @@ class FrontProductDetail extends AbstractWorkPlace
     /**
      * 商品詳細画面に付与ポイント表示
      * @param TemplateEvent $event
+     * @return bool
      */
     public function createTwig(TemplateEvent $event)
     {
@@ -71,7 +51,7 @@ class FrontProductDetail extends AbstractWorkPlace
         $parameters = $event->getParameters();
         $product = $parameters['Product'];
 
-        if(empty($product)){
+        if (empty($product)) {
             return false;
         }
 
@@ -79,8 +59,7 @@ class FrontProductDetail extends AbstractWorkPlace
         $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
 
         $point_rate = 0;
-        if(!empty($pointInfo))
-        {
+        if (!empty($pointInfo)) {
             $point_rate = (integer)$pointInfo->getPlgPointConversionRate();
         }
 
@@ -89,26 +68,26 @@ class FrontProductDetail extends AbstractWorkPlace
         $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
         // ヘルパーの取得判定
-        if(empty($calculator)){
+        if (empty($calculator)) {
             return false;
         }
 
         // カスタマー情報を取得
         $customer = $this->app['security']->getToken()->getUser();
         $unCustomer = false;
-        if(is_string($customer)) {
+        if (is_string($customer)) {
             $unCustomer = true;
         }
 
         // 計算に必要なエンティティを登録
         $calculator->addEntity('Product', $product);
-        if(!$unCustomer){
+        if (!$unCustomer) {
             $calculator->addEntity('Customer', $customer);
         }
 
         // 会員保有ポイントを取得
         $currentPoint = 0;
-        if(!$unCustomer) {
+        if (!$unCustomer) {
             $currentPoint = $calculator->getPoint();
 
             // 会員保有ポイント取得判定
@@ -121,23 +100,21 @@ class FrontProductDetail extends AbstractWorkPlace
         $point = $calculator->getAddPointByProduct();
 
         // 付与ポイント取得判定
-        if(empty($point)){
+        if (empty($point)) {
             $point['min'] = 0;
             $point['max'] = 0;
         }
 
         // 使用ポイントボタン付与
         // twigコードにポイント表示欄を追加
-        if($point['min'] == $point['max']) {
-            //$snippet = $this->createHtmlDisplayPointNotHasClassFormat();
+        if ($point['min'] == $point['max']) {
             $snippet = $this->app->render(
                 'Point/Resource/template/default/Event/ProductDetail/detail_point.twig',
                 array(
                     'point' => $point,
                 )
             )->getContent();
-        }else{
-            //$snippet = $this->createHtmlDisplayPointHasClassFormat();
+        } else {
             $snippet = $this->app->render(
                 'Point/Resource/template/default/Event/ProductDetail/detail_point_error.twig',
                 array(
@@ -153,7 +130,6 @@ class FrontProductDetail extends AbstractWorkPlace
     /**
      * 本クラスでは処理なし
      * @param EventArgs $event
-     * @return bool
      */
     public function save(EventArgs $event)
     {
