@@ -23,6 +23,7 @@ class PointEvent
 
     // フロント画面
     const HELPER_FRONT_SHOPPING = 'FrontShopping';
+    const HELPER_FRONT_SHOPPING_INDEX = 'FrontShoppingIndex';
     const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
     const HELPER_FRONT_SHOPPING_COMPLETE = 'FrontShoppingComplete';
     const HELPER_FRONT_MYPAGE = 'FrontMypage';
@@ -128,6 +129,23 @@ class PointEvent
     /**
      * 受注ステータス変更時ポイント付与
      *  - 判定・更新処理
+     *  - 更新処理前
+     *  - 管理画面 > 受注登録 ( 編集 )
+     * @param EventArgs $event
+     */
+    // @todo need delete
+    public function onAdminOrderEditIndexProcessing(EventArgs $event)
+    {
+        // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/終了 )
+        $this->setHelper(self::HELPER_ADMIN_ORDER);
+
+        // ポイント付与率保存処理
+        $this->save($event);
+    }
+
+    /**
+     * 受注ステータス変更時ポイント付与
+     *  - 判定・更新処理
      *  - 管理画面 > 受注登録 ( 編集 )
      * @param EventArgs $event
      */
@@ -137,6 +155,19 @@ class PointEvent
         $this->setHelper(self::HELPER_ADMIN_ORDER);
 
         // ポイント付与率保存処理
+        $this->save($event);
+    }
+
+    public function onFrontShoppingIndexInitialize(EventArgs $event){
+        // ログイン判定
+        if (!$this->isAuthRouteFront()) {
+            return true;
+        }
+
+        // フックポイント定形処理ヘルパー取得 ( 商品購入確認/初期処理 )
+        $this->setHelper(self::HELPER_FRONT_SHOPPING_INDEX);
+
+        // ポイント関連保存処理
         $this->save($event);
     }
 

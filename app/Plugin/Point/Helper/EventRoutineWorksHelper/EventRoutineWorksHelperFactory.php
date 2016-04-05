@@ -52,6 +52,9 @@ class EventRoutineWorksHelperFactory
             case PointEvent::HELPER_ADMIN_ORDER :
                 return new EventRoutineWorksHelper(new AdminOrder());
                 break;
+            case PointEvent::HELPER_FRONT_SHOPPING_INDEX :
+                return new EventRoutineWorksHelper(new FrontShopping());
+                break;
             case PointEvent::HELPER_FRONT_SHOPPING :
                 return new EventRoutineWorksHelper(new FrontShopping());
                 break;
@@ -77,7 +80,7 @@ class EventRoutineWorksHelperFactory
                 return new EventRoutineWorksHelper(new FrontHistory());
                 break;
             default :
-                throw new ClassNotFoundException();
+                throw new \Prophecy\Exception\Doubler\ClassNotFoundException();
                 break;
         }
     }

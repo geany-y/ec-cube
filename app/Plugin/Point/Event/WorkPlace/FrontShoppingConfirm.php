@@ -57,8 +57,11 @@ class FrontShoppingConfirm extends AbstractWorkPlace
      * @return bool
      * @throws UndefinedFunctionException
      */
+    // @todo 以下処理を仮受注情報に移設
     public function save(EventArgs $event)
     {
+        throw new MethodNotAllowedException();
+        /*
         // 保存対象受注情報の取得
         $args = $event->getArguments();
         $order = $args['Order'];
@@ -108,6 +111,7 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         }
 
         // ポイント使用合計金額取得・設定
+        // @todo 受注の支払い総額は操作せず、値引き額に対して増減→計算処理を行うこと
         $amount = $calculator->getTotalAmount();
 
         // ポイント付与受注ステータスが「新規」の場合、付与ポイントを確定
@@ -165,8 +169,18 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         $this->app['eccube.plugin.point.history.service']->saveSnapShot($point);
 
         // 支払い合計金額更新
-        $order->setPaymentTotal($amount);
-        $order->setTotal($amount);
+        // @todo 値引き額での計算に変更が必要
+        //$order->setPaymentTotal($amount);
+        //$order->setTotal($amount);
+        $revDiscount = $order->getDiscount();
+
+        if(empty($revDiscount)){
+            $order->setDiscount($point['use']);
+        }else{
+            $order->setDiscount(($revDiscount + $point['use']));
+        }
+
+        //$order->setDiscount();
         $this->app['orm.em']->persist($order);
         $this->app['orm.em']->flush($order);
 
@@ -175,5 +189,6 @@ class FrontShoppingConfirm extends AbstractWorkPlace
         if ($this->app['session']->has('usePoint')) {
             $this->app['session']->remove('usePoint');
         }
+        */
     }
 }

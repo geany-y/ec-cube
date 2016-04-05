@@ -93,6 +93,16 @@ class  AdminOrder extends AbstractWorkPlace
             }
         }
 
+        // カスタマー保有ポイント取得
+        /*
+        $hasPoint = 0;
+        if (!empty($hasCustomer)) {
+            $hasPoint = $this->app['eccube.plugin.point.repository.pointcustomer']->getLastPointById(
+                $hasCustomer->getId()
+            );
+        }
+        */
+
         // ポイント付与率項目拡張
         $builder->add(
             'plg_use_point',
@@ -114,6 +124,12 @@ class  AdminOrder extends AbstractWorkPlace
                             'message' => 'form.type.numeric.invalid',
                         )
                     ),
+                    /*
+                    new Assert\GreaterThan(array(
+                            'value' => $hasPoint,
+                        )
+                    )
+                    */
                 ),
             )
         );
@@ -232,6 +248,13 @@ class  AdminOrder extends AbstractWorkPlace
      */
     public function save(EventArgs $event)
     {
+        // 必要情報をセット
+        $this->targetOrder = $event->getArgument('TargetOrder');
+
+        if (empty($this->targetOrder)) {
+            return false;
+        }
+
         // 利用ポイント取得
         $this->usePoint = $event->getArgument('form')->get('plg_use_point')->getData();
 
@@ -240,14 +263,49 @@ class  AdminOrder extends AbstractWorkPlace
             $this->usePoint = 0;
         }
 
-        // 必要情報をセット
-        $this->targetOrder = $event->getArgument('TargetOrder');
-        $this->customer = $event->getArgument('Customer');
+        // Customerオブジェクトの有無で現在イベントを判定
+        // Processの際のみ、受注エンティティの値引き額を調整
+        // @todo need modified
+        if(!$event->hasArgument('Customer')){
+            // 最後に利用したポイントを取得
+            $lastUsePoint = 0;
+            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->targetOrder);
 
-        if (empty($this->targetOrder)) {
+            // ここでDiscoutを設定
+            $this->calculator->addEntity('Order', $this->targetOrder);
+            $this->calculator->setUsePoint($this->usePoint);
+
+            $this->calculator->saveDiscount();
+
+            // 受注情報更新処理
+            /*
+            if(!$this->calculator->setDiscount($lastUsePoint)){
+                return false;
+            }
+
+            $isEditFlg = true;
+            if ($lastUsePoint == $this->usePoint) {
+                $isEditFlg = false;
+            }
+
+            try {
+                if($isEditFlg) {
+                    $order = $this->calculator->getEntity('Order');
+
+                    //dump($order);
+                    $this->app['orm.em']->persist($order);
+                    $this->app['orm.em']->persist($order->getOrderDetails);
+                    $this->app['orm.em']->flush($order);
+                }
+            } catch (DatabaseObjectNotFoundException $e) {
+                return false;
+            }
+            */
             return false;
         }
 
+        // 会員情報取得
+        $this->customer = $event->getArgument('Customer');
         if (empty($this->customer)) {
             return false;
         }
@@ -282,16 +340,12 @@ class  AdminOrder extends AbstractWorkPlace
         $this->pointUseEvent($event);
 
         // 購入金額計算設定更新
-        $this->calculator->setUsePoint($this->usePoint);
-        $total = $addPoint = $this->calculator->getTotalAmount();
-        $this->targetOrder->setTotal($total);
-        $this->targetOrder->setPaymentTotal($total);
-        try {
-            $this->app['orm.em']->persist($this->targetOrder);
-            $this->app['orm.em']->flush($this->targetOrder);
-        } catch (DatabaseObjectNotFoundException $e) {
-            return false;
-        }
+        // @todo need delete
+        // 受注情報登録方式変更により本箇所で利用ポイントを保存
+        // 20160401変更
+        //$this->calculator->setUsePoint($this->usePoint)
+        //$total = $addPoint = $this->calculator->getTotalAmount();;
+
     }
 
     /**
@@ -435,6 +489,7 @@ class  AdminOrder extends AbstractWorkPlace
         if ($this->isSameUsePoint($lastUsePoint)) {
             return false;
         }
+
 
         // 現在利用ポイントを設定
         $calculateUsePoint = $lastUsePoint - $this->usePoint;

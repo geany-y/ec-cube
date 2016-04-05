@@ -15,7 +15,7 @@ class PointCalculateHelper
     /** @var \Eccube\Application */
     protected $app;
     /** @var \Plugin\Point\Repository\PointInfoRepository */
-    protected $baseInfo;
+    protected $pointInfo;
     /** @var  \Eccube\Entity\ */
     protected $entities;
     /** @var */
@@ -37,8 +37,8 @@ class PointCalculateHelper
     {
         $this->app = $app;
         // ポイント情報基本設定取得
-        $this->baseInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
-        $this->basicRate = $this->baseInfo->getPlgBasicPointRate();
+        $this->pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+        $this->basicRate = $this->pointInfo->getPlgBasicPointRate();
         $this->entities = array();
         // 使用ポイントをセッションから取得
         $this->usePoint = 0;
@@ -124,11 +124,11 @@ class PointCalculateHelper
     protected function getRoundValue($value)
     {
         // ポイント基本設定オブジェクトの有無を確認
-        if (empty($this->baseInfo)) {
+        if (empty($this->pointInfo)) {
             return false;
         }
 
-        $calcType = $this->baseInfo->getPlgCalculationType();
+        $calcType = $this->pointInfo->getPlgCalculationType();
 
         // 切り上げ
         if ($calcType == PointInfo::POINT_ROUND_CEIL) {
@@ -379,7 +379,7 @@ class PointCalculateHelper
             $this->entities['Product']->getId()
         );
         // サイト全体でのポイント設定
-        $basicPointRate = $this->baseInfo->getPlgBasicPointRate();
+        $basicPointRate = $this->pointInfo->getPlgBasicPointRate();
 
         // 基本付与率の設定判定
         if (empty($basicPointRate)) {
@@ -412,12 +412,12 @@ class PointCalculateHelper
     protected function isSubtraction()
     {
         // 基本情報が設定されているか確認
-        if (!empty($this->baseInfo)) {
+        if (!empty($this->pointInfo)) {
             return false;
         }
 
         // 計算方法の判定
-        if ($this->baseInfo == PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION) {
+        if ($this->pointInfo == PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION) {
             return true;
         }
 
@@ -431,7 +431,7 @@ class PointCalculateHelper
     protected function getSubtractionCalculate()
     {
         // 基本情報が設定されているか確認
-        if (!empty($this->baseInfo->getplgPointCalculateType)) {
+        if (!empty($this->pointInfo->getplgPointCalculateType)) {
             return false;
         }
 
@@ -440,7 +440,7 @@ class PointCalculateHelper
             return false;
         }
 
-        $conversionRate = $this->baseInfo->getPlgPointConversionRate();
+        $conversionRate = $this->pointInfo->getPlgPointConversionRate();
         $rate = $this->basicRate / 100;
         $usePointAddRate = (integer)$this->getRoundValue(($this->usePoint * $rate) * $conversionRate);
 
@@ -467,11 +467,73 @@ class PointCalculateHelper
     }
 
     /**
+     * 受注情報と、利用ポイント・換算値から値引き額を計算し、
+     * 受注情報の更新を行う
+     * @return bool
+     */
+    public function saveDiscount(){
+        // 必要エンティティを判定
+        if (!$this->hasEntities('Order')) {
+            return false;
+        }
+        // 利用ポイントの確認
+        if (empty($this->usePoint)) {
+            return false;
+        }
+        // ポイント基本設定の確認
+        if(empty($this->pointInfo)){
+            return false;
+        }
+
+        // 基本換金値の取得
+        $pointRate = $this->pointInfo->getPlgBasicPointRate();
+
+        // 最後に利用したポイントを取得
+        $lastUsePoint = 0;
+        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->entities['Order']);
+
+        // 受注情報に保存されている最終保存の値引き額を取得
+        $currDiscount = $this->entities['Order']->getDiscount();
+
+        // 値引き額と利用ポイント換算値を比較→相違があればポイント利用分相殺後利用ポイントセット
+        $useDiscount = (int)$this->usePoint * $pointRate;
+        if((integer)$currDiscount != (integer)$lastUsePoint * $pointRate) {
+            $useDiscount = (abs($currDiscount) - (integer)abs($lastUsePoint * $pointRate)) + $useDiscount;
+        }
+
+        // 値引き額の設定
+        $this->entities['Order']->setDiscount(abs($useDiscount));
+
+
+        // @todo 保存前の受注情報ではプロダクト情報が保存されていないため
+        // @todo 商品名が保存されていないエラーが表示
+
+        // 利用ポイントに変更があるか確認
+        // 過去ポイント所持フラグ
+        $isEditFlg = true;
+        if ($lastUsePoint == $this->usePoint) {
+            $isEditFlg = false;
+        }
+
+        try {
+            if($isEditFlg) {
+                $this->app['orm.em']->persist($this->entities['Order']);
+                $this->app['orm.em']->flush($this->entities['Order']);
+            }
+        } catch (DatabaseObjectNotFoundException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 計算後の販売価格を返却
      * @return bool|int
      */
     public function getTotalAmount()
     {
+        /*
         // 必要エンティティを判定
         if (!$this->hasEntities('Order')) {
             return false;
@@ -502,8 +564,9 @@ class PointCalculateHelper
         $this->entities['Order']->setTax($newTax);
 
         // ポイント換算値をもとに計算返却
-        $conversionRate = $this->baseInfo->getPlgPointConversionRate();
+        $conversionRate = $this->pointInfo->getPlgPointConversionRate();
 
         return (integer)$this->getRoundValue($this->entities['Order']->getTotal() - $this->usePoint * $conversionRate);
+        */
     }
 }

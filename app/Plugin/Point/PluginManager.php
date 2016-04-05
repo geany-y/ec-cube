@@ -5,6 +5,7 @@ namespace Plugin\Point;
 use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
+use Symfony\Component\Translation\Tests\Dumper\QtFileDumperTest;
 
 /**
  * インストールハンドラー

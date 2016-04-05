@@ -29,6 +29,7 @@ class PointProductRateRepository extends EntityRepository
         try {
             // DB更新
             $em = $this->getEntityManager();
+            $em->persist($product);
             $em->persist($pointRateEntity);
             $em->flush($pointRateEntity);
         } catch (NoResultException $e) {

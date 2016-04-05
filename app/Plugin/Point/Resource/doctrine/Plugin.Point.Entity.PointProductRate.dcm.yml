@@ -29,7 +29,7 @@ Plugin\Point\Entity\PointProductRate:
         update_date:
             type: datetime
             nullable: false
-    oneToOne:
+    manyToOne:
         Product:
             targetEntity: \Eccube\Entity\Product
             joinColumn:

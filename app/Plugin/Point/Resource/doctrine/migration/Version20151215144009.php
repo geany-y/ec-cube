@@ -7,6 +7,7 @@ use Eccube\Application;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use Plugin\Point\Entity;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class Version20151215144009
@@ -32,7 +33,7 @@ class Version20151215144009 extends AbstractMigration
     public function up(Schema $schema)
     {
         $classes = array(
-            self::PLG_POINT_INFO,
+            //self::PLG_POINT_INFO,
             self::PLG_POINT_INFO_ADD_STATUS,
             self::PLG_POINT,
             self::PLG_POINT_CUSTOMER,
@@ -41,14 +42,19 @@ class Version20151215144009 extends AbstractMigration
         );
 
         // this up() migration is auto-generated, please modify it to your needs
+
         $app = \Eccube\Application::getInstance();
         $em = $app['orm.em'];
-        foreach ($classes as $class) {
-            $metadatas[] = $em->getMetadataFactory()->getMetadataFor('\\Plugin\\Point\\Entity\\'.$class);
+        try {
+            foreach ($classes as $class) {
+                $metadatas[] = $em->getMetadataFactory()->getMetadataFor('\\Plugin\\Point\\Entity\\'.$class);
+            }
+            $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+            $schemaTool->dropSchema($metadatas);
+            $schemaTool->createSchema($metadatas);
+        }catch(Exception $e){
+            throw new Exception();
         }
-        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
-        $schemaTool->dropSchema($metadatas);
-        $schemaTool->createSchema($metadatas);
 
         // ポイント基本情報設定
         $em = $app['orm.em'];

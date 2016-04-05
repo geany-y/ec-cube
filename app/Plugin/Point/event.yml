@@ -14,15 +14,22 @@ admin.customer.edit.index.complete:
 ## 管理画面 > 受注登録 (編集) > 利用ポイントフォーム生成
 admin.order.edit.index.initialize:
     - [onAdminOrderEditIndexInitialize, NOMAL]
+# @todo need delete
+admin.order.edit.index.processing:
+    - [onAdminOrderEditIndexProcessing, NOMAL]
 admin.order.edit.index.complete:
     - [onAdminOrderEditIndexComplete, NOMAL]
 
 # フロント画面
-## フロント画面 > 商品購入確認完了
-front.shopping.confirm.processing:
-    - [onFrontShoppingConfirmProcessing, NOMAL]
-front.shopping.confirm.complete:
-    - [onFrontShoppingConfirmComplete, NOMAL]
+## フロント画面 > 商品購入確認完了(ポイント利用処理)
+#front.shopping.confirm.processing:
+#    - [onFrontShoppingConfirmProcessing, NOMAL]
+## フロント画面 > 商品購入確認完了(メール処理のために呼び出し)
+#front.shopping.confirm.complete:
+#   - [onFrontShoppingConfirmComplete, NOMAL]
+## フロント画面 > 商品購入確認画面
+front.shopping.index.initialize:
+    - [onFrontShoppingIndexInitialize, NOMAL]
 
 # メール
 
