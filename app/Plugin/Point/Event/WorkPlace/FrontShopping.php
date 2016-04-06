@@ -50,6 +50,7 @@ class FrontShopping extends AbstractWorkPlace
     public function createTwig(TemplateEvent $event)
     {
         $args = $event->getParameters();
+
         $order = $args['Order'];
 
         // オーダーエンティティの確認
@@ -64,14 +65,6 @@ class FrontShopping extends AbstractWorkPlace
             return false;
         }
 
-        // 利用ポイントの確認
-        $pointUse = new PointUse();
-        $usePoint = 0;
-        if ($this->app['session']->has('usePoint')) {
-            $usePoint = $this->app['session']->get('usePoint');
-            $pointUse->setPlgUsePoint($usePoint);
-        }
-
         // 計算判定取得
         $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
 
@@ -80,7 +73,18 @@ class FrontShopping extends AbstractWorkPlace
             return true;
         }
 
+        // 利用ポイントの確認
+        // @todo ポイント取得方法の変更
+        $pointUse = new PointUse();
+        $usePoint = 0;
+        $lastUsePoint = 0;
+        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
+        if (!empty($lastUsePoint)) {
+            $usePoint = $lastUsePoint;
+        }
+
         // 計算に必要なエンティティを登録
+        $calculator->setUsePoint($usePoint);
         $calculator->addEntity('Order', $order);
         $calculator->addEntity('Customer', $customer);
 
@@ -100,7 +104,20 @@ class FrontShopping extends AbstractWorkPlace
             $currentPoint = 0;
         }
 
+        $calculator->setDiscount($lastUsePoint);
+        $setUsePointOrder = $calculator->getEntity('Order');
+
+        // 値引き計算後のオーダーが返却
+        $newOrder = $this->app['eccube.service.shopping']->getAmount($setUsePointOrder);
+        $calculator->removeEntity('Order');
+        $calculator->addEntity('Order', $newOrder);
+
+        // ビュー返却値の受注情報を値引き後の情報に更新
+        $args['Order'] = $newOrder;
+        $event->setParameters($args);
+
         // ポイント使用合計金額取得・設定
+        // @todo 値引き再計算Orderの取得
         //$amount = $calculator->getTotalAmount();
 
         // 合計金額をセット
@@ -123,7 +140,7 @@ class FrontShopping extends AbstractWorkPlace
         */
         $point['use'] = 0;
         if(!empty($usePoint)) {
-            $point['use'] = abs($usePoint) * -1;
+            $point['use'] = abs($usePoint);
         }
         $point['add'] = $addPoint;
         $point['rate'] = $pointInfo->getPlgBasicPointRate();
@@ -188,11 +205,15 @@ class FrontShopping extends AbstractWorkPlace
         // 使用ポイントをエンティティに格納
         $pointUse = new PointUse();
         $usePoint = 0;
-        if ($this->app['session']->has('usePoint')) {
-            $usePoint = $this->app['session']->get('usePoint');
-            $pointUse->setPlgUsePoint($usePoint);
-            //$this->app['session']->remove('usePoint');
+
+        // 最終保存ポイントがあるかどうかの判定
+        $lastUsePoint = 0;
+        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
+        if (!empty($lastUsePoint)) {
+            $usePoint = $lastUsePoint;
         }
+
+        $pointUse->setPlgUsePoint($usePoint);
 
         // 計算判定取得
         $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
@@ -225,10 +246,13 @@ class FrontShopping extends AbstractWorkPlace
             $currentPoint = 0;
         }
 
-
         // ポイント使用合計金額取得・設定
         // @todo 以下処理は全て決済処理完了後イベントで処理
 
+        // 値引き計算後のオーダーが返却
+        $newOrder = $this->app['eccube.service.shopping']->getAmount($order);
+        $calculator->removeEntity('Order');
+        $calculator->addEntity('Order', $newOrder);
         // ポイント付与受注ステータスが「新規」の場合、付与ポイントを確定
         /*
         $add_point_flg = false;
@@ -303,7 +327,6 @@ class FrontShopping extends AbstractWorkPlace
         //$this->app['orm.em']->persist($order);
         //$this->app['orm.em']->flush($order);
 
-        $calculator->saveDiscount();
 
 
         // 利用ポイントクリア

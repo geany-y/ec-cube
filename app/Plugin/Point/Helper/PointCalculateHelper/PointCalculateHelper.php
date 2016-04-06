@@ -42,9 +42,6 @@ class PointCalculateHelper
         $this->entities = array();
         // 使用ポイントをセッションから取得
         $this->usePoint = 0;
-        if ($this->app['session']->has('usePoint')) {
-            $this->usePoint = $this->app['session']->get('usePoint');
-        }
     }
 
     /**
@@ -62,7 +59,7 @@ class PointCalculateHelper
      * @param $name
      * @return array|bool|\Eccube\Entity\
      */
-    public function getEntities($name)
+    public function getEntity($name)
     {
         if ($this->hasEntities($name)) {
             return $this->entities[$name];
@@ -476,10 +473,12 @@ class PointCalculateHelper
         if (!$this->hasEntities('Order')) {
             return false;
         }
+
         // 利用ポイントの確認
         if (empty($this->usePoint)) {
             return false;
         }
+
         // ポイント基本設定の確認
         if(empty($this->pointInfo)){
             return false;
@@ -496,7 +495,7 @@ class PointCalculateHelper
         // @todo もともとの合計値からの相殺必要か??
         $useDiscount = (int)$this->usePoint * $pointRate;
         if((integer)$currDiscount != (integer)$lastUsePoint * $pointRate) {
-            $useDiscount = (abs($currDiscount) - (integer)abs($lastUsePoint * $pointRate)) + $useDiscount;
+            $useDiscount = abs(abs($currDiscount) - (integer)abs($lastUsePoint * $pointRate)) + $useDiscount;
         }
 
         // 値引き額の設定
