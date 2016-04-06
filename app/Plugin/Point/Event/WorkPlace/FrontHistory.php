@@ -84,12 +84,14 @@ class FrontHistory extends AbstractWorkPlace
         }
 
         // 合計金額取得
+        /*
         $amount = $calculator->getTotalAmount();
 
         // 合計金額取得判定
         if (empty($amount)) {
             $amount = 0;
         }
+        */
 
         // ポイント表示用変数作成
         $point = array();
@@ -101,14 +103,15 @@ class FrontHistory extends AbstractWorkPlace
         // Twigデータ内IDをキーに表示項目を追加
         // ポイント情報表示
         // false が返却された際は、利用ポイント値が保有ポイント値を超えている
-        if ($amount != false) {
-            $point['use'] = 0 - $usePoint;
+        //if ($amount != false) {
+            $point['use'] = $usePoint;
             $snippet = $this->app->render(
                 'Point/Resource/template/default/Event/History/point_summary.twig',
                 array(
                     'point' => $point,
                 )
             )->getContent();
+        /*
         } else {
             $point['use_error'] = '利用制限を超えています';
             $snippet = $this->app->render(
@@ -118,6 +121,7 @@ class FrontHistory extends AbstractWorkPlace
                 )
             )->getContent();
         }
+        */
 
 
         $search = '<p id="summary_box__payment_total"';

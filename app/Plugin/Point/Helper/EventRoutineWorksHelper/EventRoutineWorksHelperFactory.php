@@ -64,10 +64,11 @@ class EventRoutineWorksHelperFactory
             case PointEvent::HELPER_FRONT_SHOPPING_CONFIRM :
                 return new EventRoutineWorksHelper(new FrontShoppingConfirm());
                 break;
+            */
+            // @todo 将来的には、ペイメントの完了イベントに割り込む
             case PointEvent::HELPER_FRONT_SHOPPING_COMPLETE :
                 return new EventRoutineWorksHelper(new FrontShoppingComplete());
                 break;
-            */
             case PointEvent::HELPER_FRONT_MYPAGE :
                 return new EventRoutineWorksHelper(new FrontMyPage());
                 break;

@@ -31,6 +31,11 @@ admin.order.edit.index.complete:
 #front.shopping.index.initialize:
 #    - [onFrontShoppingIndexInitialize, NOMAL]
 
+## フロント画面 > 商品購入確認画面
+## todo 将来ペイメントの完了イベントに変更
+front.shopping.complete.initialize:
+    - [onFrontShoppingCompleteInitialize, NOMAL]
+
 # メール
 
 # 画面レンダリング

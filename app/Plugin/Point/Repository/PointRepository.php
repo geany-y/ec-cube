@@ -5,6 +5,7 @@ namespace Plugin\Point\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
+use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Order;
 use Plugin\Point\Helper\PointHistoryHelper\PointHistoryHelper;
 
@@ -28,10 +29,18 @@ class PointRepository extends EntityRepository
         $needStatus[] = PointHistoryHelper::STATE_USE;      // 利用ポイント
 
         try {
+            $orderStatus = new OrderStatus();
+            $orderStatus->setId(8);
             // ログテーブルからポイントを計算
             $qb = $this->createQueryBuilder('p');
             $qb->addSelect('SUM(p.plg_dynamic_point) as point_sum')
+            //$qb->addSelect('p.plg_dynamic_point')
+                //->from('\Plugin\Point\Entity\Point', 'p')
+                ->addSelect('o as HIDDEN')
                 ->add('where', $qb->expr()->in('p.plg_point_type', $needStatus))
+                ->leftJoin('p.Order', 'o')
+                ->andwhere('o.OrderStatus != :orderStatus')
+                ->setParameter('orderStatus', $orderStatus)
                 ->andWhere('p.customer_id = :customer_id')
                 ->setParameter('customer_id', $customerId);
 
@@ -321,8 +330,11 @@ class PointRepository extends EntityRepository
     public function getLastAdjustUsePoint(Order $order)
     {
         try {
+            $orderStatus = new OrderStatus();
+            $orderStatus->setId(8);
             // 履歴情報をもとに現在利用ポイントを計算し取得
             $qb = $this->createQueryBuilder('p')
+                ->addSelect('o')
                 ->where('p.customer_id = :customerId')
                 ->andwhere('p.order_id = :orderId')
                 ->andwhere('p.plg_point_type = :pointType')
@@ -330,6 +342,9 @@ class PointRepository extends EntityRepository
                 ->setParameter('orderId', $order->getId())
                 ->setParameter('pointType', PointHistoryHelper::STATE_USE)
                 ->orderBy('p.plg_point_id', 'desc')
+                ->leftJoin('p.Order', 'o')
+                ->andwhere('o.OrderStatus != :orderStatus')
+                ->setParameter('orderStatus', $orderStatus)
                 ->setMaxResults(1);
             $max_use_point = $qb->getQuery()->getResult();
 

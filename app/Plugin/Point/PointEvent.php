@@ -220,6 +220,28 @@ class PointEvent
     */
 
     /**
+     * 購入完了画面
+     *  - 仮付与ポイントポイントログ登録
+     *  - 利用ポイントログ登録
+     *  - 保有ポイントログ処理
+     *  - フロント画面 > 商品購入完了画面
+     * @param TemplateEvent $event
+     * @return bool
+     */
+    public function onFrontShoppingCompleteInitialize(EventArgs $event){
+        // ログイン判定
+        if (!$this->isAuthRouteFront()) {
+            return true;
+        }
+
+        // フックポイント汎用処理サービス取得 ( 商品購入完了画面用 )
+        $this->setHelper(self::HELPER_FRONT_SHOPPING_COMPLETE);
+
+        // ポイント関連保存処理
+        $this->save($event);
+    }
+
+    /**
      * 商品購入確認画面
      *  - ポイント使用処理
      *  - 付与ポイント計算処理・画面描画処理
