@@ -471,7 +471,7 @@ class PointCalculateHelper
      * 受注情報の更新を行う
      * @return bool
      */
-    public function saveDiscount(){
+    public function setDiscount($lastUsePoint){
         // 必要エンティティを判定
         if (!$this->hasEntities('Order')) {
             return false;
@@ -488,14 +488,12 @@ class PointCalculateHelper
         // 基本換金値の取得
         $pointRate = $this->pointInfo->getPlgBasicPointRate();
 
-        // 最後に利用したポイントを取得
-        $lastUsePoint = 0;
-        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->entities['Order']);
 
         // 受注情報に保存されている最終保存の値引き額を取得
         $currDiscount = $this->entities['Order']->getDiscount();
 
         // 値引き額と利用ポイント換算値を比較→相違があればポイント利用分相殺後利用ポイントセット
+        // @todo もともとの合計値からの相殺必要か??
         $useDiscount = (int)$this->usePoint * $pointRate;
         if((integer)$currDiscount != (integer)$lastUsePoint * $pointRate) {
             $useDiscount = (abs($currDiscount) - (integer)abs($lastUsePoint * $pointRate)) + $useDiscount;
@@ -503,26 +501,6 @@ class PointCalculateHelper
 
         // 値引き額の設定
         $this->entities['Order']->setDiscount(abs($useDiscount));
-
-
-        // @todo 保存前の受注情報ではプロダクト情報が保存されていないため
-        // @todo 商品名が保存されていないエラーが表示
-
-        // 利用ポイントに変更があるか確認
-        // 過去ポイント所持フラグ
-        $isEditFlg = true;
-        if ($lastUsePoint == $this->usePoint) {
-            $isEditFlg = false;
-        }
-
-        try {
-            if($isEditFlg) {
-                $this->app['orm.em']->persist($this->entities['Order']);
-                $this->app['orm.em']->flush($this->entities['Order']);
-            }
-        } catch (DatabaseObjectNotFoundException $e) {
-            return false;
-        }
 
         return true;
     }

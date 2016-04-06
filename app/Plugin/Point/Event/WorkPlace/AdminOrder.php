@@ -266,19 +266,21 @@ class  AdminOrder extends AbstractWorkPlace
         // Customerオブジェクトの有無で現在イベントを判定
         // Processの際のみ、受注エンティティの値引き額を調整
         // @todo need modified
-        if(!$event->hasArgument('Customer')){
+        if (!$event->hasArgument('Customer')) {
             // 最後に利用したポイントを取得
             $lastUsePoint = 0;
-            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($this->targetOrder);
+            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint(
+                $this->targetOrder
+            );
 
             // ここでDiscoutを設定
             $this->calculator->addEntity('Order', $this->targetOrder);
             $this->calculator->setUsePoint($this->usePoint);
 
-            $this->calculator->saveDiscount();
+            $this->calculator->setDiscount($lastUsePoint);
 
-            // 受注情報更新処理
             /*
+            // 受注情報更新処理
             if(!$this->calculator->setDiscount($lastUsePoint)){
                 return false;
             }
@@ -291,16 +293,14 @@ class  AdminOrder extends AbstractWorkPlace
             try {
                 if($isEditFlg) {
                     $order = $this->calculator->getEntity('Order');
-
-                    //dump($order);
                     $this->app['orm.em']->persist($order);
-                    $this->app['orm.em']->persist($order->getOrderDetails);
                     $this->app['orm.em']->flush($order);
                 }
             } catch (DatabaseObjectNotFoundException $e) {
                 return false;
             }
             */
+
             return false;
         }
 
