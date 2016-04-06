@@ -79,10 +79,10 @@ class FrontShoppingComplete extends AbstractWorkPlace
         $usePoint = 0;
 
         // 最終保存ポイントがあるかどうかの判定
-        $lastUsePoint = 0;
-        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
-        if (!empty($lastUsePoint)) {
-            $usePoint = $lastUsePoint;
+        $lastPreUsePoint = 0;
+        $lastPreUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastPreUsePoint($order);
+        if (!empty($lastPreUsePoint)) {
+            $usePoint = $lastPreUsePoint;
         }
 
         // 計算判定取得
@@ -126,11 +126,13 @@ class FrontShoppingComplete extends AbstractWorkPlace
 
         // 履歴情報登録
         // 利用ポイント
-        /*
         $this->app['eccube.plugin.point.history.service']->addEntity($order);
         $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
-        $this->app['eccube.plugin.point.history.service']->saveUsePoint($usePoint);
-        */
+        $this->app['eccube.plugin.point.history.service']->savePreUsePoint($usePoint);
+        $this->app['eccube.plugin.point.history.service']->refreshEntity();
+        $this->app['eccube.plugin.point.history.service']->addEntity($order);
+        $this->app['eccube.plugin.point.history.service']->addEntity($order->getCustomer());
+        $this->app['eccube.plugin.point.history.service']->saveUsePoint(abs($usePoint) * -1);
 
         // 仮付与ポイント(ステータスの設定により付与ポイント)
         $this->app['eccube.plugin.point.history.service']->refreshEntity();

@@ -24,15 +24,14 @@ class PointRepository extends EntityRepository
     {
         // ログテーブルから抽出するステータス
         $needStatus = array();
-        $needStatus[] = PointHistoryHelper::STATE_ADD;      // 付与ポイント
-        $needStatus[] = PointHistoryHelper::STATE_CURRENT;  // 現在ポイント
+        $needStatus[] = PointHistoryHelper::STATE_ADD;      // 加算ポイント
+        $needStatus[] = PointHistoryHelper::STATE_CURRENT;  // 手動ポイント
         $needStatus[] = PointHistoryHelper::STATE_USE;      // 利用ポイント
 
         try {
-            /*
             $orderStatus = new OrderStatus();
             $orderStatus->setId(8);
-            */
+
             // ログテーブルからポイントを計算
             $qb = $this->createQueryBuilder('p');
             $qb->addSelect('SUM(p.plg_dynamic_point) as point_sum')
@@ -347,6 +346,41 @@ class PointRepository extends EntityRepository
                 ->leftJoin('p.Order', 'o')
                 ->andwhere('o.OrderStatus != :orderStatus')
                 ->setParameter('orderStatus', $orderStatus)
+                ->setMaxResults(1);
+            $max_use_point = $qb->getQuery()->getResult();
+
+            // 取得値判定
+            if (count($max_use_point) < 1) {
+                return 0;
+            }
+
+            return abs($max_use_point[0]->getPlgDynamicPoint());
+        } catch (NoResultException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * 最終仮利用ポイントを取得
+     * @param Order $order
+     * @return int|null|number
+     */
+    public function getLastPreUsePoint(Order $order)
+    {
+        try {
+            // 履歴情報をもとに現在利用ポイントを計算し取得
+            $qb = $this->createQueryBuilder('p')
+                //->addSelect('o')
+                ->where('p.customer_id = :customerId')
+                ->andwhere('p.order_id = :orderId')
+                ->andwhere('p.plg_point_type = :pointType')
+                ->setParameter('customerId', $order->getCustomer()->getId())
+                ->setParameter('orderId', $order->getId())
+                ->setParameter('pointType', PointHistoryHelper::STATE_PRE_USE)
+                ->orderBy('p.plg_point_id', 'desc')
+                //->leftJoin('p.Order', 'o')
+                //->andwhere('o.OrderStatus != :orderStatus')
+                //->setParameter('orderStatus', $orderStatus)
                 ->setMaxResults(1);
             $max_use_point = $qb->getQuery()->getResult();
 

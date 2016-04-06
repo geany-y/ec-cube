@@ -83,17 +83,19 @@ class ServiceMail extends AbstractWorkPlace
         // 計算値取得
         $addPoint = $calculator->getAddPointByOrder();
         $point = $calculator->getPoint();
-        $amount = $calculator->getTotalAmount();
+        //$amount = $calculator->getTotalAmount();
 
         // ポイント配列作成
         $pointMessage = array();
         $pointMessage['add'] = $addPoint;
         $pointMessage['point'] = $point;
-        $pointMessage['use'] = 0 - $usePoint;
+        $pointMessage['use'] = $usePoint;
 
         // オーダー情報更新
+        /*
         $order->setPaymentTotal($amount);
         $order->setTotal($amount);
+        */
 
         // メールボディ取得
         $body = $this->app->renderView(

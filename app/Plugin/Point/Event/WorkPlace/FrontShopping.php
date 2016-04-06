@@ -49,7 +49,6 @@ class FrontShopping extends AbstractWorkPlace
      */
     public function createTwig(TemplateEvent $event)
     {
-        ezd('twig');
         $args = $event->getParameters();
 
         $order = $args['Order'];
@@ -78,10 +77,10 @@ class FrontShopping extends AbstractWorkPlace
         // @todo ポイント取得方法の変更
         $pointUse = new PointUse();
         $usePoint = 0;
-        $lastUsePoint = 0;
-        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($order);
-        if (!empty($lastUsePoint)) {
-            $usePoint = $lastUsePoint;
+        $lastPreUsePoint = 0;
+        $lastPreUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastPreUsePoint($order);
+        if (!empty($lastPreUsePoint)) {
+            $usePoint = $lastPreUsePoint;
         }
 
         // 計算に必要なエンティティを登録
@@ -130,7 +129,7 @@ class FrontShopping extends AbstractWorkPlace
         $pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
         // ポイント表示用変数作成
         $point = array();
-        $point['current'] = $currentPoint;
+        $point['current'] = $currentPoint - $usePoint;
         // エラー判定
         // false が返却された際は、利用ポイント値が保有ポイント値を超えている
         /*

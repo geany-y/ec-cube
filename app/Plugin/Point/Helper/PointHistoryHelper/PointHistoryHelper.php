@@ -17,12 +17,14 @@ class PointHistoryHelper
     // 保存内容
     const HISTORY_MESSAGE_MANUAL_EDIT = 'ポイント手動編集';
     const HISTORY_MESSAGE_EDIT = 'ポイント購入完了登録';
+    const HISTORY_MESSAGE_USE_POINT = 'ポイント利用仮登録';
     const HISTORY_MESSAGE_ORDER_EDIT = 'ポイント管理画面受注ステータス変更保存';
     const HISTORY_MESSAGE_ORDER_CANCEL = 'ポイント管理画面受注ステータスキャンセル保存';
 
     const HISTORY_MESSAGE_TYPE_CURRENT = '保有';
     const HISTORY_MESSAGE_TYPE_PRE_ADD = '付与(仮)';
     const HISTORY_MESSAGE_TYPE_ADD = '付与(確定)';
+    const HISTORY_MESSAGE_TYPE_PRE_USE = '仮利用';
     const HISTORY_MESSAGE_TYPE_USE = '利用';
     const HISTORY_MESSAGE_TYPE_ADJUST_USE = '利用調整';
 
@@ -30,6 +32,7 @@ class PointHistoryHelper
     const STATE_PRE_ADD = 2;
     const STATE_ADD = 3;
     const STATE_USE = 4;
+    const STATE_PRE_USE = 5;
 
     protected $app;
     protected $entities;
@@ -183,6 +186,18 @@ class PointHistoryHelper
         $this->currentActionName = self::HISTORY_MESSAGE_EDIT;
         $this->historyActionType = self::HISTORY_MESSAGE_TYPE_USE;
         $this->historyType = self::STATE_USE;
+        $this->saveHistoryPoint($point);
+    }
+
+    /**
+     * 仮利用ポイント履歴登録
+     * @param $point
+     */
+    public function savePreUsePoint($point)
+    {
+        $this->currentActionName = self::HISTORY_MESSAGE_USE_POINT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_USE;
+        $this->historyType = self::STATE_PRE_USE;
         $this->saveHistoryPoint($point);
     }
 

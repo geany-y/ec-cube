@@ -59,13 +59,15 @@ class FrontPointController
             return $this->app->redirect($this->app->url('shopping_error'));
         }
 
-        // 最終保存のポイント設定情報取得
-        // 利用ポイントの保存処理
+        // 最終仮保存のポイント設定情報取得
+        // 仮利用ポイントの保存処理
         $usePoint = 0;
-        // 最終保存ポイントがあるかどうかの判定
-        $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($Order);
-        if (!empty($lastUsePoint)) {
-            $usePoint = $lastUsePoint;
+        // 最終仮保存ポイントがあるかどうかの判定
+        $lastPreUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastPreUsePoint($Order);
+
+
+        if (!empty($lastPreUsePoint)) {
+            $usePoint = $lastPreUsePoint;
         }
         /*
         if () {
@@ -149,27 +151,27 @@ class FrontPointController
             $saveUsePoint = $form->get('plg_use_point')->getData();
 
             // 最終保存ポイントがあるかどうかの判定
-            $lastUsePoint = 0;
-            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($Order);
-            if (!empty($lastUsePoint)) {
-                $usePoint = $lastUsePoint;
+            $lastPreUsePoint = 0;
+            $lastPreUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastPreUsePoint($Order);
+            if (!empty($lastPreUsePoint)) {
+                $usePoint = $lastPreUsePoint;
             }
 
             // 最終保存ポイントと現在ポイントに相違があれば利用ポイント保存
-            if (abs($lastUsePoint) != abs($saveUsePoint)) {
+            if (abs($lastPreUsePoint) != abs($saveUsePoint)) {
                 // 履歴情報登録
                 // 利用ポイント
                 // 再入力時は、以前利用ポイントを打ち消し
-                if (!empty($lastUsePoint)) {
+                if (!empty($lastPreUsePoint)) {
                     $this->app['eccube.plugin.point.history.service']->addEntity($Order);
                     $this->app['eccube.plugin.point.history.service']->addEntity($Order->getCustomer());
-                    $this->app['eccube.plugin.point.history.service']->saveUsePoint(abs($lastUsePoint));
+                    $this->app['eccube.plugin.point.history.service']->savePreUsePoint(abs($lastPreUsePoint));
                 }
                 // ユーザー入力値保存
                 $this->app['eccube.plugin.point.history.service']->refreshEntity();
                 $this->app['eccube.plugin.point.history.service']->addEntity($Order);
                 $this->app['eccube.plugin.point.history.service']->addEntity($Order->getCustomer());
-                $this->app['eccube.plugin.point.history.service']->saveUsePoint(abs($saveUsePoint) * -1);
+                $this->app['eccube.plugin.point.history.service']->savePreUsePoint(abs($saveUsePoint) * -1);
 
                 // 現在ポイントを履歴から計算
                 $calculateCurrentPoint = $this->app['eccube.plugin.point.repository.point']->getCalculateCurrentPointByCustomerId(
@@ -183,7 +185,7 @@ class FrontPointController
                 );
 
                 $calculator->setUsePoint($saveUsePoint);
-                $calculator->setDiscount($lastUsePoint);
+                $calculator->setDiscount($lastPreUsePoint);
                 $newOrder = $calculator->getEntity('Order');
 
                 // 値引き計算後のオーダーが返却
@@ -216,7 +218,7 @@ class FrontPointController
                 'form' => $form->createView(),  // フォーム
                 'usePoint' => $usePoint,        // 利用ポイント
                 'pointRate' => $pointRate,      // 換算レート
-                'point' => $point,              // 保有ポイント
+                'point' => $point - $usePoint,              // 保有ポイント
                 'total' => $total,              // 合計金額
             )
         );
