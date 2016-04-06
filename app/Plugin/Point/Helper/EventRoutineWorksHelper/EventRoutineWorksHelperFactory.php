@@ -52,18 +52,22 @@ class EventRoutineWorksHelperFactory
             case PointEvent::HELPER_ADMIN_ORDER :
                 return new EventRoutineWorksHelper(new AdminOrder());
                 break;
+            /*
             case PointEvent::HELPER_FRONT_SHOPPING_INDEX :
                 return new EventRoutineWorksHelper(new FrontShopping());
                 break;
+            */
             case PointEvent::HELPER_FRONT_SHOPPING :
                 return new EventRoutineWorksHelper(new FrontShopping());
                 break;
+            /*
             case PointEvent::HELPER_FRONT_SHOPPING_CONFIRM :
                 return new EventRoutineWorksHelper(new FrontShoppingConfirm());
                 break;
             case PointEvent::HELPER_FRONT_SHOPPING_COMPLETE :
                 return new EventRoutineWorksHelper(new FrontShoppingComplete());
                 break;
+            */
             case PointEvent::HELPER_FRONT_MYPAGE :
                 return new EventRoutineWorksHelper(new FrontMyPage());
                 break;

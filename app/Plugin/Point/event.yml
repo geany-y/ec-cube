@@ -28,8 +28,8 @@ admin.order.edit.index.complete:
 #front.shopping.confirm.complete:
 #   - [onFrontShoppingConfirmComplete, NOMAL]
 ## フロント画面 > 商品購入確認画面
-front.shopping.index.initialize:
-    - [onFrontShoppingIndexInitialize, NOMAL]
+#front.shopping.index.initialize:
+#    - [onFrontShoppingIndexInitialize, NOMAL]
 
 # メール
 

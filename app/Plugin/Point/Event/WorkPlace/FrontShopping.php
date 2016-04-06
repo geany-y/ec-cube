@@ -49,6 +49,7 @@ class FrontShopping extends AbstractWorkPlace
      */
     public function createTwig(TemplateEvent $event)
     {
+        ezd('twig');
         $args = $event->getParameters();
 
         $order = $args['Order'];
@@ -104,17 +105,18 @@ class FrontShopping extends AbstractWorkPlace
             $currentPoint = 0;
         }
 
-        $calculator->setDiscount($lastUsePoint);
-        $setUsePointOrder = $calculator->getEntity('Order');
+
+        //$calculator->setDiscount($lastUsePoint);
+        //$setUsePointOrder = $calculator->getEntity('Order');
 
         // 値引き計算後のオーダーが返却
-        $newOrder = $this->app['eccube.service.shopping']->getAmount($setUsePointOrder);
-        $calculator->removeEntity('Order');
-        $calculator->addEntity('Order', $newOrder);
+        //$newOrder = $this->app['eccube.service.shopping']->getAmount($setUsePointOrder);
+        //$calculator->removeEntity('Order');
+        //$calculator->addEntity('Order', $newOrder);
 
         // ビュー返却値の受注情報を値引き後の情報に更新
-        $args['Order'] = $newOrder;
-        $event->setParameters($args);
+        //$args['Order'] = $newOrder;
+        //$event->setParameters($args);
 
         // ポイント使用合計金額取得・設定
         // @todo 値引き再計算Orderの取得
@@ -181,12 +183,13 @@ class FrontShopping extends AbstractWorkPlace
     }
 
     /**
-     * 本クラスでは処理なし
+     * 通常はデータの保存を行うが、本処理では、情報の取得のみ
      * @param EventArgs $event
      */
     // @todo 購入商品確認画面から処理を移設
     public function save(EventArgs $event)
     {
+        /*
         // 保存対象受注情報の取得
         $args = $event->getArguments();
         $order = $args['Order'];
@@ -212,8 +215,6 @@ class FrontShopping extends AbstractWorkPlace
         if (!empty($lastUsePoint)) {
             $usePoint = $lastUsePoint;
         }
-
-        $pointUse->setPlgUsePoint($usePoint);
 
         // 計算判定取得
         $calculator = $this->app['eccube.plugin.point.calculate.helper.factory'];
@@ -249,10 +250,23 @@ class FrontShopping extends AbstractWorkPlace
         // ポイント使用合計金額取得・設定
         // @todo 以下処理は全て決済処理完了後イベントで処理
 
+        //$calculator->setDiscount($lastUsePoint);
+        //$newOrder = $calculator->getEntity('Order');
+
+        //dump($newOrder);
+        //exit();
+
         // 値引き計算後のオーダーが返却
-        $newOrder = $this->app['eccube.service.shopping']->getAmount($order);
-        $calculator->removeEntity('Order');
-        $calculator->addEntity('Order', $newOrder);
+        //$this->app['eccube.service.shopping']->getAmount($newOrder);
+
+        //$calculator->removeEntity('Order');
+        //$calculator->addEntity('Order', $newOrder);
+
+
+        //$args = $event->getArguments();
+        //$order = $args['Order'];
+        */
+
         // ポイント付与受注ステータスが「新規」の場合、付与ポイントを確定
         /*
         $add_point_flg = false;

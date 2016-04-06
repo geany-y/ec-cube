@@ -158,6 +158,7 @@ class PointEvent
         $this->save($event);
     }
 
+    /*
     public function onFrontShoppingIndexInitialize(EventArgs $event){
         // ログイン判定
         if (!$this->isAuthRouteFront()) {
@@ -170,6 +171,7 @@ class PointEvent
         // ポイント関連保存処理
         $this->save($event);
     }
+    */
 
     /**
      * 商品購入確認完了
@@ -178,6 +180,7 @@ class PointEvent
      * @param EventArgs $event
      * @return bool
      */
+    /*
     public function onFrontShoppingConfirmProcessing(EventArgs $event)
     {
         // ログイン判定
@@ -191,6 +194,7 @@ class PointEvent
         // ポイント関連保存処理
         $this->save($event);
     }
+    */
 
     /**
      * 商品購入確認完了
@@ -199,6 +203,7 @@ class PointEvent
      * @param EventArgs $event
      * @return bool
      */
+    /*
     public function onFrontShoppingConfirmComplete(EventArgs $event)
     {
         // ログイン判定
@@ -212,6 +217,7 @@ class PointEvent
         // ポイント関連保存処理
         $this->save($event);
     }
+    */
 
     /**
      * 商品購入確認画面

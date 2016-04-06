@@ -475,7 +475,9 @@ class PointCalculateHelper
         }
 
         // 利用ポイントの確認
-        if (empty($this->usePoint)) {
+        if ($this->usePoint != 0 && empty($this->usePoint)) {
+            dump('OUT');
+            exit();
             return false;
         }
 
@@ -487,16 +489,39 @@ class PointCalculateHelper
         // 基本換金値の取得
         $pointRate = $this->pointInfo->getPlgBasicPointRate();
 
-
         // 受注情報に保存されている最終保存の値引き額を取得
         $currDiscount = $this->entities['Order']->getDiscount();
+
+
+        // 最終利用ポイントを取得
+        // レート計算
+        // 現在値引きから計算レートを差し引き
+        // 現在ポイントからレート計算
+        // 値引きに現在のポイント足し込み
+
+        /*
+        dump($currDiscount);
+        dump($useDiscount);
+        exit();
+        */
 
         // 値引き額と利用ポイント換算値を比較→相違があればポイント利用分相殺後利用ポイントセット
         // @todo もともとの合計値からの相殺必要か??
         $useDiscount = (int)$this->usePoint * $pointRate;
-        if((integer)$currDiscount != (integer)$lastUsePoint * $pointRate) {
-            $useDiscount = abs(abs($currDiscount) - (integer)abs($lastUsePoint * $pointRate)) + $useDiscount;
+        /*
+        dump($useDiscount);
+        dump($lastUsePoint  * $pointRate);
+        exit();
+        */
+        $diff = $currDiscount - ($lastUsePoint  * $pointRate);
+        if($diff > 0) {
+            if ((integer)$currDiscount != (integer)$useDiscount) {
+                $useDiscount = $diff + $useDiscount;
+            }
         }
+
+        //dump($useDiscount);
+        //exit();
 
         // 値引き額の設定
         $this->entities['Order']->setDiscount(abs($useDiscount));

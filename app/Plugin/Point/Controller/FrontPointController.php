@@ -101,8 +101,6 @@ class FrontPointController
         // サービスで取得
         //$newOrder = $calculator->getTotalAmount();
 
-        // 値引き計算後のオーダーが返却
-        $newOrder = $this->app['eccube.service.shopping']->getAmount($Order);
 
 
         // ポイント換算レート
@@ -152,7 +150,7 @@ class FrontPointController
 
             // 最終保存ポイントがあるかどうかの判定
             $lastUsePoint = 0;
-            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($newOrder);
+            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint($Order);
             if (!empty($lastUsePoint)) {
                 $usePoint = $lastUsePoint;
             }
@@ -163,26 +161,33 @@ class FrontPointController
                 // 利用ポイント
                 // 再入力時は、以前利用ポイントを打ち消し
                 if (!empty($lastUsePoint)) {
-                    $this->app['eccube.plugin.point.history.service']->addEntity($newOrder);
-                    $this->app['eccube.plugin.point.history.service']->addEntity($newOrder->getCustomer());
+                    $this->app['eccube.plugin.point.history.service']->addEntity($Order);
+                    $this->app['eccube.plugin.point.history.service']->addEntity($Order->getCustomer());
                     $this->app['eccube.plugin.point.history.service']->saveUsePoint(abs($lastUsePoint));
                 }
                 // ユーザー入力値保存
                 $this->app['eccube.plugin.point.history.service']->refreshEntity();
-                $this->app['eccube.plugin.point.history.service']->addEntity($newOrder);
-                $this->app['eccube.plugin.point.history.service']->addEntity($newOrder->getCustomer());
+                $this->app['eccube.plugin.point.history.service']->addEntity($Order);
+                $this->app['eccube.plugin.point.history.service']->addEntity($Order->getCustomer());
                 $this->app['eccube.plugin.point.history.service']->saveUsePoint(abs($saveUsePoint) * -1);
 
                 // 現在ポイントを履歴から計算
                 $calculateCurrentPoint = $this->app['eccube.plugin.point.repository.point']->getCalculateCurrentPointByCustomerId(
-                    $newOrder->getCustomer()->getId()
+                    $Order->getCustomer()->getId()
                 );
 
                 // 会員ポイント更新
                 $this->app['eccube.plugin.point.repository.pointcustomer']->savePoint(
                     $calculateCurrentPoint,
-                    $newOrder->getCustomer()
+                    $Order->getCustomer()
                 );
+
+                $calculator->setUsePoint($saveUsePoint);
+                $calculator->setDiscount($lastUsePoint);
+                $newOrder = $calculator->getEntity('Order');
+
+                // 値引き計算後のオーダーが返却
+                $this->app['eccube.service.shopping']->getAmount($newOrder);
             }
 
             return $this->app->redirect($this->app->url('shopping'));
@@ -198,10 +203,12 @@ class FrontPointController
          * 合計金額→ShoppingService から取得
          *
          */
-        $total = 0;
+        $total = $Order->getPaymentTotal();
+        /*
         if (!empty($newOrder)) {
             $total = $newOrder->getPaymentTotal();
         }
+        */
 
         return $app->render(
             'Point/Resource/template/default/point_use.twig',
