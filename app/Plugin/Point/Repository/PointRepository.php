@@ -29,18 +29,20 @@ class PointRepository extends EntityRepository
         $needStatus[] = PointHistoryHelper::STATE_USE;      // 利用ポイント
 
         try {
+            /*
             $orderStatus = new OrderStatus();
             $orderStatus->setId(8);
+            */
             // ログテーブルからポイントを計算
             $qb = $this->createQueryBuilder('p');
             $qb->addSelect('SUM(p.plg_dynamic_point) as point_sum')
             //$qb->addSelect('p.plg_dynamic_point')
                 //->from('\Plugin\Point\Entity\Point', 'p')
-                ->addSelect('o as HIDDEN')
+                //->addSelect('o as HIDDEN')
                 ->add('where', $qb->expr()->in('p.plg_point_type', $needStatus))
-                ->leftJoin('p.Order', 'o')
-                ->andwhere('o.OrderStatus != :orderStatus')
-                ->setParameter('orderStatus', $orderStatus)
+                //->leftJoin('p.Order', 'o')
+                //->andwhere('o.OrderStatus != :orderStatus')
+                //->setParameter('orderStatus', $orderStatus)
                 ->andWhere('p.customer_id = :customer_id')
                 ->setParameter('customer_id', $customerId);
 
