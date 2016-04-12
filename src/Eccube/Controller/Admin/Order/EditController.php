@@ -86,6 +86,7 @@ class EditController extends AbstractController
 
             $event = new EventArgs(
                 array(
+                    'form' => $form,
                     'builder' => $builder,
                     'OriginOrder' => $OriginOrder,
                     'TargetOrder' => $TargetOrder,

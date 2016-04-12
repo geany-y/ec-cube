@@ -1,0 +1,95 @@
+# 管理画面
+## 管理画面 > 商品登録( 編集 ) > ポイント付与率設定
+admin.product.edit.initialize:
+    - [onAdminProductEditInitialize, NORMAL]
+admin.product.edit.complete:
+    - [onAdminProductEditComplete, NORMAL]
+
+## 管理画面 > 会員登録( 編集 ) > 保有ポイント設定
+admin.customer.edit.index.initialize:
+    - [onAdminCustomerEditIndexInitialize, NOMAL]
+admin.customer.edit.index.complete:
+    - [onAdminCustomerEditIndexComplete, NOMAL]
+
+## 管理画面 > 受注登録 (編集) > 利用ポイントフォーム生成
+admin.order.edit.index.initialize:
+    - [onAdminOrderEditIndexInitialize, NOMAL]
+# @todo need delete
+#admin.order.edit.index.processing:
+admin.order.edit.index.progress:
+    - [onAdminOrderEditIndexProgress, NOMAL]
+admin.order.edit.index.complete:
+    - [onAdminOrderEditIndexComplete, NOMAL]
+
+# フロント画面
+## フロント画面 > 商品購入確認完了(ポイント利用処理)
+front.shopping.confirm.processing:
+    - [onFrontShoppingConfirmProcessing, NOMAL]
+## フロント画面 > 商品購入完了(ポイント登録)
+service.shopping.notify.complete:
+    - [onServiceShoppingNotifyComplete, NOMAL]
+
+## 配送先関連
+#front.mypage.delivery.edit.initialize:
+#    - [isDeliveryOver, NOMAL]
+front.mypage.delivery.edit.complete:
+    - [isDeliveryOver, NOMAL]
+#front.mypage.delete.complete:
+#    - [isDeliveryOver, NOMAL]
+#front.shopping.delivery.initialize:
+#    - [isDeliveryOver, NOMAL]
+front.shopping.delivery.complete:
+    - [isDeliveryOver, NOMAL]
+
+## 支払い方法判定
+#front.shopping.payment.initialize:
+#    - [isPaymentOver, NOMAL]
+front.shopping.payment.complete:
+    - [isPaymentOver, NOMAL]
+
+## 配送方法設定
+#front.shopping.shipping.change.initialize:
+#    - [isShippingOver, NOMAL]
+front.shopping.shipping.complete:
+    - [isShippingOver, NOMAL]
+#front.shopping.shipping.edit.change.initialize:
+#    - [isShippingOver, NOMAL]
+#front.shopping.shipping.edit.initialize:
+#    - [isShippingOver, NOMAL]
+front.shopping.shipping.edit.complete:
+    - [isShippingOver, NOMAL]
+
+#eccube.event.front.response:
+#    - [onAllControllerResponse, NOMAL]
+
+
+
+
+# 画面レンダリング
+## 管理画面 > 受注編集
+Admin/Order/edit.twig:
+    - [onRenderAdminOrderEdit, NORMAL]
+## マイページ
+Mypage/index.twig:
+    - [onRenderMyPageIndex, NORMAL]
+
+## フロント画面 > 商品購入確認画面
+Shopping/index.twig:
+    - [onRenderShoppingIndex, NORMAL]
+
+## フロント画面 > 商品詳細画面
+Product/detail.twig:
+    - [onRenderProductDetail, NORMAL]
+
+## フロント画面 > カート
+Cart/index.twig:
+    - [onRenderCart, NORMAL]
+
+## フロント画面 > マイページ > 履歴
+Mypage/history.twig:
+    - [onRenderHistory, NORMAL]
+
+# メール
+## 受注メール
+mail.order:
+    - [onMailOrderComplete, NOMAL]

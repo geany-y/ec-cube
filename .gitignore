@@ -13,7 +13,7 @@ composer.phar
 /app/config/eccube/log.yml
 /app/log/*
 !/app/log/.gitkeep
-/app/Plugin/*
+!/app/Plugin/*
 !/app/Plugin/.gitkeep
 /app/template/*
 !/app/template/admin
