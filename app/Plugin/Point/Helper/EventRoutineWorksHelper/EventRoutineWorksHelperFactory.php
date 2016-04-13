@@ -2,6 +2,7 @@
 
 namespace Plugin\Point\Helper\EventRoutineWorksHelper;
 
+use Plugin\Point\Event\WorkPlace\AdminOrderProgress;
 use Plugin\Point\Event\WorkPlace\FrontDelivery;
 use Plugin\Point\Event\WorkPlace\FrontHistory;
 use Plugin\Point\Event\WorkPlace\FrontPayment;
@@ -51,6 +52,9 @@ class EventRoutineWorksHelperFactory
                 break;
             case PointEvent::HELPER_ADMIN_ORDER :
                 return new EventRoutineWorksHelper(new AdminOrder());
+                break;
+            case PointEvent::HELPER_ADMIN_ORDER_PROGRESS :
+                return new EventRoutineWorksHelper(new AdminOrderProgress());
                 break;
             case PointEvent::HELPER_FRONT_SHOPPING :
                 return new EventRoutineWorksHelper(new FrontShopping());

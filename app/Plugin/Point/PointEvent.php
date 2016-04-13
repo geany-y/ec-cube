@@ -20,11 +20,12 @@ class PointEvent
     const HELPER_ADMIN_PRODUCT = 'AdminProduct';
     const HELPER_ADMIN_CUSTOMER = 'AdminCustomer';
     const HELPER_ADMIN_ORDER = 'AdminOrder';
+    const HELPER_ADMIN_ORDER_PROGRESS = 'AdminOrderProgress';
 
     // フロント画面
     const HELPER_FRONT_SHOPPING = 'FrontShopping';
     const HELPER_FRONT_SHOPPING_INDEX = 'FrontShoppingIndex';
-    const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
+    //const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
     const HELPER_FRONT_SHOPPING_COMPLETE = 'FrontShoppingComplete';
     const HELPER_FRONT_MYPAGE = 'FrontMypage';
     const HELPER_FRONT_PRODUCT_DETAIL = 'FrontProductDetail';
@@ -140,7 +141,7 @@ class PointEvent
     public function onAdminOrderEditIndexProgress(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/終了 )
-        $this->setHelper(self::HELPER_ADMIN_ORDER);
+        $this->setHelper(self::HELPER_ADMIN_ORDER_PROGRESS);
 
         // ポイント付与率保存処理
         $this->save($event);
