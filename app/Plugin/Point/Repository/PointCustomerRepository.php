@@ -18,7 +18,7 @@ class PointCustomerRepository extends EntityRepository
      * @param $point
      * @param $customer
      * @return bool|PointCustomer
-     * @throws DatabaseObjectNotFoundException
+     * @throws NoResultException
      */
     public function savePoint($point, $customer)
     {
@@ -40,8 +40,8 @@ class PointCustomerRepository extends EntityRepository
             $em->flush();
 
             return $pointCustomerEntity;
-        } catch (DatabaseObjectNotFoundException $e) {
-            throw new DatabaseObjectNotFoundException();
+        } catch (NoResultException $e) {
+            throw new NoResultException();
         }
     }
 

@@ -14,8 +14,6 @@ admin.customer.edit.index.complete:
 ## 管理画面 > 受注登録 (編集) > 利用ポイントフォーム生成
 admin.order.edit.index.initialize:
     - [onAdminOrderEditIndexInitialize, NOMAL]
-# @todo need delete
-#admin.order.edit.index.processing:
 admin.order.edit.index.progress:
     - [onAdminOrderEditIndexProgress, NOMAL]
 admin.order.edit.index.complete:
@@ -30,39 +28,21 @@ service.shopping.notify.complete:
     - [onServiceShoppingNotifyComplete, NOMAL]
 
 ## 配送先関連
-#front.mypage.delivery.edit.initialize:
-#    - [isDeliveryOver, NOMAL]
 front.mypage.delivery.edit.complete:
     - [isDeliveryOver, NOMAL]
-#front.mypage.delete.complete:
-#    - [isDeliveryOver, NOMAL]
-#front.shopping.delivery.initialize:
-#    - [isDeliveryOver, NOMAL]
+
 front.shopping.delivery.complete:
     - [isDeliveryOver, NOMAL]
 
 ## 支払い方法判定
-#front.shopping.payment.initialize:
-#    - [isPaymentOver, NOMAL]
 front.shopping.payment.complete:
     - [isPaymentOver, NOMAL]
 
 ## 配送方法設定
-#front.shopping.shipping.change.initialize:
-#    - [isShippingOver, NOMAL]
 front.shopping.shipping.complete:
     - [isShippingOver, NOMAL]
-#front.shopping.shipping.edit.change.initialize:
-#    - [isShippingOver, NOMAL]
-#front.shopping.shipping.edit.initialize:
-#    - [isShippingOver, NOMAL]
 front.shopping.shipping.edit.complete:
     - [isShippingOver, NOMAL]
-
-#eccube.event.front.response:
-#    - [onAllControllerResponse, NOMAL]
-
-
 
 
 # 画面レンダリング
