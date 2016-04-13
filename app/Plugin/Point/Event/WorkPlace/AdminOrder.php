@@ -79,6 +79,8 @@ class  AdminOrder extends AbstractWorkPlace
             return false;
         }
 
+        $hasCustomer = $order->getCustomer();
+
         // 初期値・取得値設定処理
         // 初回のダミーエンティティにはカスタマー情報を含まない
         $lastUsePoint = 0;
@@ -97,7 +99,6 @@ class  AdminOrder extends AbstractWorkPlace
                 $hasCustomer->getId()
             );
         }
-
 
         // 0値設定
         if (!isset($hasPoint) && empty($hasPoint)) {
