@@ -43,6 +43,7 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 }
 
 require_once __DIR__.'/../autoload.php';
+require_once __DIR__.'../../vendor/Myfunc/myfunc.php';
 
 Debug::enable();
 

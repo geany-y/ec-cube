@@ -79,13 +79,6 @@ class  AdminOrder extends AbstractWorkPlace
             return false;
         }
 
-        $hasCustomer = $order->getCustomer();
-
-        $type = 'text';
-        if (empty($hasCustomer)) {
-            $type = 'hidden';
-        }
-
         // 初期値・取得値設定処理
         // 初回のダミーエンティティにはカスタマー情報を含まない
         $lastUsePoint = 0;
@@ -114,7 +107,7 @@ class  AdminOrder extends AbstractWorkPlace
         // ポイント付与率項目拡張
         $builder->add(
             'plg_use_point',
-            $type,
+            'text',
             array(
                 'label' => '利用ポイント',
                 'required' => false,
@@ -179,6 +172,12 @@ class  AdminOrder extends AbstractWorkPlace
         }
 
         $order = $args['Order'];
+
+        // 商品が一点もない際は、ポイント利用欄を表示しない
+        if (count($order->getOrderDetails()) < 1) {
+            $args['form']->children['plg_use_point']->vars['block_prefixes'][1] = 'hidden';
+        }
+
         $hasCustomer = $order->getCustomer();
 
         // 初回アクセスのダミーエンティティではカスタマー情報は含まない
@@ -289,25 +288,6 @@ class  AdminOrder extends AbstractWorkPlace
         // 利用ポイント確認
         if (empty($this->usePoint)) {
             $this->usePoint = 0;
-        }
-
-        /**
-         * プロセスイベントのみ以下実行
-         * 値引き計算表示を本体側で行うために、値引き金額をセット
-         */
-        if (!$event->hasArgument('Customer')) {
-            // 最後に利用したポイントを取得
-            $lastUsePoint = 0;
-            $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint(
-                $this->targetOrder
-            );
-
-            // ここでDiscoutを設定
-            $this->calculator->addEntity('Order', $this->targetOrder);
-            $this->calculator->setUsePoint($this->usePoint);
-            $this->calculator->setDiscount($lastUsePoint);
-
-            return false;
         }
 
         // 会員情報取得
