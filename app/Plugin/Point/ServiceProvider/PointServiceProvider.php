@@ -120,19 +120,9 @@ class PointServiceProvider implements ServiceProviderInterface
         /**
          * フックポイントイベント定型処理ヘルパーファクトリー登録
          */
-        /*
-        $app['eccube.plugin.point.hookpoint.routinework.helper.factory'] = $app->share(
-            function () {
-                return new EventRoutineWorksHelperFactory();
-            }
-        );
-        */
-        /** ポイント機能基本情報テーブル用リポジトリ */
-        $app['eccube.plugin.point.hookpoint.routinework'] = $app->share(
-            function ($class) {
-                return new EventRoutineWorksHelper($class);
-            }
-        );
+        $app['eccube.plugin.point.hookpoint.routinework'] = $app->protect(function ($class) {
+            return new EventRoutineWorksHelper($class);
+        });
 
         /**
          * ポイント計算処理サービスファクトリー登録
