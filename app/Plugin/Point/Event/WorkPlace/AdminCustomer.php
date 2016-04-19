@@ -97,7 +97,6 @@ class  AdminCustomer extends AbstractWorkPlace
         }
 
         // 保有ポイント
-        $pointCurrent = 0;
         $pointCurrent = $form->get('plg_point_current')->getData();
 
         if (empty($pointCurrent)) {
@@ -105,7 +104,6 @@ class  AdminCustomer extends AbstractWorkPlace
         }
 
         // 会員ID取得
-        $customerId = 0;
         $customerId = $form->getData()->getId();
 
         if (empty($customerId)) {

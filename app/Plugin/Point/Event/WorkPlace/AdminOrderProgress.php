@@ -127,7 +127,6 @@ class  AdminOrderProgress extends AbstractWorkPlace
          */
         if (!$event->hasArgument('Customer')) {
             // 最後に利用したポイントを取得
-            $lastUsePoint = 0;
             $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint(
                 $this->targetOrder
             );

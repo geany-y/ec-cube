@@ -100,12 +100,16 @@ class  AdminProduct extends AbstractWorkPlace
         }
 
         // ポイント付与率取得
-        $pointRate = 0;
         $pointRate = $form->get('plg_point_product_rate')->getData();
+        if(empty($pointRate)){
+            $pointRate = 0;
+        }
 
         // 商品ID取得
-        $productId = 0;
         $productId = $form->getData()->getId();
+        if(empty($productId)){
+            $productId = 0;
+        }
 
         // 前回入力値と比較
         $status = false;

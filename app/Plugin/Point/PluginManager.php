@@ -5,6 +5,7 @@ namespace Plugin\Point;
 use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
+use Monolog\Logger;
 use Symfony\Component\Translation\Tests\Dumper\QtFileDumperTest;
 
 /**
@@ -14,18 +15,6 @@ use Symfony\Component\Translation\Tests\Dumper\QtFileDumperTest;
  */
 class PluginManager extends AbstractPluginManager
 {
-
-    /**
-     * Image folder path (cop source)
-     * @var type
-     */
-    protected $imgSrc;
-    /**
-     *Image folder path (copy destination)
-     * @var type
-     */
-    protected $imgDst;
-
     /** @var \Eccube\Application */
     protected $app;
 
@@ -96,6 +85,8 @@ class PluginManager extends AbstractPluginManager
             $this->app['orm.em']->persist($pageLayout);
             $this->app['orm.em']->flush($pageLayout);
         } catch (DatabaseObjectNotFoundException $e) {
+            $log = $e;
+            $this->app->log($log, array(), Logger::WARNING);
             return false;
         }
     }
@@ -117,7 +108,10 @@ class PluginManager extends AbstractPluginManager
         }
         try {
             $this->app['orm.em']->flush();
+            // todo DatabaseObjectNotFoundException をスローしてログを確認
         } catch (DatabaseObjectNotFoundException $e) {
+            $log = $e;
+            $this->app->log($log, array(), Logger::WARNING);
             return false;
         }
     }

@@ -15,17 +15,21 @@ use HttpException\NotFoundHttpException;
  */
 class PointEvent
 {
-    // ヘルパー呼び出し用
-    // 管理画面
+    /**
+     * ヘルパー呼び出し用
+     * 管理画面
+     */
     const HELPER_ADMIN_PRODUCT = 'AdminProduct';
     const HELPER_ADMIN_CUSTOMER = 'AdminCustomer';
     const HELPER_ADMIN_ORDER = 'AdminOrder';
     const HELPER_ADMIN_ORDER_PROGRESS = 'AdminOrderProgress';
 
-    // フロント画面
+    /**
+     * ヘルパー呼び出し用
+     * フロント画面
+     */
     const HELPER_FRONT_SHOPPING = 'FrontShopping';
     const HELPER_FRONT_SHOPPING_INDEX = 'FrontShoppingIndex';
-    //const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
     const HELPER_FRONT_SHOPPING_COMPLETE = 'FrontShoppingComplete';
     const HELPER_FRONT_MYPAGE = 'FrontMypage';
     const HELPER_FRONT_PRODUCT_DETAIL = 'FrontProductDetail';
@@ -35,7 +39,10 @@ class PointEvent
     const HELPER_FRONT_PAYMENT = 'FrontPayment';
     const HELPER_FRONT_SHIPPING = 'FrontShipping';
 
-    // サービス
+    /**
+     * ヘルパー呼び出し用
+     * サービス
+     */
     const HELPER_SERVICE_MAIL = 'ServiceMail';
 
 
