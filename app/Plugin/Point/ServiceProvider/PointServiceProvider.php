@@ -129,7 +129,7 @@ class PointServiceProvider implements ServiceProviderInterface
         */
         /** ポイント機能基本情報テーブル用リポジトリ */
         $app['eccube.plugin.point.hookpoint.routinework'] = $app->share(
-            function () use ($class) {
+            function ($class) {
                 return new EventRoutineWorksHelper($class);
             }
         );

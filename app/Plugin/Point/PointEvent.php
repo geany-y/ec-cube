@@ -481,7 +481,6 @@ class PointEvent
      */
     protected function isAuthRouteFront()
     {
-    {
         // 権限判定
         if (!$this->app->isGranted('IS_AUTHENTICATED_FULLY')) {
             return false;
