@@ -8,6 +8,7 @@ use Eccube\Event\TemplateEvent;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
  * フックポイント定型処理コンポジションスーパークラス
@@ -33,7 +34,9 @@ abstract class AbstractWorkPlace
      * @param Request $request
      * @return mixed
      */
-    abstract public function createForm(FormBuilder $builder, Request $request);
+    public function createForm(FormBuilder $builder, Request $request){
+        throw new MethodNotAllowedException();
+    }
 
     /**
      * レンダリング拡張処理
@@ -41,21 +44,27 @@ abstract class AbstractWorkPlace
      * @param Response $response
      * @return mixed
      */
-    abstract public function renderView(Request $request, Response $response);
+    public function renderView(Request $request, Response $response){
+        throw new MethodNotAllowedException();
+    }
 
     /**
      * Twig拡張処理
      * @param TemplateEvent $event
      * @return mixed
      */
-    abstract public function createTwig(TemplateEvent $event);
+    public function createTwig(TemplateEvent $event){
+        throw new MethodNotAllowedException();
+    }
 
     /**
      * 保存拡張処理
      * @param EventArgs $event
      * @return mixed
      */
-    abstract public function save(EventArgs $event);
+    public function save(EventArgs $event){
+        throw new MethodNotAllowedException();
+    }
 
     /**
      * ビューをsearchをキーにsnippetと置き換え返却

@@ -21,35 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class ServiceMail extends AbstractWorkPlace
 {
     /**
-     * 本クラスでは処理なし
-     * @param FormBuilder $builder
-     * @param Request $request
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param TemplateEvent $event
-     */
-    public function createTwig(TemplateEvent $event)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * メール本文の置き換え
      * @param EventArgs $event
      * @return bool

@@ -64,25 +64,6 @@ class  AdminCustomer extends AbstractWorkPlace
     }
 
     /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param TemplateEvent $event
-     */
-    public function createTwig(TemplateEvent $event)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * 保有ポイント保存
      * @param EventArgs $event
      * @return bool

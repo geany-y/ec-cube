@@ -21,26 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FrontHistory extends AbstractWorkPlace
 {
     /**
-     * 本クラスでは処理なし
-     * @param FormBuilder $builder
-     * @param Request $request
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * 履歴情報挿入
      * @param TemplateEvent $event
      * @return bool
@@ -104,14 +84,5 @@ class FrontHistory extends AbstractWorkPlace
         $search = '<p id="summary_box__payment_total"';
         $this->replaceView($event, $snippet, $search);
 
-    }
-
-    /**
-     * ポイントデータの保存
-     * @param EventArgs $event
-     */
-    public function save(EventArgs $event)
-    {
-        throw new MethodNotAllowedException();
     }
 }

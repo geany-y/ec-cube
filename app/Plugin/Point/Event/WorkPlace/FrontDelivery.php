@@ -21,35 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FrontDelivery extends AbstractWorkPlace
 {
     /**
-     * 本クラスでは処理なし
-     * @param FormBuilder $builder
-     * @param Request $request
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param TemplateEvent $event
-     */
-    public function createTwig(TemplateEvent $event)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * 通常はデータの保存を行うが、本処理では、合計金額判定とエラー処理
      * @param EventArgs $event
      * @return bool

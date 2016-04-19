@@ -26,10 +26,11 @@ class PointEvent
 
     /**
      * ヘルパー呼び出し用
-     * フロント画面
+     * 管理画面
      */
     const HELPER_FRONT_SHOPPING = 'FrontShopping';
     const HELPER_FRONT_SHOPPING_INDEX = 'FrontShoppingIndex';
+    //const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
     const HELPER_FRONT_SHOPPING_COMPLETE = 'FrontShoppingComplete';
     const HELPER_FRONT_MYPAGE = 'FrontMypage';
     const HELPER_FRONT_PRODUCT_DETAIL = 'FrontProductDetail';
@@ -39,10 +40,7 @@ class PointEvent
     const HELPER_FRONT_PAYMENT = 'FrontPayment';
     const HELPER_FRONT_SHIPPING = 'FrontShipping';
 
-    /**
-     * ヘルパー呼び出し用
-     * サービス
-     */
+    // サービス
     const HELPER_SERVICE_MAIL = 'ServiceMail';
 
 

@@ -22,26 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FrontCart extends AbstractWorkPlace
 {
     /**
-     * 本クラスでは処理なし
-     * @param FormBuilder $builder
-     * @param Request $request
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * カートページにポイント情報を表示
      * @param TemplateEvent $event
      * @return bool
@@ -137,14 +117,5 @@ class FrontCart extends AbstractWorkPlace
         }
         $search = '<div id="cart_item_list"';
         $this->replaceView($event, $snippet, $search);
-    }
-
-    /**
-     * ポイントデータの保存
-     * @param EventArgs $event
-     */
-    public function save(EventArgs $event)
-    {
-        throw new MethodNotAllowedException();
     }
 }

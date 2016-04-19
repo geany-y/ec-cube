@@ -61,40 +61,6 @@ class  AdminOrderProgress extends AbstractWorkPlace
     }
 
     /**
-     * フォームを拡張
-     *  -   利用ポイント項目を追加
-     *  -   追加項目の位置はTwig拡張で配備
-     * @param FormBuilder $builder
-     * @param Request $request
-     * @return bool
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * Twigの拡張
-     *  - フォーム追加項目を挿入
-     * @param TemplateEvent $event
-     * @return bool
-     */
-    public function createTwig(TemplateEvent $event)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * 受注ステータス判定・ポイント更新
      * @param EventArgs $event
      * @return bool

@@ -21,27 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FrontMyPage extends AbstractWorkPlace
 {
     /**
-     * 本クラスでは処理なし
-     * @param FormBuilder $builder
-     * @param Request $request
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    //
-    /**
      * マイページにポイント情報を差し込む
      * @param TemplateEvent $event
      * @return bool
@@ -111,14 +90,5 @@ class FrontMyPage extends AbstractWorkPlace
         )->getContent();
         $search = '<div id="history_list"';
         $this->replaceView($event, $snippet, $search);
-    }
-
-    /**
-     * ポイントデータの保存
-     * @param EventArgs $event
-     */
-    public function save(EventArgs $event)
-    {
-        throw new MethodNotAllowedException();
     }
 }

@@ -138,16 +138,6 @@ class  AdminOrder extends AbstractWorkPlace
     }
 
     /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * Twigの拡張
      *  - フォーム追加項目を挿入
      * @param TemplateEvent $event

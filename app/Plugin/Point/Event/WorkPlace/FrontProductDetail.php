@@ -21,26 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FrontProductDetail extends AbstractWorkPlace
 {
     /**
-     * 本クラスでは処理なし
-     * @param FormBuilder $builder
-     * @param Request $request
-     */
-    public function createForm(FormBuilder $builder, Request $request)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * 商品詳細画面に付与ポイント表示
      * @param TemplateEvent $event
      * @return bool
@@ -125,14 +105,5 @@ class FrontProductDetail extends AbstractWorkPlace
 
         $search = '<p id="detail_description_box__item_range_code"';
         $this->replaceView($event, $snippet, $search);
-    }
-
-    /**
-     * 本クラスでは処理なし
-     * @param EventArgs $event
-     */
-    public function save(EventArgs $event)
-    {
-        throw new MethodNotAllowedException();
     }
 }

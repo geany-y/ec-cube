@@ -66,26 +66,6 @@ class  AdminProduct extends AbstractWorkPlace
     }
 
     /**
-     * 本クラスでは処理なし
-     * @param Request $request
-     * @param Response $response
-     */
-    public function renderView(Request $request, Response $response)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-
-    /**
-     * 本クラスでは処理なし
-     * @param TemplateEvent $event
-     */
-    public function createTwig(TemplateEvent $event)
-    {
-        throw new MethodNotAllowedException();
-    }
-
-    /**
      * 商品毎ポイント付与率保存
      * @param EventArgs $event
      * @return bool
