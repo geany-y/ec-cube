@@ -3,6 +3,7 @@
 namespace Plugin\Point\ServiceProvider;
 
 use Plugin\Point\Doctrine\Listener\ORMListener;
+use Plugin\Point\Helper\EventRoutineWorksHelper\EventRoutineWorksHelper;
 use Plugin\Point\Helper\EventRoutineWorksHelper\EventRoutineWorksHelperFactory;
 use Plugin\Point\Helper\PointCalculateHelper\PointCalculateHelper;
 use Plugin\Point\Helper\PointHistoryHelper\PointHistoryHelper;
@@ -119,9 +120,17 @@ class PointServiceProvider implements ServiceProviderInterface
         /**
          * フックポイントイベント定型処理ヘルパーファクトリー登録
          */
+        /*
         $app['eccube.plugin.point.hookpoint.routinework.helper.factory'] = $app->share(
             function () {
                 return new EventRoutineWorksHelperFactory();
+            }
+        );
+        */
+        /** ポイント機能基本情報テーブル用リポジトリ */
+        $app['eccube.plugin.point.hookpoint.routinework'] = $app->share(
+            function () use ($class) {
+                return new EventRoutineWorksHelper($class);
             }
         );
 

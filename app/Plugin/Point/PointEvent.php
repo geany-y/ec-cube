@@ -6,6 +6,20 @@ use Eccube\Application;
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
 use HttpException\NotFoundHttpException;
+use Plugin\Point\Event\WorkPlace\AdminCustomer;
+use Plugin\Point\Event\WorkPlace\AdminOrder;
+use Plugin\Point\Event\WorkPlace\AdminOrderProgress;
+use Plugin\Point\Event\WorkPlace\AdminProduct;
+use Plugin\Point\Event\WorkPlace\FrontCart;
+use Plugin\Point\Event\WorkPlace\FrontDelivery;
+use Plugin\Point\Event\WorkPlace\FrontHistory;
+use Plugin\Point\Event\WorkPlace\FrontMyPage;
+use Plugin\Point\Event\WorkPlace\FrontPayment;
+use Plugin\Point\Event\WorkPlace\FrontProductDetail;
+use Plugin\Point\Event\WorkPlace\FrontShipping;
+use Plugin\Point\Event\WorkPlace\FrontShopping;
+use Plugin\Point\Event\WorkPlace\FrontShoppingComplete;
+use Plugin\Point\Event\WorkPlace\ServiceMail;
 
 
 /**
@@ -30,7 +44,6 @@ class PointEvent
      */
     const HELPER_FRONT_SHOPPING = 'FrontShopping';
     const HELPER_FRONT_SHOPPING_INDEX = 'FrontShoppingIndex';
-    //const HELPER_FRONT_SHOPPING_CONFIRM = 'FrontShoppingConfirm';
     const HELPER_FRONT_SHOPPING_COMPLETE = 'FrontShoppingComplete';
     const HELPER_FRONT_MYPAGE = 'FrontMypage';
     const HELPER_FRONT_PRODUCT_DETAIL = 'FrontProductDetail';
@@ -40,7 +53,10 @@ class PointEvent
     const HELPER_FRONT_PAYMENT = 'FrontPayment';
     const HELPER_FRONT_SHIPPING = 'FrontShipping';
 
-    // サービス
+    /**
+     * ヘルパー呼び出し用
+     * サービス
+     */
     const HELPER_SERVICE_MAIL = 'ServiceMail';
 
 
@@ -69,10 +85,12 @@ class PointEvent
     public function onAdminProductEditInitialize(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 商品登録編集画面用/初期化 )
-        $this->setHelper(self::HELPER_ADMIN_PRODUCT);
+        //$this->setHelper(self::HELPER_ADMIN_PRODUCT);
 
         //フォーム拡張
-        $this->createForm($event);
+        //$this->createForm($event);
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminProduct());
+        $helper->createForm($event->getArgument('builder'), $this->app['request']);
     }
 
     /**
@@ -84,10 +102,12 @@ class PointEvent
     public function onAdminProductEditComplete(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 商品登録編集画面用/終了時 )
-        $this->setHelper(self::HELPER_ADMIN_PRODUCT);
+        //$this->setHelper(self::HELPER_ADMIN_PRODUCT);
 
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminProduct());
+        //$helper->createForm($event->getArgument('builder'), $this->app['request']);
         // ポイント付与率保存処理
-        $this->save($event);
+        $helper->save($event);
     }
 
     /**
@@ -99,10 +119,13 @@ class PointEvent
     public function onAdminCustomerEditIndexInitialize(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/初期化 )
-        $this->setHelper(self::HELPER_ADMIN_CUSTOMER);
+        //$this->setHelper(self::HELPER_ADMIN_CUSTOMER);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminCustomer());
+        $helper->createForm($event->getArgument('builder'), $this->app['request']);
 
         //フォーム拡張
-        $this->createForm($event);
+        //$this->createForm($event);
     }
 
     /**
@@ -114,10 +137,12 @@ class PointEvent
     public function onAdminCustomerEditIndexComplete(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/終了時 )
-        $this->setHelper(self::HELPER_ADMIN_CUSTOMER);
+        //$this->setHelper(self::HELPER_ADMIN_CUSTOMER);
 
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminCustomer());
+        $helper->save($event);
         // ポイント付与率保存処理
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -129,10 +154,13 @@ class PointEvent
     public function onAdminOrderEditIndexInitialize(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/初期化 )
-        $this->setHelper(self::HELPER_ADMIN_ORDER);
+        //$this->setHelper(self::HELPER_ADMIN_ORDER);
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminOrder());
+        $helper->createForm($event->getArgument('builder'), $this->app['request']);
+
 
         // ポイント付与率保存処理
-        $this->createForm($event);
+        //$this->createForm($event);
     }
 
     /**
@@ -146,10 +174,12 @@ class PointEvent
     public function onAdminOrderEditIndexProgress(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/終了 )
-        $this->setHelper(self::HELPER_ADMIN_ORDER_PROGRESS);
+        //$this->setHelper(self::HELPER_ADMIN_ORDER_PROGRESS);
 
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminOrderProgress());
+        $helper->save($event);
         // ポイント付与率保存処理
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -161,10 +191,13 @@ class PointEvent
     public function onAdminOrderEditIndexComplete(EventArgs $event)
     {
         // フックポイント汎用処理サービス取得 ( 会員登録編集画面用/終了 )
-        $this->setHelper(self::HELPER_ADMIN_ORDER);
+        //$this->setHelper(self::HELPER_ADMIN_ORDER);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminOrder());
+        $helper->save($event);
 
         // ポイント付与率保存処理
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -182,10 +215,12 @@ class PointEvent
         }
 
         // フックポイント汎用処理サービス取得 ( 商品購入完了画面用 )
-        $this->setHelper(self::HELPER_FRONT_SHOPPING_COMPLETE);
+        //$this->setHelper(self::HELPER_FRONT_SHOPPING_COMPLETE);
 
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontShoppingComplete());
+        $helper->save($event);
         // ポイント関連保存処理
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -202,10 +237,12 @@ class PointEvent
         }
 
         // フックポイント汎用処理サービス取得 ( 商品購入完了画面用 )
-        $this->setHelper(self::HELPER_FRONT_SHOPPING_COMPLETE);
+        //$this->setHelper(self::HELPER_FRONT_SHOPPING_COMPLETE);
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontShoppingComplete());
+        $helper->save($event);
 
         // ポイント関連保存処理
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -222,10 +259,12 @@ class PointEvent
         }
 
         // フックポイント定形処理ヘルパー取得
-        $this->setHelper(self::HELPER_FRONT_DELIVERY);
+        //$this->setHelper(self::HELPER_FRONT_DELIVERY);
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontDelivery());
+        $helper->save($event);
 
         // 配送関連合計金額判定
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -242,10 +281,12 @@ class PointEvent
         }
 
         // フックポイント定形処理ヘルパー取得
-        $this->setHelper(self::HELPER_FRONT_PAYMENT);
+        //$this->setHelper(self::HELPER_FRONT_PAYMENT);
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontPayment());
+        $helper->save($event);
 
         // 支払い合計金額判定
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -262,10 +303,12 @@ class PointEvent
         }
 
         // フックポイント定形処理ヘルパー取得
-        $this->setHelper(self::HELPER_FRONT_SHIPPING);
+        //$this->setHelper(self::HELPER_FRONT_SHIPPING);
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontShipping());
+        $helper->save($event);
 
         // 配送先合計金額判定
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -284,10 +327,13 @@ class PointEvent
         }
 
         // フックポイント汎用処理サービス取得 ( 商品購入画面用 )
-        $this->setHelper(self::HELPER_FRONT_SHOPPING);
+        //$this->setHelper(self::HELPER_FRONT_SHOPPING);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontShopping());
+        $helper->createTwig($event);
 
         // Twig拡張(ポイント計算/合計金額計算・描画)
-        $this->createTwig($event);
+        //$this->createTwig($event);
     }
 
 
@@ -299,13 +345,16 @@ class PointEvent
      */
     public function onRenderAdminOrderEdit(TemplateEvent $event)
     {
-        $args = $event->getParameters();
+        //$args = $event->getParameters();
 
         // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
-        $this->setHelper(self::HELPER_ADMIN_ORDER);
+        //$this->setHelper(self::HELPER_ADMIN_ORDER);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new AdminOrder());
+        $helper->createTwig($event);
 
         // ポイント関連保存処理
-        $this->createTwig($event);
+        //$this->createTwig($event);
 
     }
 
@@ -322,10 +371,13 @@ class PointEvent
         }
 
         // フックポイント定形処理ヘルパー取得 ( 商品購入完了 )
-        $this->setHelper(self::HELPER_FRONT_MYPAGE);
+        //$this->setHelper(self::HELPER_FRONT_MYPAGE);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontMyPage());
+        $helper->createTwig($event);
 
         // ポイント関連保存処理
-        $this->createTwig($event);
+        //$this->createTwig($event);
     }
 
     /**
@@ -342,10 +394,13 @@ class PointEvent
         }
 
         // フックポイント定形処理ヘルパー取得 ( 受注完了/終了 )
-        $this->setHelper(self::HELPER_SERVICE_MAIL);
+        //$this->setHelper(self::HELPER_SERVICE_MAIL);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new ServiceMail());
+        $helper->save($event);
 
         // ポイント関連保存処理
-        $this->save($event);
+        //$this->save($event);
     }
 
     /**
@@ -356,10 +411,13 @@ class PointEvent
     public function onRenderProductDetail(TemplateEvent $event)
     {
         // フックポイント定形処理ヘルパー取得 ( 商品詳細 )
-        $this->setHelper(self::HELPER_FRONT_PRODUCT_DETAIL);
+        //$this->setHelper(self::HELPER_FRONT_PRODUCT_DETAIL);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontProductDetail());
+        $helper->createTwig($event);
 
         // ポイント関連保存処理
-        $this->createTwig($event);
+        //$this->createTwig($event);
     }
 
     /**
@@ -370,10 +428,13 @@ class PointEvent
     public function onRenderCart(TemplateEvent $event)
     {
         // フックポイント定形処理ヘルパー取得 ( カート画面 )
-        $this->setHelper(self::HELPER_FRONT_CART);
+        //$this->setHelper(self::HELPER_FRONT_CART);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontCart());
+        $helper->createTwig($event);
 
         // ポイント関連保存処理
-        $this->createTwig($event);
+        //$this->createTwig($event);
     }
 
     /**
@@ -390,10 +451,13 @@ class PointEvent
         }
 
         // フックポイント定形処理ヘルパー取得 ( マイページ履歴 )
-        $this->setHelper(self::HELPER_FRONT_HISTORY);
+        //$this->setHelper(self::HELPER_FRONT_HISTORY);
+
+        $helper = $this->app['eccube.plugin.point.hookpoint.routinework'](new FrontHistory());
+        $helper->createTwig($event);
 
         // ポイント関連保存処理
-        $this->createTwig($event);
+        //$this->createTwig($event);
     }
 
 
@@ -417,6 +481,7 @@ class PointEvent
      */
     protected function isAuthRouteFront()
     {
+    {
         // 権限判定
         if (!$this->app->isGranted('IS_AUTHENTICATED_FULLY')) {
             return false;
@@ -429,6 +494,7 @@ class PointEvent
      * ヘルパーインスタンス取得処理呼び出しラッパーメソッド
      * @param $key
      */
+    /*
     protected function setHelper($key)
     {
         $this->factory = $this->app['eccube.plugin.point.hookpoint.routinework.helper.factory'];
@@ -437,36 +503,43 @@ class PointEvent
 
         return;
     }
+    */
 
     /**
      * ヘルパー機能フォーム作成呼び出しラッパーメソッド
      * @param EventArgs $event
      * @return mixed
      */
+    /*
     protected function createForm(EventArgs $event)
     {
+    */
         /** @var \Symfony\Component\Form\FormBuilder $formBuilder */
         // フォームビルダー取得
-        return $this->helper->createForm($event->getArgument('builder'), $this->app['request']);
-    }
+        //return $this->helper->createForm($event->getArgument('builder'), $this->app['request']);
+    //}
 
     /**
      * ヘルパー機能保存処理呼び出しラッパーメソッド
      * @param EventArgs $event
      * @return mixed
      */
+    /*
     protected function save(EventArgs $event)
     {
         return $this->helper->save($event);
     }
+    */
 
     /**
      * ヘルパー機能Twig作成呼び出しラッパーメソッド
      * @param TemplateEvent $event
      * @return mixed
      */
+    /*
     protected function createTwig(TemplateEvent $event)
     {
         return $this->helper->createTwig($event);
     }
+    */
 }
