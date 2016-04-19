@@ -59,7 +59,7 @@ class FrontPointController
             return $this->app->redirect($this->app->url('shopping_error'));
         }
 
-        // 最終仮保存ポイントがあるかどうかの判定
+        // 最終仮利用ポイントがあるかどうかの判定
         $lastPreUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastPreUsePoint($Order);
         if (empty($lastPreUsePoint)) {
             $lastPreUsePoint = 0;
@@ -95,6 +95,10 @@ class FrontPointController
             return false;
         }
         $pointRate = $pointInfo->getPlgBasicPointRate();
+        if (empty($pointInfo)) {
+            return false;
+        }
+
 
         //フォーム生成
         $form = $this->app['form.factory']
