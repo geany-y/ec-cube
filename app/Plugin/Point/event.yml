@@ -29,20 +29,20 @@ service.shopping.notify.complete:
 
 ## 配送先関連
 front.mypage.delivery.edit.complete:
-    - [isDeliveryOver, NORMAL]
+    - [Delivery, NORMAL]
 
 front.shopping.delivery.complete:
-    - [isDeliveryOver, NORMAL]
+    - [Delivery, NORMAL]
 
 ## 支払い方法判定
 front.shopping.payment.complete:
-    - [isPaymentOver, NORMAL]
+    - [Payment, NORMAL]
 
 ## 配送方法設定
 front.shopping.shipping.complete:
-    - [isShippingOver, NORMAL]
+    - [Shipping, NORMAL]
 front.shopping.shipping.edit.complete:
-    - [isShippingOver, NORMAL]
+    - [Shipping, NORMAL]
 
 
 # 画面レンダリング

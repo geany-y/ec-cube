@@ -251,7 +251,7 @@ class PointEvent
      * @param TemplateEvent $event
      * @return bool
      */
-    public function isDeliveryOver(EventArgs $event)
+    public function Delivery(EventArgs $event)
     {
         // ログイン判定
         if (!$this->isAuthRouteFront()) {
@@ -273,7 +273,7 @@ class PointEvent
      * @param TemplateEvent $event
      * @return bool
      */
-    public function isPaymentOver(EventArgs $event)
+    public function Payment(EventArgs $event)
     {
         // ログイン判定
         if (!$this->isAuthRouteFront()) {
@@ -295,7 +295,7 @@ class PointEvent
      * @param TemplateEvent $event
      * @return bool
      */
-    public function isShippingOver(EventArgs $event)
+    public function Shipping(EventArgs $event)
     {
         // ログイン判定
         if (!$this->isAuthRouteFront()) {
@@ -488,57 +488,4 @@ class PointEvent
 
         return true;
     }
-
-    /**
-     * ヘルパーインスタンス取得処理呼び出しラッパーメソッド
-     * @param $key
-     */
-    /*
-    protected function setHelper($key)
-    {
-        $this->factory = $this->app['eccube.plugin.point.hookpoint.routinework.helper.factory'];
-        // フックポイント汎用処理ヘルパー取得
-        $this->helper = $this->factory->createEventRoutineWorksHelper($key);
-
-        return;
-    }
-    */
-
-    /**
-     * ヘルパー機能フォーム作成呼び出しラッパーメソッド
-     * @param EventArgs $event
-     * @return mixed
-     */
-    /*
-    protected function createForm(EventArgs $event)
-    {
-    */
-        /** @var \Symfony\Component\Form\FormBuilder $formBuilder */
-        // フォームビルダー取得
-        //return $this->helper->createForm($event->getArgument('builder'), $this->app['request']);
-    //}
-
-    /**
-     * ヘルパー機能保存処理呼び出しラッパーメソッド
-     * @param EventArgs $event
-     * @return mixed
-     */
-    /*
-    protected function save(EventArgs $event)
-    {
-        return $this->helper->save($event);
-    }
-    */
-
-    /**
-     * ヘルパー機能Twig作成呼び出しラッパーメソッド
-     * @param TemplateEvent $event
-     * @return mixed
-     */
-    /*
-    protected function createTwig(TemplateEvent $event)
-    {
-        return $this->helper->createTwig($event);
-    }
-    */
 }

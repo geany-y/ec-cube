@@ -542,7 +542,7 @@ class PointCalculateHelper
      * @return bool
      * @throws EntityNotFoundException
      */
-    public function isTotalAsMinus()
+    public function calculateTotalDiscountOnChangeConditions()
     {
         // 必要エンティティを判定
         if (!$this->hasEntities('Order')) {

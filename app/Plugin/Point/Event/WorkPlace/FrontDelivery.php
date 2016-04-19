@@ -51,7 +51,7 @@ class FrontDelivery extends AbstractWorkPlace
         $calculator->addEntity('Customer', $customer);
 
         // 合計金額マイナス確認
-        if ($calculator->isTotalAsMinus()) {
+        if ($calculator->calculateTotalDiscountOnChangeConditions()) {
             $this->app->addError('お支払い金額がマイナスになったため、ポイントをキャンセルしました。', 'front.request');
         }
     }
