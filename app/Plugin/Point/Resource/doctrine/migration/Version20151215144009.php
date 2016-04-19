@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  */
 class Version20151215144009 extends AbstractMigration
 {
+    protected $app;
     // テーブル名称
     const PLG_POINT_INFO = 'plg_point_Info';
     const PLG_POINT = 'plg_point';
@@ -22,6 +23,10 @@ class Version20151215144009 extends AbstractMigration
     const PLG_POINT_PRODUCT_RATE = 'plg_point_product_rate';
     const PLG_POINT_SNAP_SHOT = 'plg_point_snapshot';
     const PLG_POINT_DTB_PAGE_LAYOUT = 'PageLayout';
+
+    public function __construct(){
+        $this->app = \Eccube\Application::getInstance();
+    }
 
     /**
      * インストール時処理
@@ -108,32 +113,6 @@ class Version20151215144009 extends AbstractMigration
             $t->addColumn('update_date', 'datetime', array('NotNull' => true));
             $t->setPrimaryKey(array('plg_point_snapshot_id'));
         }
-
-        // @todo Plugin Install
-        /*
-        $this->addSql("INSERT INTO plg_point_info (plg_point_info_id,
- plg_add_point_status, plg_basic_point_rate, plg_point_conversion_rate,
-  plg_round_type, plg_calculation_type, create_date, update_date) VALUES (
-  null, , 'Eccube\\\\Entity\\\\Category', 'level', NULL, '階層', 5, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
-        */
-
-        // this up() migration is auto-generated, please modify it to your needs
-
-        /*
-        $app = \Eccube\Application::getInstance();
-        $em = $app['orm.em'];
-        try {
-            foreach ($classes as $class) {
-                $metadatas[] = $em->getMetadataFactory()->getMetadataFor('\\Plugin\\Point\\Entity\\'.$class);
-            }
-            $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
-            $schemaTool->dropSchema($metadatas);
-            $schemaTool->createSchema($metadatas);
-        }catch(Exception $e){
-            throw new Exception();
-        }
-        */
-
     }
 
     /**
@@ -158,26 +137,5 @@ class Version20151215144009 extends AbstractMigration
         if ($schema->hasTable(self::PLG_POINT_SNAP_SHOT)) {
             $schema->dropTable(self::PLG_POINT_SNAP_SHOT);
         }
-
-        /*
-        // 不要DB削除
-        $classes = array(
-            self::PLG_POINT_INFO,
-            self::PLG_POINT,
-            self::PLG_POINT_CUSTOMER,
-            self::PLG_POINT_PRODUCT_RATE,
-            self::PLG_POINT_SNAP_SHOT,
-        );
-
-        // this up() migration is auto-generated, please modify it to your needs
-        $app = \Eccube\Application::getInstance();
-        $em = $app['orm.em'];
-        foreach ($classes as $class) {
-            $metadatas[] = $em->getMetadataFactory()->getMetadataFor('\\Plugin\\Point\\Entity\\'.$class);
-        }
-        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
-        $schemaTool->dropSchema($metadatas);
-        $schemaTool->createSchema($metadatas);
-        */
     }
 }
