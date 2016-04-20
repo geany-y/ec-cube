@@ -291,7 +291,7 @@ class PointCalculateHelper
                 }
             }
             $this->addPoint += (integer)$this->getRoundValue(
-                ($node->getObject()->getPrice01() * $rate * $node->getQuantity())
+                (($node->getObject()->getPrice02() * $rate) * $node->getQuantity())
             );
         }
 
@@ -349,9 +349,10 @@ class PointCalculateHelper
                 }
             }
             $this->addPoint += (integer)$this->getRoundValue(
-                ($node->getProductClass()->getPrice01() * $rate * $node->getQuantity())
+                (($node->getProductClass()->getPrice02() * $rate) * $node->getQuantity())
             );
         }
+
 
         // 減算処理の場合減算値を返却
         if ($this->isSubtraction()) {
@@ -392,8 +393,8 @@ class PointCalculateHelper
         }
 
         // 金額の取得
-        $min_price = $this->entities['Product']->getPrice01Min();
-        $max_price = $this->entities['Product']->getPrice01Max();
+        $min_price = $this->entities['Product']->getPrice02Min();
+        $max_price = $this->entities['Product']->getPrice02Max();
 
         // 返却値生成
         $rate = array();
