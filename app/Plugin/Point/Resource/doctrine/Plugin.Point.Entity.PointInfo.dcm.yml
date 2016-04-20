@@ -19,13 +19,13 @@ Plugin\Point\Entity\PointInfo:
         plg_basic_point_rate:
             type: integer
             unsigned: false
-            nullable: false
+            nullable: true
             options:
                 default: 0
         plg_point_conversion_rate:
             type: integer
-            nullable: false
             unsigned: false
+            nullable: true
             options:
                 default: 0
         plg_round_type:

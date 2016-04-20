@@ -92,7 +92,7 @@ class PointInfoType extends AbstractType
                     'label' => '基本ポイント付与率',
                     'required' => false,
                     'mapped' => true,
-                    'empty_data' => 0,
+                    'empty_data' => null,
                     'attr' => array(
                         'placeholder' => '「商品毎の付与率」が設定されていない場合に本値が適用されます。( ％ )',
                     ),
@@ -101,6 +101,18 @@ class PointInfoType extends AbstractType
                             array(
                                 'pattern' => "/^\d+$/u",
                                 'message' => 'form.type.numeric.invalid',
+                            )
+                        ),
+                        new Assert\NotEqualTo(
+                            array(
+                                'value' => 0,
+                                'message' => 'admin.point.validate.zero.error',
+                            )
+                        ),
+                        new Assert\Range(
+                            array(
+                                'min' => 0,
+                                'max' => 100,
                             )
                         ),
                     ),
@@ -113,7 +125,7 @@ class PointInfoType extends AbstractType
                     'label' => 'ポイント換算率',
                     'required' => false,
                     'mapped' => true,
-                    'empty_data' => 0,
+                    'empty_data' => null,
                     'attr' => array(
                         'placeholder' => 'ポイント利用時の換算値です( 1 → 1pt = 1円 )',
                     ),
@@ -122,6 +134,18 @@ class PointInfoType extends AbstractType
                             array(
                                 'pattern' => "/^\d+$/u",
                                 'message' => 'form.type.numeric.invalid',
+                            )
+                        ),
+                        new Assert\NotEqualTo(
+                            array(
+                                'value' => 0,
+                                'message' => 'admin.point.validate.zero.error',
+                            )
+                        ),
+                        new Assert\Range(
+                            array(
+                                'min' => 0,
+                                'max' => 100,
                             )
                         ),
                     ),

@@ -66,7 +66,7 @@ class PluginManager extends AbstractPluginManager
             ->setParameter('plgAddPointStatus', 1)
             ->setParameter('plgBasicPointRate', 1)
             ->setParameter('plgPointConversionRate', 1)
-            ->setParameter('plgRoundType', 0)
+            ->setParameter('plgRoundType', 1)
             ->setParameter('plgCalculationType', 1)
             ->setParameter('CreateDate', date('Y-m-d h:i:s'))
             ->setParameter('UpdateDate', date('Y-m-d h:i:s'));

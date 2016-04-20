@@ -60,6 +60,12 @@ class  AdminProduct extends AbstractWorkPlace
                                 'message' => 'form.type.numeric.invalid',
                             )
                         ),
+                        new Assert\Range(
+                            array(
+                                'min' => 0,
+                                'max' => 100,
+                            )
+                        ),
                     ),
                 )
             );

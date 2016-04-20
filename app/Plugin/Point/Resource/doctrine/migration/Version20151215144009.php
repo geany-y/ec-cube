@@ -43,8 +43,8 @@ class Version20151215144009 extends AbstractMigration
             $t = $schema->createTable(self::PLG_POINT_INFO);
             $t->addColumn('plg_point_info_id', 'integer', array('NotNull' => true, 'autoincrement' => true));
             $t->addColumn('plg_add_point_status', 'smallint', array('NotNull' => true, 'Default' => 0));
-            $t->addColumn('plg_basic_point_rate', 'integer', array('NotNull' => true, 'Default' => 0));
-            $t->addColumn('plg_point_conversion_rate', 'integer', array('NotNull' => true, 'Default' => 0));
+            $t->addColumn('plg_basic_point_rate', 'integer', array('NotNull' => false, 'Default' => null));
+            $t->addColumn('plg_point_conversion_rate', 'integer', array('NotNull' => false, 'Default' => null));
             $t->addColumn('plg_round_type', 'smallint', array('NotNull' => true, 'Default' => 0));
             $t->addColumn('plg_calculation_type', 'smallint', array('NotNull' => true, 'Default' => 0));
             $t->addColumn('create_date', 'datetime', array('NotNull' => true));
