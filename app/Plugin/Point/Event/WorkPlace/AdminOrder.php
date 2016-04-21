@@ -123,13 +123,19 @@ class  AdminOrder extends AbstractWorkPlace
                     new Assert\Regex(
                         array(
                             'pattern' => "/^\d+?$/u",
-                            'message' => 'form.type.numeric.invalid',
+                            'message' => '数字で入力してください。',
                         )
                     ),
                     new Assert\LessThanOrEqual(
                         array(
                             'value' => $hasPoint,
                             'message' => '利用ポイントは保有ポイント以内で入力してください。',
+                        )
+                    ),
+                    new Assert\Range(
+                        array(
+                            'min' => 0,
+                            'max' => 100000,
                         )
                     ),
                 ),

@@ -90,7 +90,7 @@ class PointInfoType extends AbstractType
                 'text',
                 array(
                     'label' => '基本ポイント付与率',
-                    'required' => false,
+                    'required' => true,
                     'mapped' => true,
                     'empty_data' => null,
                     'attr' => array(
@@ -123,7 +123,7 @@ class PointInfoType extends AbstractType
                 'text',
                 array(
                     'label' => 'ポイント換算率',
-                    'required' => false,
+                    'required' => true,
                     'mapped' => true,
                     'empty_data' => null,
                     'attr' => array(
@@ -145,7 +145,7 @@ class PointInfoType extends AbstractType
                         new Assert\Range(
                             array(
                                 'min' => 0,
-                                'max' => 100,
+                                'max' => 10000,
                             )
                         ),
                     ),
