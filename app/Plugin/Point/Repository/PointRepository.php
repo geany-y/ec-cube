@@ -190,6 +190,49 @@ class PointRepository extends EntityRepository
     }
 
     /**
+     * 最終保存手動保存保有ポイントを取得
+     * @param $customer
+     * @return array|bool|null
+     */
+    public function getLastManualPointByCustomer($customer)
+    {
+        // 必要エンティティ判定
+        if (empty($customer)) {
+            return false;
+        }
+
+        try {
+            // 会員IDをもとに保有ポイントを計算
+            $qb = $this->createQueryBuilder('p')
+                ->andWhere('p.customer_id = :customer_id')
+                ->andWhere('p.plg_point_type = :plg_point_type')
+                ->orderBy('p.create_date', 'desc')
+                ->setParameter('customer_id', $customer->getId())
+                ->setParameter('plg_point_type', PointHistoryHelper::STATE_CURRENT)
+                ->setMaxResults(1);
+
+            $manualPoint = $qb->getQuery()->getResult();
+
+            // 仮ポイント取得判定
+            if (count($manualPoint) < 1) {
+                return false;
+            }
+
+
+            $lastManualPoint = $manualPoint[0]->getPlgDynamicPoint();
+
+            // 保有ポイントがマイナスになった場合はエラー表示
+            if ($lastManualPoint < 0) {
+                return false;
+            }
+
+            return $lastManualPoint;
+        } catch (NoResultException $e) {
+            return null;
+        }
+    }
+
+    /**
      * 最終利用ポイントを受注エンティティより取得
      * @param Order $order
      * @return int|null|number
