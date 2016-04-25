@@ -522,6 +522,7 @@ class PointCalculateHelper
         $useDiscount = $this->getConversionPoint();
 
         $diff = $currDiscount - ($lastUsePoint * $this->pointInfo->getPlgBasicPointRate());
+
         if ($diff >= 0) {
             if ((integer)$currDiscount != (integer)$useDiscount) {
                 $mergeDiscount = $diff + $useDiscount;

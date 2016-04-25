@@ -1,0 +1,9 @@
+mail:
+    transport: mail
+    host: localhost
+    port: 25
+    username: 
+    password: 
+    encryption: null
+    auth_mode: null
+    charset_iso_2022_jp: false

@@ -1,0 +1,49 @@
+# duplicated
+root: /ec-cube/html/ # root_urlpath
+admin_dir: ecpub/ # admin_route
+tpl: /ec-cube/html/user_data/packages/default/ # front_urlpath
+admin_tpl: /ec-cube/html/user_data/packages/admin/ # admin_urlpath
+image_path: /ec-cube/html/upload/save_image/ # image_save_urlpath
+
+# base valiables
+root_dir: C:\xampp\htdocs\ec-cube
+root_urlpath: /ec-cube/html
+template_code: default
+
+# routing
+admin_route: ecpub
+user_data_route: user_data
+
+# realdir::image
+image_save_realdir: C:\xampp\htdocs\ec-cube/html/upload/save_image
+image_temp_realdir: C:\xampp\htdocs\ec-cube/html/upload/temp_image
+
+# realdir::user_data
+user_data_realdir: C:\xampp\htdocs\ec-cube/html/user_data
+
+# realdir::block
+block_default_realdir: C:\xampp\htdocs\ec-cube/src/Eccube/Resource/template/default/Block
+block_realdir: C:\xampp\htdocs\ec-cube/app/template/default/Block
+
+# realdir::template
+template_default_realdir: C:\xampp\htdocs\ec-cube/src/Eccube/Resource/template/default
+template_default_html_realdir: C:\xampp\htdocs\ec-cube/html/template/default
+template_admin_realdir: C:\xampp\htdocs\ec-cube/src/Eccube/Resource/template/admin
+template_admin_html_realdir: C:\xampp\htdocs\ec-cube/html/template/admin
+template_realdir: C:\xampp\htdocs\ec-cube/app/template/default
+template_html_realdir: C:\xampp\htdocs\ec-cube/html/template/default
+template_temp_realdir: C:\xampp\htdocs\ec-cube/app/cache/eccube/template
+
+# realdir::csv
+csv_temp_realdir: C:\xampp\htdocs\ec-cube/app/cache/eccube/csv
+
+# realdir:plugin
+plugin_realdir: C:\xampp\htdocs\ec-cube/app/Plugin
+plugin_temp_realdir: C:\xampp\htdocs\ec-cube/app/cache/plugin
+
+# urlpath
+admin_urlpath: /ec-cube/html/template/admin
+front_urlpath: /ec-cube/html/template/default
+image_save_urlpath: /ec-cube/html/upload/save_image
+image_temp_urlpath: /ec-cube/html/upload/temp_image
+user_data_urlpath: /ec-cube/html/user_data

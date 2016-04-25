@@ -34,13 +34,13 @@ class PointRepository extends EntityRepository
 
             // ログテーブルからポイントを計算
             $qb = $this->createQueryBuilder('p');
-            $qb->addSelect('SUM(p.plg_dynamic_point) as point_sum')
+            $qb->select('SUM(p.plg_dynamic_point) as point_sum')
                 ->add('where', $qb->expr()->in('p.plg_point_type', $needStatus))
                 ->andWhere('p.customer_id = :customer_id')
                 ->setParameter('customer_id', $customerId);
 
             // 合計ポイント
-            $sum_point = $qb->getQuery()->getResult();
+            $sum_point = $qb->getQuery()->getScalarResult();
 
             // 情報が取得できない場合
             if (count($sum_point) < 1) {
@@ -69,13 +69,13 @@ class PointRepository extends EntityRepository
         try {
             // 会員IDをもとに仮付与ポイントを計算
             $qb = $this->createQueryBuilder('p')
-                ->addSelect('SUM(p.plg_dynamic_point) as point_sum')
+                ->select('SUM(p.plg_dynamic_point) as point_sum')
                 ->andWhere('p.plg_point_type = :pointType')
                 ->andWhere('p.customer_id = :customer_id')
                 ->setParameter('pointType', PointHistoryHelper::STATE_PRE_ADD)
                 ->setParameter('customer_id', $customer_id);
 
-            $provisionalAddPoint = $qb->getQuery()->getResult();
+            $provisionalAddPoint = $qb->getQuery()->getScalarResult();
 
             // 仮ポイント取得判定
             if (count($provisionalAddPoint) < 1) {

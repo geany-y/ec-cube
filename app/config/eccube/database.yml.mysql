@@ -1,0 +1,9 @@
+database:
+    driver: pdo_mysql
+    host: localhost
+    dbname: cube3_dev
+    port: 3306
+    user: root
+    password : root
+    charset: utf8
+    defaultTableOptions: { collate: utf8_general_ci }

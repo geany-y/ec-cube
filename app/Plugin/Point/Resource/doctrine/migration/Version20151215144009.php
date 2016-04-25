@@ -17,7 +17,7 @@ class Version20151215144009 extends AbstractMigration
 {
     protected $app;
     // テーブル名称
-    const PLG_POINT_INFO = 'plg_point_Info';
+    const PLG_POINT_INFO = 'plg_point_info';
     const PLG_POINT = 'plg_point';
     const PLG_POINT_CUSTOMER = 'plg_point_customer';
     const PLG_POINT_PRODUCT_RATE = 'plg_point_product_rate';

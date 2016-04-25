@@ -54,7 +54,7 @@ class PluginManager extends AbstractPluginManager
         $qb = $this->app['db']->createQueryBuilder();
         $qb
             ->insert('plg_point_info')
-            ->setValue('plg_point_info_id', ':plgPointInfoId')
+            //->setValue('plg_point_info_id', ':plgPointInfoId')
             ->setValue('plg_add_point_status', ':plgAddPointStatus')
             ->setValue('plg_basic_point_rate', ':plgBasicPointRate')
             ->setValue('plg_point_conversion_rate', ':plgPointConversionRate')
@@ -62,7 +62,7 @@ class PluginManager extends AbstractPluginManager
             ->setValue('plg_calculation_type', ':plgCalculationType')
             ->setValue('create_date', ':CreateDate')
             ->setValue('update_date', ':UpdateDate')
-            ->setParameter('plgPointInfoId', null)
+            //->setParameter('plgPointInfoId', null)
             ->setParameter('plgAddPointStatus', 1)
             ->setParameter('plgBasicPointRate', 1)
             ->setParameter('plgPointConversionRate', 1)
