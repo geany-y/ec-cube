@@ -175,13 +175,14 @@ class PointRepository extends EntityRepository
                 return false;
             }
 
-
             $lastAddPoint = $lastAddPoint[0]->getPlgDynamicPoint();
 
             // 仮ポイントがマイナスになった場合はエラー表示
+            /*
             if ($lastAddPoint < 0) {
                 return false;
             }
+            */
 
             return $lastAddPoint;
         } catch (NoResultException $e) {

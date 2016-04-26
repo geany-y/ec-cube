@@ -67,6 +67,7 @@ class  AdminOrderProgress extends AbstractWorkPlace
      */
     public function save(EventArgs $event)
     {
+        /*
         // 必要情報をセット
         $this->targetOrder = $event->getArgument('TargetOrder');
 
@@ -86,11 +87,13 @@ class  AdminOrderProgress extends AbstractWorkPlace
         if (empty($this->usePoint)) {
             $this->usePoint = 0;
         }
+        */
 
         /**
          * プロセスイベントのみ以下実行
          * 値引き計算表示を本体側で行うために、値引き金額をセット
          */
+        /*
         if (!$event->hasArgument('Customer')) {
             // 最後に利用したポイントを取得
             $lastUsePoint = $this->app['eccube.plugin.point.repository.point']->getLastAdjustUsePoint(
@@ -100,9 +103,10 @@ class  AdminOrderProgress extends AbstractWorkPlace
             // ここでDiscoutを設定
             $this->calculator->addEntity('Order', $this->targetOrder);
             $this->calculator->setUsePoint($this->usePoint);
-            $this->calculator->setDiscount($lastUsePoint);
+            //$this->calculator->setDiscount($lastUsePoint);
 
             return false;
         }
+        */
     }
 }

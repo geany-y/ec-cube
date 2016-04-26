@@ -296,7 +296,7 @@ class PointCalculateHelper
         }
 
         // 減算処理の場合減算値を返却
-        if ($this->isSubtraction()) {
+        if ($this->isSubtraction() && !empty($this->usePoint)) {
             return $this->getSubtractionCalculate();
         }
 
@@ -354,7 +354,7 @@ class PointCalculateHelper
         }
 
         // 減算処理の場合減算値を返却
-        if ($this->isSubtraction()) {
+        if ($this->isSubtraction() && !empty($this->usePoint)) {
             return $this->getSubtractionCalculate();
         }
 
