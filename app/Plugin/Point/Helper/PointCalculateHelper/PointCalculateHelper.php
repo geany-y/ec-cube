@@ -39,6 +39,10 @@ class PointCalculateHelper
         $this->app = $app;
         // ポイント情報基本設定取得
         $this->pointInfo = $this->app['eccube.plugin.point.repository.pointinfo']->getLastInsertData();
+
+        if(empty($this->pointInfo)){
+            return false;
+        }
         // ポイント換算値
         $this->basicRate = $this->pointInfo->getPlgBasicPointRate();
         $this->entities = array();
