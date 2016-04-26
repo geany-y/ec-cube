@@ -102,6 +102,19 @@ class PointHistoryHelper
 
     /**
      * 仮加算ポイント情報を履歴登録
+     *  - 会員管理
+     * @param $point
+     */
+    public function saveManualProvisionalAddPoint($point)
+    {
+        $this->currentActionName = self::HISTORY_MESSAGE_MANUAL_EDIT;
+        $this->historyActionType = self::HISTORY_MESSAGE_TYPE_PRE_ADD;
+        $this->historyType = self::STATE_PRE_ADD;
+        $this->saveHistoryPoint($point);
+    }
+
+    /**
+     * 仮加算ポイント情報を履歴登録
      *  - 受注管理画面
      * @param $point
      */

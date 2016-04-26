@@ -353,7 +353,6 @@ class PointCalculateHelper
             );
         }
 
-
         // 減算処理の場合減算値を返却
         if ($this->isSubtraction()) {
             return $this->getSubtractionCalculate();
@@ -411,12 +410,12 @@ class PointCalculateHelper
     protected function isSubtraction()
     {
         // 基本情報が設定されているか確認
-        if (!empty($this->pointInfo)) {
+        if (empty($this->pointInfo)) {
             return false;
         }
 
         // 計算方法の判定
-        if ($this->pointInfo == PointInfo::POINT_CALCULATE_ADMIN_ORDER_SUBTRACTION) {
+        if ($this->pointInfo->getPlgCalculationType() === PointInfo::POINT_CALCULATE_SUBTRACTION) {
             return true;
         }
 
@@ -430,7 +429,7 @@ class PointCalculateHelper
     protected function getSubtractionCalculate()
     {
         // 基本情報が設定されているか確認
-        if (!empty($this->pointInfo->getplgPointCalculateType)) {
+        if (is_null($this->pointInfo->getPlgCalculationType())) {
             return false;
         }
 
@@ -440,7 +439,7 @@ class PointCalculateHelper
         }
 
         $conversionRate = $this->pointInfo->getPlgPointConversionRate();
-        $rate = $this->basicRate / 100;
+        $rate = ($this->basicRate / 100) + 1;
         $usePointAddRate = (integer)$this->getRoundValue(($this->usePoint * $rate) * $conversionRate);
 
         $this->addPoint = (($this->addPoint - $usePointAddRate) < 0) ? 0 : ($this->addPoint - $usePointAddRate);

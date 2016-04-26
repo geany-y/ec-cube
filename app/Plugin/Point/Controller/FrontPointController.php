@@ -151,10 +151,6 @@ class FrontPointController
             // ユーザー入力値
             $saveUsePoint = $form->get('plg_use_point')->getData();
 
-            //dump($lastPreUsePoint);
-            //dump($saveUsePoint);
-            //exit();
-
             // 最終保存ポイントと現在ポイントに相違があれば利用ポイント保存
             if (abs($lastPreUsePoint) != abs($usePoint)) {
                 if ($calculator->setDiscount($lastPreUsePoint)) {
