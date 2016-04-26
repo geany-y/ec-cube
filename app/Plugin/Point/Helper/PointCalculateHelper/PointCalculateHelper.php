@@ -318,6 +318,11 @@ class PointCalculateHelper
         // 商品詳細情報ををオーダーから取得
         $this->products = $this->getOrderDetail();
 
+        if (!$this->products) {
+            // 商品詳細がなければ処理終了
+            return;
+        }
+
         // 商品ごとのポイント付与率を取得
         $productRates = $this->app['eccube.plugin.point.repository.pointproductrate']->getPointProductRateByEntity(
             $this->products

@@ -5,6 +5,7 @@ namespace Plugin\Point;
 use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
 use Monolog\Logger;
+use Plugin\Point\Entity\PointInfo;
 
 /**
  * インストールハンドラー
@@ -51,27 +52,18 @@ class PluginManager extends AbstractPluginManager
      */
     public function enable($config, $app)
     {
-        $qb = $this->app['db']->createQueryBuilder();
-        $qb
-            ->insert('plg_point_info')
-            //->setValue('plg_point_info_id', ':plgPointInfoId')
-            ->setValue('plg_add_point_status', ':plgAddPointStatus')
-            ->setValue('plg_basic_point_rate', ':plgBasicPointRate')
-            ->setValue('plg_point_conversion_rate', ':plgPointConversionRate')
-            ->setValue('plg_round_type', ':plgRoundType')
-            ->setValue('plg_calculation_type', ':plgCalculationType')
-            ->setValue('create_date', ':CreateDate')
-            ->setValue('update_date', ':UpdateDate')
-            //->setParameter('plgPointInfoId', null)
-            ->setParameter('plgAddPointStatus', 1)
-            ->setParameter('plgBasicPointRate', 1)
-            ->setParameter('plgPointConversionRate', 1)
-            ->setParameter('plgRoundType', 1)
-            ->setParameter('plgCalculationType', 1)
-            ->setParameter('CreateDate', date('Y-m-d h:i:s'))
-            ->setParameter('UpdateDate', date('Y-m-d h:i:s'));
 
-        $qb->execute();
+        $PointInfo = new PointInfo();
+        $PointInfo
+            ->setPlgAddPointStatus(1)
+            ->setPlgBasicPointRate(1)
+            ->setPlgPointConversionRate(1)
+            ->setPlgRoundType(1)
+            ->setPlgCalculationType(1);
+
+        $this->app['orm.em']->persist($PointInfo);
+        $this->app['orm.em']->flush($PointInfo);
+
 
         // ページレイアウトにプラグイン使用時の値を代入
         $deviceType = $this->app['eccube.repository.master.device_type']->findOneById(10);
