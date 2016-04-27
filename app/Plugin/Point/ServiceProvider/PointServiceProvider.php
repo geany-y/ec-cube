@@ -2,7 +2,11 @@
 
 namespace Plugin\Point\ServiceProvider;
 
-use Plugin\Point\Doctrine\Listener\ORMListener;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Logger;
 use Plugin\Point\Helper\EventRoutineWorksHelper\EventRoutineWorksHelper;
 use Plugin\Point\Helper\EventRoutineWorksHelper\EventRoutineWorksHelperFactory;
 use Plugin\Point\Helper\PointCalculateHelper\PointCalculateHelper;
@@ -159,6 +163,29 @@ class PointServiceProvider implements ServiceProviderInterface
                 }
             )
         );
+
+        // ログファイル設定
+        $app['monolog.point'] = $app->share(function ($app) {
+            $logger = new $app['monolog.logger.class']('plugin.point');
+            $file = $app['config']['root_dir'].'/app/log/poing.log';
+            $RotateHandler = new RotatingFileHandler($file, $app['config']['log']['max_files'], Logger::INFO);
+            $RotateHandler->setFilenameFormat(
+                'point_{date}',
+                'Y-m-d'
+            );
+
+            $token = substr($app['session']->getId(), 0, 8);
+            $format = "[%datetime%][".$token."] %channel%.%level_name%: %message% %context% %extra%\n";
+            $RotateHandler->setFormatter(new LineFormatter($format));
+
+            $logger->pushHandler(
+                new FingersCrossedHandler(
+                    $RotateHandler,
+                    new ErrorLevelActivationStrategy(Logger::INFO)
+                )
+            );
+            return $logger;
+        });
     }
 
     /**
