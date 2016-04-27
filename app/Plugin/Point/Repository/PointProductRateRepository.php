@@ -139,7 +139,7 @@ class PointProductRateRepository extends EntityRepository
     public function getPointProductRateByEntity($entity = null)
     {
         // 値が取得出来ない際は処理をキャンセル
-        if (is_null($entity)) {
+        if (!$entity) {
             return null;
         }
 
