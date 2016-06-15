@@ -235,6 +235,10 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.plugin_event_handler'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\PluginEventHandler');
         });
+        $app['eccube.repository.crud'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Crud');
+        });
+
         // em
         if (isset($app['orm.em'])) {
             $app['orm.em'] = $app->share($app->extend('orm.em', function (\Doctrine\ORM\EntityManager $em, \Silex\Application $app) {
@@ -316,6 +320,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\CustomerAddressType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ForgotType();
             $types[] = new \Eccube\Form\Type\Front\CustomerLoginType($app['session']);
+            $types[] = new \Eccube\Form\Type\Front\CrudType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);
