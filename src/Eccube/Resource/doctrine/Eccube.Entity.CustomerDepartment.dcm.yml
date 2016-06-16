@@ -1,0 +1,31 @@
+Eccube\Entity\CustomerDepartment:
+    type: entity
+    table: dtb_customer_department
+    repositoryClass: Eccube\Repository\CustomerDepartmentRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: id
+            generator:
+                strategy: AUTO
+    fields:
+        department:
+            type: text
+            nullable: true
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+    manyToOne:
+        Customer:
+            targetEntity: Eccube\Entity\Customer
+            #inversedBy: department
+            joinColumn:
+                name: customer_id
+                referencedColumnName: customer_id
+    lifecycleCallbacks: {  }

@@ -159,4 +159,9 @@ Eccube\Entity\Customer:
         Orders:
             targetEntity: Eccube\Entity\Order
             mappedBy: Customer
+        department:
+            targetEntity: Eccube\Entity\CustomerDepartment
+            mappedBy: Customer
+            #orderBy:
+            #    id: ASC
     lifecycleCallbacks: {  }

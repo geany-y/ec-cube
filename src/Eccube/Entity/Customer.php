@@ -238,6 +238,11 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     private $Orders;
 
     /**
+     * @var string
+     */
+    private $department;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -1227,6 +1232,27 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     public function getZipcode()
     {
         return $this->zipcode;
+    }
+
+    /**
+     * Get department
+     *
+     * @return string
+     */
+    public function getDepartment()
+    {
+        return $this->department;
+    }
+
+    /**
+     * Set CustomerDepartment
+     *
+     * @param CustomerDepartment $Department
+     * @return CustomerDepartment
+     */
+    public function setDepartment($department)
+    {
+        return $this->department = $department;
     }
 
     /**
