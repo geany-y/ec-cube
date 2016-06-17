@@ -60,6 +60,15 @@ class CustomerType extends AbstractType
                     ))
                 ),
             ))
+            ->add('department', 'text', array(
+                'required' => false,
+                'label' => '部署名',
+                'constraints' => array(
+                    new Assert\Length(array(
+                        'max' => $config['stext_len'],
+                    ))
+                ),
+            ))
             ->add('zip', 'zip', array(
                 'required' => true,
             ))
@@ -128,7 +137,7 @@ class CustomerType extends AbstractType
                     )),
                 ),
             ))
-            ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+           ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
     }
 
     /**

@@ -88,6 +88,14 @@
                                 {{ form_errors(form.company_name) }}
                             </div>
                         </div>
+                        {# 部署名 #}
+                        <div id="detail_box__department" class="form-group">
+                            {{ form_label(form.department) }}
+                            <div class="col-sm-9 col-lg-10">
+                                {{ form_widget(form.department) }}
+                                {{ form_errors(form.department) }}
+                            </div>
+                        </div>
                         {# 住所：郵便番号 #}
                         <div id="detail_box__address" class="form-group">
                             {{ form_label(form.address) }}
